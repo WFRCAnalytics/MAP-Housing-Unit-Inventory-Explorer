@@ -1,0 +1,80 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>ArcGIS Maps SDK for JavaScript Tutorials: Display a map</title>
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+
+      
+
+    </style>
+	
+	<link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.28/"></script>
+	
+	
+	<script>
+    require([
+      "esri/config", 
+      "esri/Map",  
+      "esri/views/MapView",
+      "esri/layers/FeatureLayer"
+    ], function(esriConfig, Map, MapView, FeatureLayer) {
+		
+		esriConfig.apiKey = "AAPK5915b242a27845f389e0a11a17dc46b46gXNFj09FJVdb711lVLGhgoVFJBqdW6ow3bl71N1hx2llpMyogGBeF8kgvrKm3cY";
+
+    const map = new Map({
+      // basemap: "arcgis/topographic" // basemap styles service  
+      basemap: "arcgis-imagery"
+      //basemap: "arcgis-navigation"
+      //basemap: "arcgis-light-gray"
+
+    });
+
+    const view = new MapView({
+      map: map,
+      // center: [-118.80543,34.02700],
+      center: [-111.8587166, 40.7665529], // Longitude, latitude
+      zoom: 18, // Zoom level
+      container: "viewDiv" // Div element
+    });
+
+    // const trailheadsLayer = new FeatureLayer({
+    //   url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trailheads/FeatureServer/0"
+    // });
+
+    const housingLayer = new FeatureLayer({
+      url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/wfrc_hui_20220103_web_gdb/FeatureServer/3"
+    });
+
+    const housingRenderer = {
+        "type": "simple",
+        "symbol": {
+          "color": "#fb12ff",
+          "width": "18px",
+          "height": "18px"
+        }
+      }
+
+
+
+    // map.add(trailheadsLayer);
+    map.add(housingLayer);
+	  
+	  });
+    </script>
+	
+  </head>
+  <body>
+    <div id="viewDiv"></div>
+  </body>
+</html>

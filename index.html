@@ -3,9 +3,20 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
   <script src="https://js.arcgis.com/4.28/"></script>
   <script src="js/map.js"></script>
+  <script
+      type="module"
+      src="https://js.arcgis.com/calcite-components/1.9.2/calcite.esm.js"
+  ></script>
+  <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://js.arcgis.com/calcite-components/1.9.2/calcite.css"
+    />
+    <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css">
 
   <style>
   .item1 { grid-area: header; }
@@ -13,6 +24,7 @@
   .item3 { grid-area: main; }
   .item4 { grid-area: right; }
   .item5 { grid-area: footer; }
+  
 
   .grid-container {
     display: grid;
@@ -42,7 +54,7 @@
   <div class="item2">Menu</div>
   <div class="item3" id="main"></div>  
   <div class="item4">Right</div>
-  <div class="item5">Footer</div>
+  <div class="item5" id="footer"></div>
 </div>
 </body>
 </html>
