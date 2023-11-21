@@ -6,8 +6,7 @@
       content="initial-scale=1,maximum-scale=1,user-scalable=no"
     />
     <title>
-      TimeSlider widget and time zone | Sample | ArcGIS Maps SDK for JavaScript
-      4.28
+      Housing Unit Inventory Time Slider
     </title>
     <script
       type="module"
@@ -48,86 +47,192 @@
       }
     </style>
     <script>
-      require([
-        "esri/Map",
-        "esri/views/MapView",
-        "esri/layers/FeatureLayer",
-        "esri/widgets/TimeSlider",
-        "esri/widgets/Expand",
-        "esri/widgets/Legend",
-        "esri/widgets/TimeZoneLabel"
-      ], (
-        Map,
-        MapView,
-        FeatureLayer,
-        TimeSlider,
-        Expand,
-        Legend,
-        TimeZoneLabel
-      ) => {
-        const layer = new FeatureLayer({
-          // url: "https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/NDFD_Precipitation_v1/FeatureServer/0"
-          url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/housing_unit_inventory_2022_gdb/FeatureServer/0"
+        require([
+          "esri/Map",
+          "esri/views/MapView",
+          "esri/layers/FeatureLayer",
+          "esri/widgets/TimeSlider",
+          "esri/widgets/Expand",
+          "esri/widgets/Legend",
+          "esri/widgets/TimeZoneLabel"
+        ], (
+          Map,
+          MapView,
+          FeatureLayer,
+          TimeSlider,
+          Expand,
+          Legend,
+          TimeZoneLabel
+        ) => {
+
+            // arcade functions used to modify text in the popup window
+            const arcadeExpressionInfos = [
+            {
+              name: "capitalize-subtype-arcade",
+              title: "Subtype",
+              expression: "Proper($feature.SUBTYPE)"
+            },
+            {
+              name: "format-type-arcade",
+              title: "Type",
+              expression: "Proper(Replace($feature.TYPE, '_', ' '))"
+            }
+          ];
+
+            // renderer used to setup the symbolizaton of the housing layers
+            const housingRenderer = {
+              type: "unique-value",
+              legendOptions: {
+                  title: "Housing Type"
+              },
+              field: "SUBTYPE",
+              uniqueValueInfos: [{
+                  value: "single_family",
+                  label: "Single Family",
+                  symbol: {
+                      type: "simple-fill",
+                      color: [250, 236, 167, 0.5], // [R,G,B, Transparency]
+                      opacity: 0.5
+                  }
+              }, {
+                  value: "duplex",
+                  label: "Duplex",
+                  symbol: {
+                      type: "simple-fill",
+                      color: [252, 146, 31, 0.5]
+                  }
+              }, {
+                  value: "single_family_adu",
+                  label: "Single Family ADU",
+                  symbol: {
+                      type: "simple-fill",
+                      color: [230, 0, 73, 0.5]
+                  }
+              }, {
+                  value: "townhome",
+                  label: "Townhome",
+                  symbol: {
+                      type: "simple-fill",
+                      color: [40, 200, 48, 0.5]
+                  }
+              }, {
+                  value: "condo",
+                  label: "Condo",
+                  symbol: {
+                      type: "simple-fill",
+                      color: [158, 85, 156, 0.5]
+                  }
+              }, {
+                  value: "mobile_home_park",
+                  label: "Mobile Home Park",
+                  symbol: {
+                      type: "simple-fill",
+                      color: [91, 73, 196, 0.5]
+                  }
+              }, {
+                  value: 'mixed th/single_family',
+                  label: "Townhome/Single Family",
+                  symbol: {
+                      type: "simple-fill",
+                      color: [30, 133, 83, 0.5]
+                  }
+              }, {
+                  value: "apartment",
+                  label: "Apartment",
+                  symbol: {
+                      type: "simple-fill",
+                      color: [20, 158, 206, 0.5]
+                  }
+              }]
+            };
+
+            // create the feature layer
+            const housingLayer = new FeatureLayer({
+              url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/housing_unit_inventory_2022_gdb/FeatureServer/0",
+              renderer:housingRenderer,
+              popupTemplate:{
+              title: "{expression/capitalize-subtype-arcade} in {CITY}",
+              content: [
+                {
+                  type: "fields",
+                  fieldInfos: [
+                    {
+                      fieldName: "expression/format-type-arcade",
+                      label: "Type"
+                    },
+                    {
+                      fieldName: "expression/capitalize-subtype-arcade",
+                    }
+                  ],
+                }
+              ],
+              expressionInfos: arcadeExpressionInfos
+              }
+            });
+
+            // create the map object
+            const map = new Map({
+              basemap: "hybrid",
+              layers: [housingLayer] 
+            });
+
+            // initialize the view
+            const view = new MapView({
+              map: map,
+              container: "viewDiv",
+              center: [-111.8587166, 40.7665529], // Longitude, latitude
+              zoom: 18, // Zoom level
+            });
+
+            // when the view object is created, create a time slider
+            view.when(() => {
+              timeSlider = new TimeSlider({
+                container: "timeSlider",
+                view: view,
+                // full min max of time slider
+                fullTimeExtent: { 
+                  start: new Date(1850, 0, 1),
+                  end: new Date(2022, 0, 1)
+                },
+                // starting min max of time slider
+                timeExtent:{ 
+                  start: new Date(1850, 0, 1),
+                  end: new Date(2022, 0, 1)
+                },
+                // play speed, not needed?
+                playRate: 2000, 
+                stops: {
+                  interval: {
+                    value: 1,
+                    unit: "years"
+                  }
+                },
+                
+                // set custom labels for the timeslider's min, max, and extent dates
+                labelFormatFunction: (value, type, element, layout) => {
+                  const options = {year: 'numeric'}
+                  const normal = new Intl.DateTimeFormat("en-us", options);
+                  switch (type) {
+                    case "min":
+                      element.setAttribute("style", "color: #ff642e;");
+                      element.innerText = normal.format(value);
+                      break;
+                    case "max":
+                      element.setAttribute("style", "color: #ff642e;");
+                      element.innerText = normal.format(value);
+                      break;
+                    case "extent":
+                      const year0 = value[0].getFullYear();
+                      const year1 = value[1].getFullYear()
+                      element.innerText = `${year0} - ${year1}`;
+                      break;
+                  }
+                }
+              });
+            // add the time slider to the view, manual allows for div placement
+            view.ui.add(timeSlider, "manual");
+          });
         });
-
-        const map = new Map({
-          basemap: "hybrid",
-          layers: [layer]
-        });
-
-        const view = new MapView({
-          map: map,
-          container: "viewDiv",
-          zoom: 4,
-          center: [-100, 30]
-        });
-
-        // time slider widget initialization
-        const timeSlider = new TimeSlider({
-          container: "timeSlider",
-          view: view,
-          timeVisible: true, // show the time stamps on the timeslider
-          loop: true
-        });
-
-        // add the UI for a title
-        view.ui.add("titleDiv", "top-right");
-
-        view.whenLayerView(layer).then((lv) => {
-          // around up the full time extent to full hour
-          timeSlider.fullTimeExtent =
-            layer.timeInfo.fullTimeExtent.expandTo("hours");
-          timeSlider.stops = {
-            interval: layer.timeInfo.interval
-          };
-        });
-
-        // calcite input time zone component allows users to pick from one of the IANA
-        // time zones without having to add the time zones manually to a drop down
-        const timezonePicker = document.getElementById("timezone-picker");
-        view.ui.add("timezone-picker", "top-right");
-
-        // Change the map view's time zone when user picks a time zone from the component
-        timezonePicker.addEventListener("calciteInputTimeZoneChange", () => {
-          view.timeZone = timezonePicker.value;
-        });
-
-        // TimeZoneLabel lets users know what the time zone of the view is.
-        // This provides an important context to users how the date and times are displayed
-        view.ui.add(new TimeZoneLabel({ view: view }), "top-left");
-
-        const legend = new Legend({
-          view: view
-        });
-        const legendExpand = new Expand({
-          expandIcon: "legend",
-          expandTooltip: "Legend",
-          view: view,
-          content: legend,
-          expanded: false
-        });
-        view.ui.add(legendExpand, "top-left");
-      });
     </script>
   </head>
 
@@ -135,11 +240,8 @@
     <div id="viewDiv"></div>
     <div id="timeSlider"></div>
     <div id="titleDiv" class="esri-widget">
-      <div id="titleText">Precipitation forecast for next 72 hours</div>
+    <div id="titleText">Precipitation forecast for next 72 hours</div>
     </div>
-    <calcite-input-time-zone
-      mode="name"
-      id="timezone-picker"
-    ></calcite-input-time-zone>
+    
   </body>
 </html>
