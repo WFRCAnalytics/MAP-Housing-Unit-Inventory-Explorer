@@ -40,11 +40,44 @@
         bottom: 20px;
       }
 
+      #seasons-filter {
+        height: 120px;
+        width: 120px;
+        visibility: hidden;
+      }
+
+      .season-item {
+        width: 100%;
+        padding: 12px;
+        text-align: center;
+        vertical-align: baseline;
+        cursor: pointer;
+        height: 40px;
+      }
+
+      .season-item:focus {
+        background-color: dimgrey;
+      }
+
+      .season-item:hover {
+        background-color: dimgrey;
+      }
+
+
+
+
       #titleDiv {
         padding: 10px;
         font-weight: 36;
         text-align: center;
       }
+      
+      #titleText {
+        font-size: 20pt;
+        font-weight: 60;
+        padding-bottom: 10px;
+      }
+
     </style>
     <script>
         require([
@@ -54,7 +87,8 @@
           "esri/widgets/TimeSlider",
           "esri/widgets/Expand",
           "esri/widgets/Legend",
-          "esri/widgets/TimeZoneLabel"
+          "esri/widgets/TimeZoneLabel",
+          "esri/core/reactiveUtils"
         ], (
           Map,
           MapView,
@@ -62,7 +96,8 @@
           TimeSlider,
           Expand,
           Legend,
-          TimeZoneLabel
+          TimeZoneLabel,
+          reactiveUtils
         ) => {
 
             // arcade functions used to modify text in the popup window
@@ -146,6 +181,8 @@
               }]
             };
 
+            let floodLayerView;
+
             // create the feature layer
             const housingLayer = new FeatureLayer({
               url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/housing_unit_inventory_2022_gdb/FeatureServer/0",
@@ -166,7 +203,8 @@
                   ],
                 }
               ],
-              expressionInfos: arcadeExpressionInfos
+              expressionInfos: arcadeExpressionInfos,
+              outFields: ["*"]
               }
             });
 
@@ -224,23 +262,80 @@
                     case "extent":
                       const year0 = value[0].getFullYear();
                       const year1 = value[1].getFullYear()
-                      element.innerText = `${year0} - ${year1}`;
+                      element.innerText = `Year Built:
+                      ${year0} - ${year1}`;
                       break;
                   }
                 }
               });
+            
+              const seasonsNodes = document.querySelectorAll(`.season-item`);
+              const seasonsElement = document.getElementById("seasons-filter");
+
+              // click event handler for seasons choices
+              seasonsElement.addEventListener("click", filterBySeason);
+
+              // User clicked on Winter, Spring, Summer or Fall
+              // set an attribute filter on flood warnings layer view
+              // to display the warnings issued in that season
+              function filterBySeason(event) {
+                const selectedSeason = event.target.getAttribute("data-season");
+                floodLayerView.filter = {
+                  where: "COUNTY = '" + selectedSeason + "'"
+                };
+                
+                
+              }
+              
+              view.whenLayerView(housingLayer).then((layerView) => {
+              // flash flood warnings layer loaded
+              // get a reference to the flood warnings layerview
+              floodLayerView = layerView;
+
+              // set up UI items
+              seasonsElement.style.visibility = "visible";
+              const seasonsExpand = new Expand({
+                view: view,
+                content: seasonsElement,
+                expandIcon: "filter",
+                group: "top-left"
+              });
+              
+              //clear the filters when user closes the expand widget
+              reactiveUtils.when(
+                () => !seasonsExpand.expanded,
+                () => {
+                  floodLayerView.filter = null;
+                }
+              );
+              view.ui.add(seasonsExpand, "top-left");
+              view.ui.add("titleDiv", "top-right");
+            }); 
+
+
+
             // add the time slider to the view, manual allows for div placement
             view.ui.add(timeSlider, "manual");
+            // view.ui.add(seasonsExpand, "top-left");
+            // view.ui.add("titleDiv", "top-right");
           });
         });
     </script>
   </head>
 
   <body>
+    <div id="seasons-filter" class="esri-widget">
+      <div class="season-item visible-season" data-season="Weber">Weber</div>
+      <div class="season-item visible-season" data-season="Davis">Davis</div>
+      <div class="season-item visible-season" data-season="Salt Lake">Salt Lake</div>
+    </div>
+
     <div id="viewDiv"></div>
     <div id="timeSlider"></div>
+
     <div id="titleDiv" class="esri-widget">
-    <div id="titleText">Precipitation forecast for next 72 hours</div>
+      <div id="titleText">Housing Unit Inventory Explorer</div>
+      <div>January 2022</div>
     </div>
     
   </body>

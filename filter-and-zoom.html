@@ -1,0 +1,209 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>Zoom to extent of all features | Sample | ArcGIS Maps SDK for JavaScript 4.28</title>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css" />
+    <script src="https://js.arcgis.com/4.28/"></script>
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+
+    <script>
+      require([
+        "esri/Map",
+        "esri/views/MapView",
+        // "esri/views/SceneView",
+        "esri/layers/FeatureLayer",
+        "esri/widgets/LayerList",
+        "esri/core/Collection"
+    //   ], (Map, SceneView, FeatureLayer, LayerList, Collection) => {
+        ], (Map, MapView, FeatureLayer, LayerList, Collection) => {
+        const featureLayer = new FeatureLayer({
+          outFields: ["*"],
+          url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/housing_unit_inventory_2022_gdb/FeatureServer/0",
+          title: "Temperature on Jan, 4, 2017"
+        });
+
+        // When the layer is loaded, query for the extent
+        // of all features in the layer that satisfy the
+        // definitionExpression. Then set the view's
+        // extent to the returned extent of all features.
+
+        featureLayer.when(() => {
+          featureLayer.definitionExpression = createDefinitionExpression("");
+          zoomToLayer(featureLayer);
+        });
+
+        const map = new Map({
+          basemap: "dark-gray-vector",
+          layers: [featureLayer]
+        });
+
+        // const view = new SceneView({
+        //   container: "viewDiv",
+        //   map: map
+        // });
+
+        // initialize the view
+        const view = new MapView({
+              map: map,
+              container: "viewDiv",
+              center: [-111.8587166, 40.7665529], // Longitude, latitude
+              zoom: 18, // Zoom level
+            });
+
+        const layerList = new LayerList({
+          view: view,
+          listItemCreatedFunction: createActions
+        });
+        view.ui.add(layerList, "top-right");
+
+        // definitionExpressions used by each action
+        // listed in the LayerList
+
+        const expressions = new Collection([
+          {
+            id: "Single Family",
+            expression: "TYPE = 'single_family'"
+          },
+          {
+            id: "Multifamily",
+            expression: "TYPE = 'multi_family'"
+          },
+          {
+            id: "Owned Unit Grouping",
+            expression: "IS_OUG = 1"
+          },
+          {
+            id: "Affordable",
+            expression: "TOT_VALUE < 350000"
+          },
+          {
+            id: "Weber County",
+            expression: "COUNTY = 'Weber'"
+          },
+          {
+            id: "Davis County",
+            expression: "COUNTY = 'Davis'"
+          },
+          {
+            id: "Salt Lake County",
+            expression: "COUNTY = 'Salt Lake'"
+          }
+        ]);
+
+        // When an action is triggered, the definitionExpression
+        // is set on the layer and the view's extent updates
+        // to match the features visible in the layer
+
+        layerList.on("trigger-action", (event) => {
+          const actionId = event.action.id;
+          const layer = event.item.layer;
+
+          const subExpression = expressions.find((item) => {
+            return item.id === actionId;
+          }).expression;
+
+          const definitionExpression = createDefinitionExpression(subExpression);
+          layer.definitionExpression = definitionExpression;
+
+          zoomToLayer(layer);
+        });
+
+        function createActions(event) {
+          const item = event.item;
+
+          item.actionsOpen = true;
+          item.actionsSections = [
+            [
+              {
+                title: "Single Family-",
+                className: "esri-icon-zoom-out-fixed",
+                id: "Single Family"
+              },
+              {
+                title: "Multifamily-",
+                className: "esri-icon-zoom-out-fixed",
+                id: "Multifamily"
+              },
+              {
+                title: "Owned Unit Grouping-",
+                className: "esri-icon-zoom-out-fixed",
+                id: "Owned Unit Grouping"
+              },
+              {
+                title: "Affordable-",
+                className: "esri-icon-zoom-out-fixed",
+                id: "Affordable"
+              }
+            ],
+            [
+              {
+                title: "Weber County-",
+                className: "esri-icon-zoom-out-fixed",
+                id: "Weber County"
+              },
+              {
+                title: "Davis County-",
+                className: "esri-icon-zoom-out-fixed",
+                id: "Davis County"
+              },
+              {
+                title: "Salt Lake County-",
+                className: "esri-icon-zoom-out-fixed",
+                id: "Salt Lake County"
+              }
+            ]
+          ];
+        }
+
+        // Appends a definitionExpression to a base expression
+        // the base expression only returns freatures in
+        // Canada, USA, and Mexico. It excludes some US territories
+        // located on the other side of the dateline
+
+        function createDefinitionExpression(subExpression) {
+          const baseExpression =
+            "( COUNTRY LIKE '%United States Of America%' OR " +
+            "COUNTRY LIKE '%Canada%' OR " +
+            "COUNTRY LIKE '%Mexico%') AND NOT" +
+            "(COUNTRY LIKE '%Johnston/Wake/Xmas%' OR " +
+            "COUNTRY LIKE '%Hawaii%' OR " +
+            "COUNTRY LIKE '%Marshall Islands%' OR " +
+            "STATION_NAME = 'Eareckson/Shemya' OR " +
+            "COUNTRY LIKE '%Guam%' )";
+
+        //   return subExpression ? baseExpression + " AND (" + subExpression + ")" : baseExpression;
+          return subExpression;
+        }
+
+        // Zooms to the extent of the layer as defined by
+        // its definitionExpression
+        // This method will work for all FeatureLayers, even
+        // those without a saved `fullExtent` on the service.
+
+        function zoomToLayer(layer) {
+          return layer.queryExtent().then((response) => {
+            view.goTo(response.extent)
+            .catch((error) => {
+              console.error(error);
+            });
+          });
+        }
+      });
+    </script>
+  </head>
+
+  <body>
+    <div id="viewDiv"></div>
+  </body>
