@@ -1,0 +1,277 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>Filter and Zoom</title>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css" />
+    <script src="https://js.arcgis.com/4.28/"></script>
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+
+
+    </style>
+
+    <script>
+      require(["esri/Map", "esri/layers/FeatureLayer", "esri/views/MapView"], (
+  Map,
+  FeatureLayer,
+  MapView
+) => {
+
+  
+  // renderer used to setup the symbolizaton of the housing layers
+  const parcelRenderer = {
+              type: "unique-value",
+              legendOptions: {
+                  title: "Housing Type"
+              },
+              field: "SUBTYPE",
+              uniqueValueInfos: [{
+                  value: "single_family",
+                  label: "Single Family",
+                  symbol: {
+                      type: "simple-fill",
+                      color: [250, 236, 167, 0.5], // [R,G,B, Transparency]
+                  }
+              }, {
+                  value: "duplex",
+                  label: "Duplex",
+                  symbol: {
+                      type: "simple-fill",
+                      color: [252, 146, 31, 0.5]
+                  }
+              }, {
+                  value: "single_family_adu",
+                  label: "Single Family ADU",
+                  symbol: {
+                      type: "simple-fill",
+                      color: [230, 0, 73, 0.5]
+                  }
+              }, {
+                  value: "townhome",
+                  label: "Townhome",
+                  symbol: {
+                      type: "simple-fill",
+                      color: [40, 200, 48, 0.5]
+                  }
+              }, {
+                  value: "condo",
+                  label: "Condo",
+                  symbol: {
+                      type: "simple-fill",
+                      color: [158, 85, 156, 0.5]
+                  }
+              }, {
+                  value: "mobile_home_park",
+                  label: "Mobile Home Park",
+                  symbol: {
+                      type: "simple-fill",
+                      color: [91, 73, 196, 0.5]
+                  }
+              }, {
+                  value: 'mixed th/single_family',
+                  label: "Townhome/Single Family",
+                  symbol: {
+                      type: "simple-fill",
+                      color: [30, 133, 83, 0.5]
+                  }
+              }, {
+                  value: "apartment",
+                  label: "Apartment",
+                  symbol: {
+                      type: "simple-fill",
+                      color: [20, 158, 206, 0.5]
+                  }
+              }]
+            };
+      // renderer used to setup the symbolizaton of the housing layers
+  
+      dPixelSize = "6px"
+      dOutlineWidth = 1
+      transparency = 1
+      PtOutlineColor = [40,40,40]
+
+      const pointRenderer = {
+              type: "unique-value",
+              legendOptions: {
+                  title: "Housing Type"
+              },
+              field: "SUBTYPE",
+              uniqueValueInfos: [{
+                  value: "single_family",
+                  label: "Single Family",
+                  symbol: {
+                    type: "simple-marker",
+                    color: [250, 236, 167, transparency], // [R,G,B, Transparency]
+                    size: dPixelSize,
+                    outline: {
+                      color: PtOutlineColor,
+                      width: dOutlineWidth
+                  }
+                }
+              }, {
+                  value: "duplex",
+                  label: "Duplex",
+                  symbol: {
+                      type: "simple-marker",
+                      color: [252, 146, 31, 0.5],
+                      size: dPixelSize,
+                      outline: {
+                        color: PtOutlineColor,
+                        width: dOutlineWidth
+                    }
+                  }
+              }, {
+                  value: "single_family_adu",
+                  label: "Single Family ADU",
+                  symbol: {
+                      type: "simple-marker",
+                      color: [230, 0, 73, 0.5],
+                      size: dPixelSize,
+                      outline: {
+                        color: PtOutlineColor,
+                        width: dOutlineWidth
+                    }
+                  }
+              }, {
+                  value: "townhome",
+                  label: "Townhome",
+                  symbol: {
+                      type: "simple-marker",
+                      color: [40, 200, 48, 0.5],
+                      size: dPixelSize,
+                      outline: {
+                        color: PtOutlineColor,
+                        width: dOutlineWidth
+                    }
+                  }
+              }, {
+                  value: "condo",
+                  label: "Condo",
+                  symbol: {
+                      type: "simple-marker",
+                      color: [158, 85, 156, 0.5],
+                      size: dPixelSize,
+                      outline: {
+                        color: PtOutlineColor,
+                        width: dOutlineWidth
+                    }
+                  }
+              }, {
+                  value: "mobile_home_park",
+                  label: "Mobile Home Park",
+                  symbol: {
+                      type: "simple-marker",
+                      color: [91, 73, 196, 0.5],
+                      size: dPixelSize,
+                      outline: {
+                        color: PtOutlineColor,
+                        width: dOutlineWidth
+                    }
+                  }
+              }, {
+                  value: 'mixed th/single_family',
+                  label: "Townhome/Single Family",
+                  symbol: {
+                      type: "simple-marker",
+                      color: [30, 133, 83, 0.5],
+                      size: dPixelSize,
+                      outline: {
+                        color: PtOutlineColor,
+                        width: dOutlineWidth
+                    }
+                  }
+              }, {
+                  value: "apartment",
+                  label: "Apartment",
+                  symbol: {
+                      type: "simple-marker",
+                      color: [20, 158, 206, 0.5],
+                      size: dPixelSize,
+                      outline: {
+                        color: PtOutlineColor,
+                        width: dOutlineWidth
+                    }
+                  }
+              }]
+            };
+
+  
+
+  const ParcelsLayer = new FeatureLayer({
+          outFields: ["*"],
+          url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/housing_unit_inventory_2022_gdb/FeatureServer/0",
+          renderer:parcelRenderer,
+          visible: false
+        });
+  
+  const PointsLayer = new FeatureLayer({
+    url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/housing_unit_inventory_2022_gdb/FeatureServer/3",
+    renderer:pointRenderer,
+    outFields: ["*"],
+    visible: true
+  });
+
+  // let housingLayer
+
+  // function setLayer(_zoom) {
+  //   if (_zoom >= 15) {
+  //     housingLayer = ParcelsLayer;
+  //   } if (_zoom < 15 && _zoom > 5) {
+  //     housingLayer = PointsLayer;
+  //   }
+  // }
+
+  const defaultZoom = 10
+
+  const map = new Map({
+    basemap: "dark-gray-vector",
+    layers: [PointsLayer, ParcelsLayer],
+  });
+
+  const view = new MapView({
+    container: "viewDiv",
+    map: map,
+    zoom: defaultZoom,
+    center: [-111.8587166, 40.7665529]
+  });
+
+
+  // Add an event listener for the zoom change
+  view.watch("zoom", function (newZoom) {
+    console.log("Zoom level changed to: ", newZoom);
+
+    if (newZoom >= 15){ 
+      ParcelsLayer.visible = true;
+      PointsLayer.visible = false;
+    }
+    else if (newZoom < 15 && newZoom > 5){ 
+      ParcelsLayer.visible = false;
+      PointsLayer.visible = true;
+    }else{
+      ParcelsLayer.visible = false;
+      PointsLayer.visible = false;
+    }
+  });
+
+  
+
+  
+
+});
+
+    </script>
+  </head>
+
+  <body>
+    <div id="viewDiv"></div>
+  </body>
