@@ -2,8 +2,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
-    <title>Filter and Zoom</title>
+    <title>Housing Inventory Explorer</title>
 
+    <script type="module" src="https://js.arcgis.com/calcite-components/1.9.2/calcite.esm.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.9.2/calcite.css"/>
     <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css" />
     <script src="https://js.arcgis.com/4.28/"></script>
 
@@ -17,6 +19,60 @@
         width: 100%;
       }
 
+      #timeSlider {
+        position: absolute;
+        left: 5%;
+        right: 5%;
+        bottom: 20px;
+      }
+
+      #seasons-filter {
+        height: 120px;
+        width: 120px;
+        visibility: hidden;
+      }
+
+      .season-item {
+        width: 100%;
+        padding: 12px;
+        text-align: center;
+        vertical-align: baseline;
+        cursor: pointer;
+        height: 40px;
+      }
+
+      .season-item:focus {
+        background-color: dimgrey;
+      }
+
+      .season-item:hover {
+        background-color: dimgrey;
+      }
+      
+      #info {
+        z-index: 99;
+        position: absolute;
+        top: 15px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        padding: 10px 15px 5px 15px;
+        margin-left: auto;
+        margin-right: auto;
+        width: 30%;
+        background: rgba(255, 255, 255, 1);
+        font-size: 25pt;
+      }
+      /* #titleDiv {
+        padding: 10px;
+        font-weight: 36;
+        text-align: center;
+      } */
+      
+      #titleText {
+        font-size: 16pt;
+        font-weight: 500;
+      }
 
     </style>
 
@@ -25,15 +81,36 @@
                "esri/layers/FeatureLayer", 
                "esri/views/MapView", 
                "esri/widgets/Legend",
-               "esri/widgets/Expand"], (
+               "esri/widgets/TimeSlider",
+               "esri/widgets/Expand",
+               "esri/widgets/BasemapGallery",
+               "esri/core/reactiveUtils"], (
   Map,
   FeatureLayer,
   MapView,
   Legend,
-  Expand
+  TimeSlider,
+  Expand,
+  BasemapGallery,
+  reactiveUtils,
+  
 ) => {
 
-  
+  // arcade functions used to modify text in the popup window
+  const arcadeExpressionInfos = [
+          {
+            name: "capitalize-subtype-arcade",
+            title: "Subtype",
+            expression: "Proper($feature.SUBTYPE)"
+          },
+          {
+            name: "format-type-arcade",
+            title: "Type",
+            expression: "Proper(Replace($feature.TYPE, '_', ' '))"
+          }
+        ];
+
+
   // renderer used to setup the symbolizaton of the housing layers
   const parcelRenderer = {
               type: "unique-value",
@@ -227,18 +304,9 @@
       visible: true
     });
 
-  // let housingLayer
 
-  // function setLayer(_zoom) {
-  //   if (_zoom >= 15) {
-  //     housingLayer = ParcelsLayer;
-  //   } if (_zoom < 15 && _zoom > 5) {
-  //     housingLayer = PointsLayer;
-  //   }
-  // }
-
-  const defaultZoom = 10
-
+  // Create the Map and View objects
+  const defaultZoom = 9
   const map = new Map({
     basemap: "dark-gray-vector",
     layers: [PointsLayer, ParcelsLayer],
@@ -248,16 +316,45 @@
     container: "viewDiv",
     map: map,
     zoom: defaultZoom,
-    center: [-111.8587166, 40.7665529]
+    center: [-111.98, 40.86]
   });
+
+
+  // create the base map gallery expand object
+  const basemapGallery = new BasemapGallery({
+          view: view,
+          container: document.createElement("div")
+        });
+
+  // Create an Expand instance and set the content
+  // property to the DOM node of the basemap gallery widget
+  // Use an Esri icon font to represent the content inside
+  // of the Expand widget
+  const bgExpand = new Expand({
+    expandTooltip: "Basemap",
+    view: view,
+    content: basemapGallery
+  });
+
+  // close the expand whenever a basemap is selected
+  // on mobile devices
+  reactiveUtils.watch(
+    () => basemapGallery.activeBasemap,
+    () => {
+      const mobileSize = view.heightBreakpoint === "xsmall" || view.widthBreakpoint === "xsmall";
+
+      if (mobileSize) {
+        bgExpand.collapse();
+      }
+    }
+  );
+
+  // Add the expand instance to the ui
+  view.ui.add(bgExpand, "top-right");
 
   view.when(() => {
           // get the first layer in the collection of operational layers in the WebMap
           // when the resources in the MapView have loaded.
-          // const featureLayer = webmap.layers.getItemAt(0);
-
-          
-
           const legend = new Legend({
             view: view,
             layerInfos: [
@@ -273,15 +370,73 @@
           });
 
           const legendExpand = new Expand({
+          expandIcon: "legend",
+          expandTooltip: "Legend",
           view: view,
           content: legend
           });
 
           // Add widget to the bottom right corner of the view
-          // view.ui.add(legend, "bottom-right");
-          view.ui.add(legendExpand, "bottom-right");
+          view.ui.add(legendExpand, "top-right");
         });
   
+  
+  // when the view object is created, create a time slider
+  view.when(() => {
+              timeSlider = new TimeSlider({
+                container: "timeSlider",
+                view: view,
+                // full min max of time slider
+                fullTimeExtent: { 
+                  start: new Date(1850, 0, 1),
+                  end: new Date(2022, 0, 1)
+                },
+                // starting min max of time slider
+                timeExtent:{ 
+                  start: new Date(1850, 0, 1),
+                  end: new Date(2022, 0, 1)
+                },
+                // play speed, not needed?
+                playRate: 2000, 
+                stops: {
+                  interval: {
+                    value: 1,
+                    unit: "years"
+                  }
+                },
+                
+                // set custom labels for the timeslider's min, max, and extent dates
+                labelFormatFunction: (value, type, element, layout) => {
+                  const options = {year: 'numeric'}
+                  const normal = new Intl.DateTimeFormat("en-us", options);
+                  switch (type) {
+                    case "min":
+                      element.setAttribute("style", "color: #ff642e;");
+                      element.innerText = normal.format(value);
+                      break;
+                    case "max":
+                      element.setAttribute("style", "color: #ff642e;");
+                      element.innerText = normal.format(value);
+                      break;
+                    case "extent":
+                      const year0 = value[0].getFullYear();
+                      const year1 = value[1].getFullYear()
+                      element.innerText = `Year Built:
+                      ${year0} - ${year1}`;
+                      break;
+                  }
+                }
+              });
+            
+
+
+
+
+            // add the time slider to the view, manual allows for div placement
+            view.ui.add(timeSlider, "manual");
+          });
+
+
 
 
   // Add an event listener for the zoom change
@@ -312,4 +467,10 @@
 
   <body>
     <div id="viewDiv"></div>
+    <div id="timeSlider"></div>
+
+    <div id="info" class="esri-widget">
+      <div id="titleText">Housing Unit Inventory Explorer (Jan 2022)</div>
+    </div>
+
   </body>
