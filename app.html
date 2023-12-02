@@ -3,9 +3,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
     <title>Housing Inventory Explorer</title>
-
     <script type="module" src="https://js.arcgis.com/calcite-components/1.9.2/calcite.esm.js"></script>
     <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.9.2/calcite.css"/>
+    <!-- Load the Chart.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
     <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css" />
     <script src="https://js.arcgis.com/4.28/"></script>
 
@@ -26,28 +27,6 @@
         bottom: 20px;
       }
 
-      #seasons-filter {
-        height: 120px;
-        width: 120px;
-        visibility: hidden;
-      }
-
-      .season-item {
-        width: 100%;
-        padding: 12px;
-        text-align: center;
-        vertical-align: baseline;
-        cursor: pointer;
-        height: 40px;
-      }
-
-      .season-item:focus {
-        background-color: dimgrey;
-      }
-
-      .season-item:hover {
-        background-color: dimgrey;
-      }
       
       #info {
         z-index: 99;
@@ -63,15 +42,17 @@
         background: rgba(255, 255, 255, 1);
         font-size: 25pt;
       }
-      /* #titleDiv {
-        padding: 10px;
-        font-weight: 36;
-        text-align: center;
-      } */
+
       
       #titleText {
         font-size: 16pt;
         font-weight: 500;
+      }
+
+      #sidebarDiv {
+        width: 240px;
+        padding: 10px;
+        height: 200px;
       }
 
     </style>
@@ -111,7 +92,9 @@
         ];
 
 
+
   // renderer used to setup the symbolizaton of the housing layers
+  const parcelTransparency = .5;
   const parcelRenderer = {
               type: "unique-value",
               legendOptions: {
@@ -123,61 +106,61 @@
                   label: "Single Family",
                   symbol: {
                       type: "simple-fill",
-                      color: [250, 236, 167], // [R,G,B, Transparency]
+                      color: [250, 236, 167, parcelTransparency], // [R,G,B, Transparency]
                   }
               }, {
                   value: "duplex",
                   label: "Duplex",
                   symbol: {
                       type: "simple-fill",
-                      color: [252, 146, 31]
+                      color: [252, 146, 31, parcelTransparency]
                   }
               }, {
                   value: "single_family_adu",
                   label: "Single Family ADU",
                   symbol: {
                       type: "simple-fill",
-                      color: [230, 0, 73]
+                      color: [230, 0, 73,parcelTransparency]
                   }
               }, {
                   value: "townhome",
                   label: "Townhome",
                   symbol: {
                       type: "simple-fill",
-                      color: [40, 200, 48]
+                      color: [40, 200, 48,parcelTransparency]
                   }
               }, {
                   value: "condo",
                   label: "Condo",
                   symbol: {
                       type: "simple-fill",
-                      color: [158, 85, 156]
+                      color: [158, 85, 156,parcelTransparency]
                   }
               }, {
                   value: "mobile_home_park",
                   label: "Mobile Home Park",
                   symbol: {
                       type: "simple-fill",
-                      color: [91, 73, 196]
+                      color: [91, 73, 196,parcelTransparency]
                   }
               }, {
                   value: 'mixed th/single_family',
                   label: "Townhome/Single Family",
                   symbol: {
                       type: "simple-fill",
-                      color: [30, 133, 83]
+                      color: [30, 133, 83,parcelTransparency]
                   }
               }, {
                   value: "apartment",
                   label: "Apartment",
                   symbol: {
                       type: "simple-fill",
-                      color: [20, 158, 206]
+                      color: [20, 158, 206,parcelTransparency]
                   }
               }]
             };
+            
       // renderer used to setup the symbolizaton of the housing layers
-  
       dPixelSize = "6px"
       dOutlineWidth = 1
       transparency = 1
@@ -435,13 +418,35 @@
             // add the time slider to the view, manual allows for div placement
             view.ui.add(timeSlider, "manual");
           });
+  
+  // filter and zoom
+  const initialDefinitionExpression =  "COUNTY IN ('Davis', 'Salt Lake', 'Weber')";
+  const countySelect = document.getElementById("countySelect");
+  let activeQuery = initialDefinitionExpression
+  countySelect.addEventListener("change", () => {
+    map.layers.forEach((layer) => { // can this just be the housing Feature layer?
+      activeQuery = countySelect.value
+      layer.definitionExpression = countySelect.value;
+    });
+    PointsLayer.queryExtent().then((results) => {
+      view.goTo(results.extent);
+    });
+  });
 
+  typeSelect.addEventListener("change", () => {
+    map.layers.forEach((layer) => {
+      layer.definitionExpression = activeQuery + " AND " + typeSelect.value; // Seems like the query could keep growing dangerously
+    });
+    // housingLayer.queryExtent().then((results) => { 
+    //   view.goTo(results.extent);
+    // });
+  });
 
-
+  view.ui.add("sidebarDiv", { position: "top-left" });
 
   // Add an event listener for the zoom change
   view.watch("zoom", function (newZoom) {
-    console.log("Zoom level changed to: ", newZoom);
+    // console.log("Zoom level changed to: ", newZoom);
 
     if (newZoom >= 15){ 
       ParcelsLayer.visible = true;
@@ -471,6 +476,26 @@
 
     <div id="info" class="esri-widget">
       <div id="titleText">Housing Unit Inventory Explorer (Jan 2022)</div>
+    </div>
+
+    <div id="sidebarDiv" class="esri-widget">
+      
+      <h4 class="esri-heading">Filter by County</h4>
+      <select id="countySelect">
+        <option value="COUNTY IN ('Davis', 'Salt Lake', 'Weber')">All Counties</option>
+        <option value="COUNTY = 'Davis'">Davis</option>
+        <option value="COUNTY = 'Salt Lake'">Salt Lake</option>
+        <option value="COUNTY = 'Weber'">Weber</option>
+      </select>
+
+      <!-- This needs to reset to the default when the county is selected -->
+      <h4 class="esri-heading">Filter by Housing Type</h4> // this needs to
+      <select id="typeSelect">
+        <option value="TYPE IN ('single_family', 'multi_family')">All Types</option>
+        <option value="TYPE = 'single_family'">Single Family</option>
+        <option value="TYPE = 'multi_family'">Multifamily</option>
+      </select>
+
     </div>
 
   </body>
