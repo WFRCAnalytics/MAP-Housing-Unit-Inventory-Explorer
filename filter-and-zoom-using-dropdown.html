@@ -19,7 +19,7 @@
       #sidebarDiv {
         width: 240px;
         padding: 10px;
-        height: 200px;
+        height: 400px;
       }
 
 
@@ -131,8 +131,118 @@
   });
 
   const countySelect = document.getElementById("countySelect");
+  const citySelect = document.getElementById("citySelect");
+  const subcountySelect = document.getElementById("subcountySelect");
+  const typeSelect = document.getElementById("typeSelect");
 
   let activeQuery = initialDefinitionExpression
+
+
+  // query all features from the wells layer
+  view
+        .when(function () {
+          return housingLayer.when(function () {
+            var query = housingLayer.createQuery();
+            return housingLayer.queryFeatures(query);
+          });
+        })
+        .then(getValues)
+        .then(getUniqueValues)
+        .then(addToSelect)
+
+
+  // return an array of all the values in the
+      // STATUS2 field of the wells layer
+      function getValues(response) {
+        var features = response.features;
+        var values = features.map(function (feature) {
+          return {
+            COUNTY: feature.attributes.COUNTY,
+            TYPE: feature.attributes.TYPE,
+            CITY: feature.attributes.CITY,
+            SUBCOUNTY: feature.attributes.SUBCOUNTY
+          }
+        });
+        return values;
+      }
+
+
+  // return an array of unique values in
+      // the STATUS2 field of the wells layer
+      function getUniqueValues(values) {
+        var uniqueCountyValues = [];
+        var uniqueTypeValues = [];
+        var uniqueCityValues = [];
+        var uniqueSubCountyValues = [];
+
+        values.forEach(function (item, i) {
+          var countyVal = item.COUNTY
+          var typeVal = item.TYPE
+          var cityVal = item.CITY
+          var subCountyVal = item.SUBCOUNTY
+
+
+          if (
+              (uniqueCountyValues.length < 1 || uniqueCountyValues.indexOf(countyVal) === -1) &&
+              countyVal !== ""
+          ) {
+              uniqueCountyValues.push(countyVal);
+            }
+
+          if (
+              (uniqueTypeValues.length < 1 || uniqueTypeValues.indexOf(typeVal) === -1) &&
+              typeVal !== ""
+          ) {
+            uniqueTypeValues.push(typeVal);
+            }
+          
+          // continue here
+
+
+          if (
+              (uniqueCityValues.length < 1 || uniqueCityValues.indexOf(cityVal) === -1) &&
+              cityVal !== ""
+          ) {
+              uniqueCityValues.push(cityVal);
+            }
+
+          if (
+            (uniqueSubCountyValues.length < 1 || uniqueSubCountyValues.indexOf(subCountyVal) === -1) &&
+            subCountyVal !== ""
+          ) {
+            uniqueSubCountyValues.push(subCountyVal);
+            }
+
+        });
+        return {
+          uCityVals: uniqueCityValues,
+          uSubCountyVals: uniqueSubCountyValues
+        };
+      }
+
+      // Add the unique values to the wells type
+      // select element. This will allow the user
+      // to filter wells by type.
+      function addToSelect(values) {
+        values.uCityVals.sort();
+        values.uCityVals.forEach(function (value) {
+          var option = document.createElement("option");
+          option.text = value;
+          citySelect.add(option);
+        });
+
+        values.uSubCountyVals.sort();
+        values.uSubCountyVals.forEach(function (value) {
+          var option = document.createElement("option");
+          option.text = value;
+          subcountySelect.add(option);
+        });
+
+        // return setDefinitionExpression();
+      }
+
+
+
 
   countySelect.addEventListener("change", () => {
     map.layers.forEach((layer) => { // can this just be the housing Feature layer?
@@ -166,7 +276,7 @@
     <div id="sidebarDiv" class="esri-widget">
       
       <h4 class="esri-heading">Filter by County</h4>
-      <select id="countySelect">
+      <select id="countySelect" class="esri-widget">
         <option value="COUNTY IN ('Davis', 'Salt Lake', 'Weber')">All Counties</option>
         <option value="COUNTY = 'Davis'">Davis</option>
         <option value="COUNTY = 'Salt Lake'">Salt Lake</option>
@@ -174,11 +284,17 @@
       </select>
 
       <h4 class="esri-heading">Filter by Housing Type</h4>
-      <select id="typeSelect">
+      <select id="typeSelect" class="esri-widget">
         <option value="TYPE IN ('single_family', 'multi_family')">All Types</option>
         <option value="TYPE = 'single_family'">Single Family</option>
         <option value="TYPE = 'multi_family'">Multifamily</option>
       </select>
+
+      <h4 class="esri-heading">Filter by City</h4>
+      <select id="citySelect" class="esri-widget"></select>
+      
+      <h4 class="esri-heading">Filter by Subcounty</h4>
+      <select id="subcountySelect" class="esri-widget"></select>
 
     </div>
   </body>

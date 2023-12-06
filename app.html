@@ -22,9 +22,10 @@
 
       #timeSlider {
         position: absolute;
+        width: 1600px;
         left: 5%;
         right: 5%;
-        bottom: 20px;
+        bottom: 0px;
       }
 
       
@@ -38,21 +39,36 @@
         padding: 10px 15px 5px 15px;
         margin-left: auto;
         margin-right: auto;
-        width: 30%;
+        width: 25%;
         background: rgba(255, 255, 255, 1);
         font-size: 25pt;
       }
 
-      
       #titleText {
         font-size: 16pt;
         font-weight: 500;
       }
 
+      #infoDiv {
+        padding: 10px;
+        width: 320px;
+        height: 420px;
+        font-size: 14px;
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+
+      #instructionsDiv{
+        width: 240px;
+        padding: 10px;
+        height: 300px;
+        /* margin-top: 2000px; */
+      }
+
       #sidebarDiv {
         width: 240px;
         padding: 10px;
-        height: 200px;
+        height: 300px;
       }
 
     </style>
@@ -289,9 +305,9 @@
 
 
   // Create the Map and View objects
-  const defaultZoom = 9
+  const defaultZoom = 10
   const map = new Map({
-    basemap: "dark-gray-vector",
+    basemap: "satellite",
     layers: [PointsLayer, ParcelsLayer],
   });
 
@@ -299,7 +315,7 @@
     container: "viewDiv",
     map: map,
     zoom: defaultZoom,
-    center: [-111.98, 40.86]
+    center: [-111.98, 40.94]
   });
 
 
@@ -318,6 +334,19 @@
     view: view,
     content: basemapGallery
   });
+
+  // add the wind rose chart div
+  const infoDiv = document.getElementById("infoDiv");
+          const infoDivExpand = new Expand({
+            expandIcon: "information",
+            expandTooltip: "Info",
+            view,
+            content: infoDiv,
+            expanded: false
+          });
+          view.ui.add(infoDivExpand, "top-right");
+
+
 
   // close the expand whenever a basemap is selected
   // on mobile devices
@@ -412,13 +441,26 @@
               });
             
 
+            // Option 1: time slider expand
+            const timeSliderExpand = new Expand({
+                expandIcon: "calendar",
+                expandTooltip: "TimeSlider",
+                view,
+                content: timeSlider.container,
+                expanded: false
+              });
+            
+            view.ui.add(timeSliderExpand, "bottom-left");
 
 
-
-            // add the time slider to the view, manual allows for div placement
-            view.ui.add(timeSlider, "manual");
+            // Option 2: add the time slider (non-expandable) to the view, manual allows for div placement
+            // view.ui.add(timeSlider, "manual");
           });
   
+  
+
+
+
   // filter and zoom
   const initialDefinitionExpression =  "COUNTY IN ('Davis', 'Salt Lake', 'Weber')";
   const countySelect = document.getElementById("countySelect");
@@ -461,6 +503,8 @@
     }
   });
 
+
+
   
 
   
@@ -481,7 +525,7 @@
     <div id="sidebarDiv" class="esri-widget">
       
       <h4 class="esri-heading">Filter by County</h4>
-      <select id="countySelect">
+      <select id="countySelect" class="esri-input esri-select">
         <option value="COUNTY IN ('Davis', 'Salt Lake', 'Weber')">All Counties</option>
         <option value="COUNTY = 'Davis'">Davis</option>
         <option value="COUNTY = 'Salt Lake'">Salt Lake</option>
@@ -490,12 +534,22 @@
 
       <!-- This needs to reset to the default when the county is selected -->
       <h4 class="esri-heading">Filter by Housing Type</h4> // this needs to
-      <select id="typeSelect">
+      <select id="typeSelect" class="esri-input esri-select">
         <option value="TYPE IN ('single_family', 'multi_family')">All Types</option>
         <option value="TYPE = 'single_family'">Single Family</option>
         <option value="TYPE = 'multi_family'">Multifamily</option>
       </select>
-
     </div>
+
+    <div id="infoDiv" class="esri-widget">
+      <h4 class="esri-widget__heading esri-editor__title">Summary</h4>
+      <div class="esri-widget">
+        <p>This map highlights the basic types and quantities of existing housing in Davis, Salt Lake and Weber counties. The filters below allow for a closer look at counties, cities, trends over time, and transit station and freeway distance buffers. </p>
+        <p> WFRC uses the County Assessor <a href="https://gis.utah.gov/data/cadastre/parcels/"> tax parcel GIS data</a> gathered annually by UGRC as a key input to its land use models and forecasts.</p>
+        <p>The Housing Unit Inventory shown in this webmap is derived from January 1, 2020 residential data from the Assessor’s tax parcels, adding in unit count estimates for rental properties and grouping housing units together that share adjoining ‘common areas’ (e.g. condos and HOAs).</p>
+        <p>For more information about this dataset, consult our <a href="https://docs.google.com/document/d/1W-ZdTamoB-rMPg91OTFyEO3OlI5LE0Vq7meF3oKFgVM/edit">metadata</a> or contact <a href="mailto:analytics@wfrc.org"> analytics@wfrc.org</a>.</p>
+      </div>
+    </div>
+
 
   </body>
