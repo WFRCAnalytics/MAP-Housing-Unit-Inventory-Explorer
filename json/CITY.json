@@ -1,0 +1,308 @@
+[
+	{
+		"NAME":"-No Selection-",
+		"COUNTY":["-No Selection-", "Davis", "Salt Lake", "Weber"],
+		"CITY":["-No Selection-", "Bluffdale", "Bountiful", "Centerville", "Clearfield", "Clinton", "Copperton", "Cottonwood Heights", "Draper", "Emigration Canyon", "Farmington", "Farr West", "Fruit Heights", "Harrisville", "Herriman", "Holladay", "Hooper", "Kaysville", "Kearns Township", "Layton", "Magna Township", "Marriott-Slaterville", "Midvale", "Millcreek", "Murray", "None", "North Ogden", "North Salt Lake", "Ogden", "Plain City", "Pleasant View", "Riverdale", "Riverton", "Roy", "Salt Lake City", "Sandy", "South Jordan", "South Ogden", "South Salt Lake", "South Weber", "Sunset", "Syracuse", "Taylorsville", "Uintah", "Washington Terrace", "West Bountiful", "West Haven", "West Jordan", "West Point", "West Valley City", "White City Township", "Woods Cross"],
+		"CENTER":["-No Selection-", "12600 South Mountain View Corridor", "21st and 21st", "2300 East 3300 South", "2600 South Center", "2700 South Station", "4800 South Redwood", "5400 South Redwood", "7th Street Sandy Point", "900 East Station", "9th and 9th Center", "Antelope & Main Town Center", "Ballpark", "Bingham Junction", "Bountiful 200 West", "Bountiful 500 South", "Bountiful Downtown", "Business Depot Ogden", "Centerville Downtown", "Church & Hwy 193 Town Center", "Clinton Town Center", "Copperton Community Center", "Cottonwood Heights Fort Union", "Cottonwood Village", "Courthouse Downtown", "Daybreak", "Decker Lake Center", "Downtown Clearfield", "Downtown Kaysville", "Downtown Riverton", "Downtown South Salt Lake", "Draper City Center", "Draper Kimballs Lane Station", "East Antelope Center", "East Gate Business Center", "Fairbourne Station", "Farr West 2700 North", "Fashion Place West", "Fireclay Center", "Five Points", "Fore Lakes Center", "Fort Union Canyon Center", "Foxboro", "Freeport Center", "Gardner Village", "Gateway Crossing", "Gentile & Fairfield Town Center", "Glendale Center", "Gordon & Fairfield Town Center", "Granary District", "Harrisville US 89", "Herriman Porter Rockwell Center", "Herriman Town Center", "Highberry Center", "Highlands Loop Center", "Highline", "Historic Magna Main Street", "Historic Sandy Station", "Holladay City Center", "Hunter Town Center", "Independence", "Ivy Place Center", "Jordan Bluffs", "Jordan Valley", "Kaysville Business Park", "Layton Downtown", "Layton Industrial Center", "Layton Midtown", "Legacy Crossing", "Legacy Gateway", "Lone Peak Parkway Employment Center", "Marketview Center", "Marmalade", "Marriott-Slaterville Employment District", "Meadowbrook Station", "Midvale Center Station", "Midvale Fort Union Station", "Midvale Main Street", "Millcreek City Center", "Millcreek Station", "Mountain View Village", "Murray Downtown", "Murray Industrial District", "Murray Medical Park", "Newgate Center", "None", "North Ogden Downtown", "North Ogden Southtown", "North Salt Lake / Woods Cross Industrial District", "North Salt Lake Town Center", "North Shore", "North Station", "North Temple Center", "Oakwood Village Center", "Ogden 12th Street", "Ogden Airport Industrial District", "Ogden Downtown", "Ogden Harrison Boulevard North", "Ogden Harrison Boulevard South", "Oquirrh View Center", "Orchard Drive 2200 South", "Pages Lane Center", "Plain City Gateway", "Pleasant Green", "Pleasant View 2700 North", "Pleasant View Employment Center", "Quarry Bend Center", "Renaissance Towne Center", "Research Park", "River Park", "River Trail Station", "Riverdale City Center", "Rose Park Center", "Roy Downtown", "Roy Station", "S-Line Center", "Salt Lake 15th and 15th", "Salt Lake 900 West", "Salt Lake City CBD", "Salt Lake City East Downtown", "Salt Lake City Northwest Quadrant", "Sandy Union Park", "Sandy Village Center", "SoDa Row", "Sorenson Research Park", "South Jordan Gateway", "South Jordan Towne Center", "South Ogden City Center", "South Ogden Gateway", "South Ogden US 89", "South Salt Lake State Street", "Station Park", "Sugarhouse", "Sunset SR 126", "Syracuse City Center", "Syracuse SR 193 Center", "Taylrosville West Point Center", "The Cairns", "The District", "Union Park", "University Gardens", "University of Utah", "Village Green Center", "Vista Station", "Washington Terrace US 89", "Weber State University", "Weber State University Davis", "West 12th Street", "West Bountiful Industrial District", "West Haven City Center", "West Haven Midland Drive", "West Jordan City Center", "West Ogden Center", "West Point City Center", "West Point West Davis", "West Riverdale Center", "West Valley Redwood Center", "West Warren Center", "West Weber", "Westpointe Center", "Wheeler Village"]
+	},
+	{
+		"NAME":"Bluffdale",
+		"COUNTY":["-No Selection-", "Salt Lake"],
+		"CITY":["-No Selection-", "Bluffdale"],
+		"CENTER":["-No Selection-", "None", "Marketview Center", "Independence"]
+	},
+	{
+		"NAME":"Bountiful",
+		"COUNTY":["-No Selection-", "Davis"],
+		"CITY":["-No Selection-", "Bountiful"],
+		"CENTER":["-No Selection-", "Bountiful 200 West", "None", "2600 South Center", "Bountiful Downtown", "Pages Lane Center", "Gateway Crossing", "Renaissance Towne Center", "Orchard Drive 2200 South", "Bountiful 500 South"]
+	},
+	{
+		"NAME":"Centerville",
+		"COUNTY":["-No Selection-", "Davis"],
+		"CITY":["-No Selection-", "Centerville"],
+		"CENTER":["-No Selection-", "None", "Legacy Crossing", "Pages Lane Center", "Centerville Downtown"]
+	},
+	{
+		"NAME":"Clearfield",
+		"COUNTY":["-No Selection-", "Davis"],
+		"CITY":["-No Selection-", "Clearfield"],
+		"CENTER":["-No Selection-", "Freeport Center", "Weber State University Davis", "Downtown Clearfield", "None", "East Antelope Center"]
+	},
+	{
+		"NAME":"Clinton",
+		"COUNTY":["-No Selection-", "Davis"],
+		"CITY":["-No Selection-", "Clinton"],
+		"CENTER":["-No Selection-", "None", "Clinton Town Center"]
+	},
+	{
+		"NAME":"Copperton",
+		"COUNTY":["-No Selection-", "Salt Lake"],
+		"CITY":["-No Selection-", "Copperton"],
+		"CENTER":["-No Selection-", "None", "Copperton Community Center"]
+	},
+	{
+		"NAME":"Cottonwood Heights",
+		"COUNTY":["-No Selection-", "Salt Lake"],
+		"CITY":["-No Selection-", "Cottonwood Heights"],
+		"CENTER":["-No Selection-", "None", "Union Park", "Fort Union Canyon Center", "Cottonwood Heights Fort Union"]
+	},
+	{
+		"NAME":"Draper",
+		"COUNTY":["-No Selection-", "Salt Lake"],
+		"CITY":["-No Selection-", "Draper"],
+		"CENTER":["-No Selection-", "Draper City Center", "Highline", "None", "Lone Peak Parkway Employment Center", "Draper Kimballs Lane Station", "Vista Station"]
+	},
+	{
+		"NAME":"Emigration Canyon",
+		"COUNTY":["-No Selection-", "Salt Lake"],
+		"CITY":["-No Selection-", "Emigration Canyon"],
+		"CENTER":["-No Selection-", "None"]
+	},
+	{
+		"NAME":"Farmington",
+		"COUNTY":["-No Selection-", "Davis"],
+		"CITY":["-No Selection-", "Farmington"],
+		"CENTER":["-No Selection-", "None", "Courthouse Downtown", "North Station", "Station Park"]
+	},
+	{
+		"NAME":"Farr West",
+		"COUNTY":["-No Selection-", "Weber"],
+		"CITY":["-No Selection-", "Farr West"],
+		"CENTER":["-No Selection-", "None", "Farr West 2700 North", "Pleasant View Employment Center", "Marriott-Slaterville Employment District"]
+	},
+	{
+		"NAME":"Fruit Heights",
+		"COUNTY":["-No Selection-", "Davis"],
+		"CITY":["-No Selection-", "Fruit Heights"],
+		"CENTER":["-No Selection-", "None"]
+	},
+	{
+		"NAME":"Harrisville",
+		"COUNTY":["-No Selection-", "Weber"],
+		"CITY":["-No Selection-", "Harrisville"],
+		"CENTER":["-No Selection-", "Harrisville US 89", "None", "Five Points", "Pleasant View 2700 North", "North Ogden Southtown"]
+	},
+	{
+		"NAME":"Herriman",
+		"COUNTY":["-No Selection-", "Salt Lake"],
+		"CITY":["-No Selection-", "Herriman"],
+		"CENTER":["-No Selection-", "None", "Herriman Town Center", "Herriman Porter Rockwell Center", "12600 South Mountain View Corridor"]
+	},
+	{
+		"NAME":"Holladay",
+		"COUNTY":["-No Selection-", "Salt Lake"],
+		"CITY":["-No Selection-", "Holladay"],
+		"CENTER":["-No Selection-", "None", "Holladay City Center"]
+	},
+	{
+		"NAME":"Hooper",
+		"COUNTY":["-No Selection-", "Davis", "Weber"],
+		"CITY":["-No Selection-", "Hooper"],
+		"CENTER":["-No Selection-", "None"]
+	},
+	{
+		"NAME":"Kaysville",
+		"COUNTY":["-No Selection-", "Davis"],
+		"CITY":["-No Selection-", "Kaysville"],
+		"CENTER":["-No Selection-", "None", "Downtown Kaysville", "North Station", "Kaysville Business Park"]
+	},
+	{
+		"NAME":"Kearns Township",
+		"COUNTY":["-No Selection-", "Salt Lake"],
+		"CITY":["-No Selection-", "Kearns Township"],
+		"CENTER":["-No Selection-", "None"]
+	},
+	{
+		"NAME":"Layton",
+		"COUNTY":["-No Selection-", "Davis"],
+		"CITY":["-No Selection-", "Layton"],
+		"CENTER":["-No Selection-", "Gentile & Fairfield Town Center", "Gordon & Fairfield Town Center", "Weber State University Davis", "East Gate Business Center", "None", "Antelope & Main Town Center", "Layton Industrial Center", "Layton Downtown", "Church & Hwy 193 Town Center", "Layton Midtown"]
+	},
+	{
+		"NAME":"Magna Township",
+		"COUNTY":["-No Selection-", "Salt Lake"],
+		"CITY":["-No Selection-", "Magna Township"],
+		"CENTER":["-No Selection-", "None", "Historic Magna Main Street", "Pleasant Green"]
+	},
+	{
+		"NAME":"Marriott-Slaterville",
+		"COUNTY":["-No Selection-", "Weber"],
+		"CITY":["-No Selection-", "Marriott-Slaterville"],
+		"CENTER":["-No Selection-", "None", "West 12th Street", "Marriott-Slaterville Employment District"]
+	},
+	{
+		"NAME":"Midvale",
+		"COUNTY":["-No Selection-", "Salt Lake"],
+		"CITY":["-No Selection-", "Midvale"],
+		"CENTER":["-No Selection-", "Midvale Fort Union Station", "None", "Midvale Center Station", "Bingham Junction", "Midvale Main Street", "Union Park", "Jordan Bluffs"]
+	},
+	{
+		"NAME":"Millcreek",
+		"COUNTY":["-No Selection-", "Salt Lake"],
+		"CITY":["-No Selection-", "Millcreek"],
+		"CENTER":["-No Selection-", "Millcreek City Center", "Meadowbrook Station", "Cottonwood Village", "None", "2300 East 3300 South"]
+	},
+	{
+		"NAME":"Murray",
+		"COUNTY":["-No Selection-", "Salt Lake"],
+		"CITY":["-No Selection-", "Murray"],
+		"CENTER":["-No Selection-", "Fireclay Center", "None", "Oakwood Village Center", "Fashion Place West", "Murray Downtown", "Murray Medical Park", "Murray Industrial District", "Ivy Place Center"]
+	},
+	{
+		"NAME":"North Ogden",
+		"COUNTY":["-No Selection-", "Weber"],
+		"CITY":["-No Selection-", "North Ogden"],
+		"CENTER":["-No Selection-", "None", "North Ogden Southtown", "North Ogden Downtown"]
+	},
+	{
+		"NAME":"North Salt Lake",
+		"COUNTY":["-No Selection-", "Davis"],
+		"CITY":["-No Selection-", "North Salt Lake"],
+		"CENTER":["-No Selection-", "Foxboro", "North Salt Lake Town Center", "North Salt Lake / Woods Cross Industrial District", "None", "2600 South Center"]
+	},
+	{
+		"NAME":"Ogden",
+		"COUNTY":["-No Selection-", "Weber"],
+		"CITY":["-No Selection-", "Ogden"],
+		"CENTER":["-No Selection-", "Newgate Center", "Ogden Harrison Boulevard North", "Ogden Harrison Boulevard South", "Business Depot Ogden", "Ogden 12th Street", "Weber State University", "Ogden Airport Industrial District", "None", "West Ogden Center", "Five Points", "Ogden Downtown"]
+	},
+	{
+		"NAME":"Plain City",
+		"COUNTY":["-No Selection-", "Weber"],
+		"CITY":["-No Selection-", "Plain City"],
+		"CENTER":["-No Selection-", "None", "Wheeler Village", "Plain City Gateway"]
+	},
+	{
+		"NAME":"Pleasant View",
+		"COUNTY":["-No Selection-", "Weber"],
+		"CITY":["-No Selection-", "Pleasant View"],
+		"CENTER":["-No Selection-", "None", "Pleasant View 2700 North", "Pleasant View Employment Center"]
+	},
+	{
+		"NAME":"Riverdale",
+		"COUNTY":["-No Selection-", "Weber"],
+		"CITY":["-No Selection-", "Riverdale"],
+		"CENTER":["-No Selection-", "Newgate Center", "West Riverdale Center", "Riverdale City Center", "Roy Downtown", "None"]
+	},
+	{
+		"NAME":"Riverton",
+		"COUNTY":["-No Selection-", "Salt Lake"],
+		"CITY":["-No Selection-", "Riverton"],
+		"CENTER":["-No Selection-", "None", "Downtown Riverton", "Mountain View Village"]
+	},
+	{
+		"NAME":"Roy",
+		"COUNTY":["-No Selection-", "Davis", "Weber"],
+		"CITY":["-No Selection-", "Roy"],
+		"CENTER":["-No Selection-", "None", "Roy Station", "West Haven Midland Drive", "Roy Downtown"]
+	},
+	{
+		"NAME":"Salt Lake City",
+		"COUNTY":["-No Selection-", "Salt Lake"],
+		"CITY":["-No Selection-", "Salt Lake City"],
+		"CENTER":["-No Selection-", "University Gardens", "9th and 9th Center", "University of Utah", "Rose Park Center", "North Temple Center", "Research Park", "900 East Station", "Glendale Center", "Salt Lake City Northwest Quadrant", "Salt Lake 900 West", "None", "Salt Lake City East Downtown", "Ballpark", "Salt Lake 15th and 15th", "Granary District", "Salt Lake City CBD", "Marmalade", "Westpointe Center", "Sugarhouse", "21st and 21st"]
+	},
+	{
+		"NAME":"Sandy",
+		"COUNTY":["-No Selection-", "Salt Lake"],
+		"CITY":["-No Selection-", "Sandy"],
+		"CENTER":["-No Selection-", "7th Street Sandy Point", "The Cairns", "Sandy Union Park", "Historic Sandy Station", "Quarry Bend Center", "None", "Sandy Village Center"]
+	},
+	{
+		"NAME":"South Jordan",
+		"COUNTY":["-No Selection-", "Salt Lake"],
+		"CITY":["-No Selection-", "South Jordan"],
+		"CENTER":["-No Selection-", "Daybreak", "North Shore", "None", "The District", "South Jordan Towne Center", "River Park", "SoDa Row", "South Jordan Gateway"]
+	},
+	{
+		"NAME":"South Ogden",
+		"COUNTY":["-No Selection-", "Weber"],
+		"CITY":["-No Selection-", "South Ogden"],
+		"CENTER":["-No Selection-", "None", "South Ogden Gateway", "South Ogden City Center", "South Ogden US 89"]
+	},
+	{
+		"NAME":"South Salt Lake",
+		"COUNTY":["-No Selection-", "Salt Lake"],
+		"CITY":["-No Selection-", "South Salt Lake"],
+		"CENTER":["-No Selection-", "2700 South Station", "S-Line Center", "Millcreek Station", "Downtown South Salt Lake", "Meadowbrook Station", "None", "South Salt Lake State Street"]
+	},
+	{
+		"NAME":"South Weber",
+		"COUNTY":["-No Selection-", "Davis"],
+		"CITY":["-No Selection-", "South Weber"],
+		"CENTER":["-No Selection-", "None"]
+	},
+	{
+		"NAME":"Sunset",
+		"COUNTY":["-No Selection-", "Davis"],
+		"CITY":["-No Selection-", "Sunset"],
+		"CENTER":["-No Selection-", "None", "Sunset SR 126"]
+	},
+	{
+		"NAME":"Syracuse",
+		"COUNTY":["-No Selection-", "Davis"],
+		"CITY":["-No Selection-", "Syracuse"],
+		"CENTER":["-No Selection-", "None", "Syracuse City Center", "Syracuse SR 193 Center"]
+	},
+	{
+		"NAME":"Taylorsville",
+		"COUNTY":["-No Selection-", "Salt Lake"],
+		"CITY":["-No Selection-", "Taylorsville"],
+		"CENTER":["-No Selection-", "Sorenson Research Park", "5400 South Redwood", "None", "Taylrosville West Point Center", "Fore Lakes Center", "4800 South Redwood"]
+	},
+	{
+		"NAME":"Uintah",
+		"COUNTY":["-No Selection-", "Weber"],
+		"CITY":["-No Selection-", "Uintah"],
+		"CENTER":["-No Selection-", "None"]
+	},
+	{
+		"NAME":"Washington Terrace",
+		"COUNTY":["-No Selection-", "Weber"],
+		"CITY":["-No Selection-", "Washington Terrace"],
+		"CENTER":["-No Selection-", "None", "Washington Terrace US 89"]
+	},
+	{
+		"NAME":"West Bountiful",
+		"COUNTY":["-No Selection-", "Davis"],
+		"CITY":["-No Selection-", "West Bountiful"],
+		"CENTER":["-No Selection-", "None", "West Bountiful Industrial District", "Gateway Crossing"]
+	},
+	{
+		"NAME":"West Haven",
+		"COUNTY":["-No Selection-", "Weber"],
+		"CITY":["-No Selection-", "West Haven"],
+		"CENTER":["-No Selection-", "None", "West Haven Midland Drive", "West Haven City Center", "Ogden Airport Industrial District"]
+	},
+	{
+		"NAME":"West Jordan",
+		"COUNTY":["-No Selection-", "Salt Lake"],
+		"CITY":["-No Selection-", "West Jordan"],
+		"CENTER":["-No Selection-", "Jordan Valley", "Gardner Village", "None", "West Jordan City Center", "Highlands Loop Center"]
+	},
+	{
+		"NAME":"West Point",
+		"COUNTY":["-No Selection-", "Davis"],
+		"CITY":["-No Selection-", "West Point"],
+		"CENTER":["-No Selection-", "None", "West Point West Davis", "West Point City Center"]
+	},
+	{
+		"NAME":"West Valley City",
+		"COUNTY":["-No Selection-", "Salt Lake"],
+		"CITY":["-No Selection-", "West Valley City"],
+		"CENTER":["-No Selection-", "Salt Lake City Northwest Quadrant", "Oquirrh View Center", "Fairbourne Station", "Highberry Center", "River Trail Station", "Decker Lake Center", "None", "Hunter Town Center", "West Valley Redwood Center", "Village Green Center"]
+	},
+	{
+		"NAME":"White City Township",
+		"COUNTY":["-No Selection-", "Salt Lake"],
+		"CITY":["-No Selection-", "White City Township"],
+		"CENTER":["-No Selection-", "None"]
+	},
+	{
+		"NAME":"Woods Cross",
+		"COUNTY":["-No Selection-", "Davis"],
+		"CITY":["-No Selection-", "Woods Cross"],
+		"CENTER":["-No Selection-", "None", "Legacy Gateway", "North Salt Lake / Woods Cross Industrial District"]
+	}
+]

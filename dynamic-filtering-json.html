@@ -1,0 +1,486 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>Filter and Zoom</title>
+
+    <script type="module" src="https://js.arcgis.com/calcite-components/1.9.2/calcite.esm.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.9.2/calcite.css"/>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css" />
+    <script src="https://js.arcgis.com/4.28/"></script>
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+      #sidebarDiv {
+        width: 240px;
+        padding: 10px;
+        height: 600px;
+        overflow-y: auto;
+        border: 2px solid #ccc;
+      }
+
+      .filterBoxes {
+        width: 200px;
+      }
+
+    </style>
+
+    <script>
+
+      function fetchLocalJsonArray(filePath) {
+        return fetch(filePath)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .catch(error => {
+            console.error('Error reading JSON file:', error);
+          });
+      }
+
+      function populateSelectBox(selectName,array) {
+      const selectBox = document.getElementById(selectName);
+
+      // Clear existing options
+      selectBox.innerHTML = '';
+
+      // Populate with options from the array
+      array.forEach(item => {
+        const option = document.createElement('option');
+        // option.value = item.value;  // Set the value attribute if needed
+        option.text = item;    // Set the text content of the option
+        selectBox.appendChild(option);
+      });
+    }
+    
+
+
+      
+
+      require(["esri/Map", "esri/layers/FeatureLayer", "esri/views/MapView"], (
+        Map,
+        FeatureLayer,
+        MapView
+      ) => {
+
+      
+      const jsonBase = 'json/BASE.json';
+      const jsonCounty = 'json/COUNTY.json';
+      const jsonCity = 'json/CITY.json';
+      const jsonCenter = 'json/CENTER.json';
+      
+      fetchLocalJsonArray(jsonBase)
+      .then(data => {
+        const countyArray = data[0].COUNTY;
+        const cityArray = data[0].CITY;
+        const centerArray = data[0].CENTER;
+        populateSelectBox('countySelect', countyArray);
+        populateSelectBox('citySelect', cityArray);
+        populateSelectBox('centerSelect', centerArray);
+      });
+
+  
+
+        // renderer used to setup the symbolizaton of the housing layers
+        dPixelSize = "6px"
+        dOutlineWidth = 1
+        transparency = 1
+        PtOutlineColor = [40,40,40]
+
+        const pointRenderer = {
+                type: "unique-value",
+                legendOptions: {
+                    title: "Housing Type"
+                },
+                field: "SUBTYPE",
+                uniqueValueInfos: [{
+                    value: "single_family",
+                    label: "Single Family",
+                    symbol: {
+                      type: "simple-marker",
+                      color: [250, 236, 167, transparency], // [R,G,B, Transparency]
+                      size: dPixelSize,
+                      outline: {
+                        color: PtOutlineColor,
+                        width: dOutlineWidth
+                    }
+                  }
+                }, {
+                    value: "duplex",
+                    label: "Duplex",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [252, 146, 31, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }, {
+                    value: "single_family_adu",
+                    label: "Single Family ADU",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [230, 0, 73, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }, {
+                    value: "townhome",
+                    label: "Townhome",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [40, 200, 48, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }, {
+                    value: "condo",
+                    label: "Condo",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [158, 85, 156, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }, {
+                    value: "mobile_home_park",
+                    label: "Mobile Home Park",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [91, 73, 196, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }, {
+                    value: 'mixed th/single_family',
+                    label: "Townhome/Single Family",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [30, 133, 83, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }, {
+                    value: "apartment",
+                    label: "Apartment",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [20, 158, 206, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }]
+              };
+
+
+
+        const housingLayer = new FeatureLayer({
+                outFields: ["*"],
+                url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/hui_for_web_gdb/FeatureServer/1",
+                renderer:pointRenderer
+              });
+
+
+
+        const map = new Map({
+          basemap: "topo-vector",
+          // layers: [statesFeatureLayer, countiesFeatureLayer]
+          layers: [housingLayer]
+        });
+
+        const view = new MapView({
+          container: "viewDiv",
+          map: map,
+          zoom: 16,
+          center: [-111.8587166, 40.7665529]
+        });
+
+
+        // store ui objects as variables
+        const countySelect = document.getElementById("countySelect");
+        const citySelect = document.getElementById("citySelect");
+        const centerSelect = document.getElementById("centerSelect");
+        const typeSelect = document.getElementById("typeSelect");
+        const resetButton1 = document.getElementById("resetButton1");
+        
+        // define initial definition expression
+        const initialDefinitionExpression =  "COUNTY IN ('Davis', 'Salt Lake', 'Weber')";
+        let activeQuery = initialDefinitionExpression
+
+        const defaultCountyQuery = "(COUNTY IS NULL OR COUNTY IS NOT NULL)";
+        const defaultCityQuery = "(CITY IS NULL OR CITY IS NOT NULL)";
+        const defaultCenterQuery = "(CENTER IS NULL OR CENTER IS NOT NULL)";
+
+        let countySelectionCurrent = "-No Selection-";
+        let citySelectionCurrent = "-No Selection-";
+        let centerSelectionCurrent = "-No Selection-";
+
+        let countyQuery = defaultCountyQuery;
+        let cityQuery = defaultCityQuery;
+        let centerQuery = defaultCenterQuery;
+        let fullQuery = null;
+
+        // setup actions for the reset button
+        resetButton1.addEventListener("click", () => {
+          
+          activeQuery = initialDefinitionExpression
+          housingLayer.definitionExpression = null;
+          
+          fetchLocalJsonArray(jsonBase)
+          .then(data => {
+            const countyArray = data[0].COUNTY;
+            const cityArray = data[0].CITY;
+            const centerArray = data[0].CENTER;
+            populateSelectBox('countySelect', countyArray);
+            populateSelectBox('citySelect', cityArray);
+            populateSelectBox('centerSelect', centerArray);
+          });
+        });
+
+
+        // COUNTY - filter and zoom features, update select options
+        countySelect.addEventListener("change", () => {
+          [housingLayer].forEach((layer) => { // fix this to include parcels and points in main app
+
+            selectionText = countySelect.options[countySelect.selectedIndex].text;
+            countySelectionCurrent = selectionText;
+            console.log(selectionText)
+
+            if(selectionText === "-No Selection-"){
+              countyQuery = defaultCountyQuery
+            }else{
+              countyQuery = `COUNTY = '${selectionText}'`
+            }
+
+            // update the main query
+            fullQuery = countyQuery + ' AND ' + cityQuery + ' AND ' + centerQuery
+            console.log(fullQuery)
+            layer.definitionExpression = fullQuery;
+            
+            // update the select options
+            fetchLocalJsonArray(jsonCounty)
+            .then(data => {
+              const dataFiltered = data.find(item => item.NAME === selectionText);
+              const countyArray = dataFiltered.COUNTY;
+              const cityArray = dataFiltered.CITY;
+              const centerArray = dataFiltered.CENTER;
+
+              populateSelectBox('countySelect', countyArray);
+              populateSelectBox('citySelect', cityArray);
+              populateSelectBox('centerSelect', centerArray);
+
+              countySelect.value = countySelectionCurrent;
+              citySelect.value = citySelectionCurrent;
+              centerSelect.value = centerSelectionCurrent;
+            });
+          });
+          housingLayer.queryExtent().then((results) => {
+            view.goTo(results.extent);
+          });
+        });
+
+        // CITY - filter and zoom features, update select options
+        citySelect.addEventListener("change", () => {
+          [housingLayer].forEach((layer) => { // fix this to include parcels and points in main app
+
+            selectionText = citySelect.options[citySelect.selectedIndex].text;
+            citySelectionCurrent = selectionText;
+            console.log(selectionText)
+
+            if(selectionText === "-No Selection-"){
+              cityQuery = defaultCityQuery
+            }else{
+              cityQuery = `CITY = '${selectionText}'`
+            }
+
+            // update the main query
+            fullQuery = countyQuery + ' AND ' + cityQuery + ' AND ' + centerQuery
+            console.log(fullQuery)
+            layer.definitionExpression = fullQuery;
+            
+            // update the select options
+            fetchLocalJsonArray(jsonCity)
+            .then(data => {
+              const dataFiltered = data.find(item => item.NAME === selectionText);
+              const countyArray = dataFiltered.COUNTY;
+              const cityArray = dataFiltered.CITY;
+              const centerArray = dataFiltered.CENTER;
+
+              populateSelectBox('countySelect', countyArray);
+              populateSelectBox('citySelect', cityArray);
+              populateSelectBox('centerSelect', centerArray);
+
+              countySelect.value = countySelectionCurrent;
+              citySelect.value = citySelectionCurrent;
+              centerSelect.value = centerSelectionCurrent;
+            });
+          });
+          housingLayer.queryExtent().then((results) => {
+            view.goTo(results.extent);
+          });
+        });
+
+        // CENTER - filter and zoom features, update select options
+        centerSelect.addEventListener("change", () => {
+          [housingLayer].forEach((layer) => { // fix this to include parcels and points in main app
+
+            selectionText = centerSelect.options[centerSelect.selectedIndex].text;
+            centerSelectionCurrent = selectionText;
+            console.log(selectionText)
+
+            if(selectionText === "-No Selection-"){
+              centerQuery = defaultCenterQuery
+            }else{
+              centerQuery = `CENTER = '${selectionText}'`
+            }
+
+            // update the main query
+            fullQuery = countyQuery + ' AND ' + cityQuery + ' AND ' + centerQuery
+            console.log(fullQuery)
+            layer.definitionExpression = fullQuery;
+            
+            // update the select options
+            fetchLocalJsonArray(jsonCenter)
+            .then(data => {
+              const dataFiltered = data.find(item => item.NAME === selectionText);
+              const countyArray = dataFiltered.COUNTY;
+              const cityArray = dataFiltered.CITY;
+              const centerArray = dataFiltered.CENTER;
+
+              populateSelectBox('countySelect', countyArray);
+              populateSelectBox('citySelect', cityArray);
+              populateSelectBox('centerSelect', centerArray);
+
+              countySelect.value = countySelectionCurrent;
+              citySelect.value = citySelectionCurrent;
+              centerSelect.value = centerSelectionCurrent;
+            });
+          });
+          housingLayer.queryExtent().then((results) => {
+            view.goTo(results.extent);
+          });
+        });
+
+        //initialize verticalOffset slider value
+        const offsetInput = document.getElementById("offsetInput");
+          offsetInput.value = 0;
+          offsetInput.addEventListener("calciteInputChange", function(){
+            const newVolOffsetStyles = vxlLayer.volumeStyles.clone();
+            const newVolOffsetStyle0 = newVolOffsetStyles.getItemAt(0);
+            newVolOffsetStyle0.verticalOffset = offsetInput.value;
+            vxlLayer.volumeStyles = newVolOffsetStyles;
+          });
+
+
+        view.ui.add("sidebarDiv", { position: "top-right" });
+
+      });
+
+    </script>
+  </head>
+
+  <body>
+    <div id="viewDiv"></div>
+
+    <div id="sidebarDiv" class="esri-widget">
+      
+      <h4 class="esri-heading">Filter by County</h4>
+      <select id="countySelect" class="esri-widget"  style="width: 200px;">
+      </select>
+
+      <h4 class="esri-heading">Filter by City</h4>
+      <select id="citySelect" class="esri-widget"  style="width: 200px;">
+      </select>
+
+      <h4 class="esri-heading">Filter by Center</h4>
+      <select id="centerSelect" class="esri-widget"  style="width: 200px;">
+      </select>
+
+      <h4 class="esri-heading">- - - - - - - - -</h4>
+      
+      <h4 class="esri-heading">Filter by Type</h4>
+      <select id="typeSelect" class="esri-widget"  style="width: 200px;">
+        <option>-No Selection-</option>
+      </select>
+
+      <h4 class="esri-heading">- - - - - - - - -</h4>
+  
+      <label>
+        <b>Distance from TRAX (mi)</b>
+        <br>
+        <br>
+        <calcite-input id="offsetInput"
+        width="auto" type="number"></calcite-input>
+      </label>
+      
+      <br>
+      <br>
+      
+      <label>
+        <b>Distance from Frontrunner (mi)</b>
+        <br>
+        <br>
+        <calcite-input id="offsetInput"
+        width="auto" type="number"></calcite-input>
+      </label>
+
+      <br>
+      <br>
+
+      <label>
+        <b>Distance from BRT (mi)</b>
+        <br>
+        <br>
+        <calcite-input id="offsetInput"
+        width="auto" type="number"></calcite-input>
+      </label>
+
+      <br>
+      <br>
+
+      <label>
+        <b>Distance from FWY Exit (mi)</b>
+        <br>
+        <br>
+        <calcite-input id="offsetInput"
+        width="auto" type="number"></calcite-input>
+      </label>
+      
+      <br>
+      <br>
+
+      <input id="resetButton1" type="button" value="Reset Filters" class="esri-button" style="width: 200px;" />
+
+
+    </div>
+  </body>

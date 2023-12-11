@@ -1,0 +1,624 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>Filter and Zoom</title>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css" />
+    <script src="https://js.arcgis.com/4.28/"></script>
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+      #sidebarDiv {
+        width: 240px;
+        padding: 10px;
+        height: 600px;
+      }
+
+      .filterBoxes {
+        width: 200px;
+      }
+
+    </style>
+
+    <script>
+      function fetchLocalJsonArray(filePath) {
+        return fetch(filePath)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .catch(error => {
+            console.error('Error reading JSON file:', error);
+          });
+      }
+
+
+      fetchLocalJsonArray('json/BASE.json')
+        .then(jsonBase => {
+          // 'data' is now an array containing the contents of the JSON file
+          console.log(jsonBase);
+        });
+
+      fetchLocalJsonArray('json/COUNTY.json')
+      .then(jsonCounty => {
+        // 'data' is now an array containing the contents of the JSON file
+        console.log(jsonCounty);
+      });
+
+      fetchLocalJsonArray('json/CITY.json')
+        .then(jsonCity => {
+          // 'data' is now an array containing the contents of the JSON file
+          console.log(jsonCity);
+        });
+
+      fetchLocalJsonArray('json/CENTER.json')
+      .then(jsonCenter => {
+        // 'data' is now an array containing the contents of the JSON file
+        console.log(jsonCenter);
+      });
+      
+
+
+      require(["esri/Map", "esri/layers/FeatureLayer", "esri/views/MapView"], (
+        Map,
+        FeatureLayer,
+        MapView
+      ) => {
+        
+        // renderer used to setup the symbolizaton of the housing layers
+        dPixelSize = "6px"
+        dOutlineWidth = 1
+        transparency = 1
+        PtOutlineColor = [40,40,40]
+
+        const pointRenderer = {
+                type: "unique-value",
+                legendOptions: {
+                    title: "Housing Type"
+                },
+                field: "SUBTYPE",
+                uniqueValueInfos: [{
+                    value: "single_family",
+                    label: "Single Family",
+                    symbol: {
+                      type: "simple-marker",
+                      color: [250, 236, 167, transparency], // [R,G,B, Transparency]
+                      size: dPixelSize,
+                      outline: {
+                        color: PtOutlineColor,
+                        width: dOutlineWidth
+                    }
+                  }
+                }, {
+                    value: "duplex",
+                    label: "Duplex",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [252, 146, 31, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }, {
+                    value: "single_family_adu",
+                    label: "Single Family ADU",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [230, 0, 73, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }, {
+                    value: "townhome",
+                    label: "Townhome",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [40, 200, 48, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }, {
+                    value: "condo",
+                    label: "Condo",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [158, 85, 156, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }, {
+                    value: "mobile_home_park",
+                    label: "Mobile Home Park",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [91, 73, 196, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }, {
+                    value: 'mixed th/single_family',
+                    label: "Townhome/Single Family",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [30, 133, 83, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }, {
+                    value: "apartment",
+                    label: "Apartment",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [20, 158, 206, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }]
+              };
+
+
+
+        const housingLayer = new FeatureLayer({
+                outFields: ["*"],
+                url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/hui_for_web_gdb/FeatureServer/1",
+                renderer:pointRenderer
+              });
+
+
+
+        const map = new Map({
+          basemap: "topo-vector",
+          // layers: [statesFeatureLayer, countiesFeatureLayer]
+          layers: [housingLayer]
+        });
+
+        const view = new MapView({
+          container: "viewDiv",
+          map: map,
+          zoom: 16,
+          center: [-111.8587166, 40.7665529]
+        });
+
+
+        // store ui objects as variables
+        const countySelect = document.getElementById("countySelect");
+        const citySelect = document.getElementById("citySelect");
+        const centerSelect = document.getElementById("centerSelect");
+        const typeSelect = document.getElementById("typeSelect");
+        const resetButton1 = document.getElementById("resetButton1");
+        
+        // define initial definition expression
+        const initialDefinitionExpression =  "COUNTY IN ('Davis', 'Salt Lake', 'Weber')";
+        let activeQuery = initialDefinitionExpression
+
+        // query all features from the housing layer
+        view.when(function () {
+                    return housingLayer.when(function () {
+                    var query = housingLayer.createQuery();
+                    return housingLayer.queryFeatures(query);
+                  });
+                })
+              .then(getValues)
+              .then(getUniqueValues)
+              .then(addToSelect);
+
+
+        // return an array of all the values in the
+          // STATUS2 field of the wells layer
+          function getValues(response) {
+            var features = response.features;
+            var values = features.map(function (feature) {
+              return {
+                COUNTY: feature.attributes.COUNTY,
+                CITY: feature.attributes.CITY,
+                CENTER: feature.attributes.CENTER,
+                TYPE: feature.attributes.TYPE,
+              }
+            });
+            return values;
+          }
+
+            // re-query the layer based on the selected Category and re-populate the keyword select
+        function getValuesAgain(response) {
+          var features = response.features;
+          var values = features.map(function (feature) {
+            return {
+                  COUNTY: feature.attributes.COUNTY,
+                  CITY: feature.attributes.CITY,
+                  CENTER: feature.attributes.CENTER,
+                  TYPE: feature.attributes.TYPE,
+
+                }
+          });
+          return values;
+        }
+
+        // return an array of unique values in
+            // the STATUS2 field of the wells layer
+            function getUniqueValues(values) {
+              var uniqueCountyValues = [];
+              var uniqueCenterValues = [];
+              var uniqueCityValues = [];
+              var uniqueTypeValues = [];
+
+
+              values.forEach(function (item, i) {
+                var countyVal = item.COUNTY
+                var cityVal = item.CITY
+                var centerVal = item.CENTER
+                var typeVal = item.TYPE
+                
+
+                // COUNTY
+                if (
+                    (uniqueCountyValues.length < 1 || uniqueCountyValues.indexOf(countyVal) === -1) && (countyVal !== "")
+                ) {
+                    uniqueCountyValues.push(countyVal);
+                  }
+
+                // CITY
+                if (
+                    (uniqueCityValues.length < 1 || uniqueCityValues.indexOf(cityVal) === -1) && (cityVal !== "") && (cityVal !== null)
+                ) {
+                    uniqueCityValues.push(cityVal);
+                  }
+
+                // CENTER
+                if (
+                    (uniqueCenterValues.length < 1 || uniqueCenterValues.indexOf(centerVal) === -1) && (countyVal !== "")
+                ) {
+                    uniqueCenterValues.push(centerVal);
+                  }
+
+                // TYPE
+                if (
+                    (uniqueTypeValues.length < 1 || uniqueTypeValues.indexOf(typeVal) === -1) && (typeVal !== "")
+                ) {
+                  uniqueTypeValues.push(typeVal);
+                  }
+                
+              
+
+              });
+              return {
+                uCountyVals: uniqueCountyValues,
+                uCityVals: uniqueCityValues,
+                uCenterVals: uniqueCenterValues,
+                uTypeVals: uniqueTypeValues,  
+              };
+            }
+
+            // re-query the layer based on the selected Category and re-populate the keyword select
+            function getUniqueValuesAgain(values) {
+              var uniqueCountyValues = [];
+              var uniqueCityValues = [];
+              var uniqueCenterValues = [];
+
+              values.forEach(function (item, i) {
+                var countyVal = item.COUNTY
+                var cityVal = item.CITY
+                var centerVal = item.CENTER
+
+                // COUNTY
+                if ((uniqueCountyValues.length < 1 || uniqueCountyValues.indexOf(countyVal) === -1) &&  (countyVal !== "")) 
+                  {uniqueCountyValues.push(countyVal);}
+
+                // CITY
+                if ((uniqueCityValues.length < 1 || uniqueCityValues.indexOf(cityVal) === -1) && (cityVal !== "") && (cityVal !== null)) 
+                  {uniqueCityValues.push(cityVal);}
+
+                // CENTER
+                if ((uniqueCenterValues.length < 1 || uniqueCenterValues.indexOf(centerVal) === -1) && (centerVal !== "") && (centerVal !== null)) 
+                  {uniqueCenterValues.push(centerVal);}
+              
+
+              });
+              return {
+                uCountyVals: uniqueCountyValues,
+                uCityVals: uniqueCityValues,
+                uCenterVals: uniqueCenterValues
+              };
+            }
+
+
+            // Add the unique values to the
+            // select elements. This will allow the user
+            // to filter by attribute.
+            function addToSelect(values) {
+              
+              // COUNTY
+              values.uCountyVals.sort();
+              values.uCountyVals.forEach(function (value) {
+                var option = document.createElement("option");
+                option.text = value;
+                countySelect.add(option);
+              });
+
+              // CITY
+              values.uCityVals.sort();
+              values.uCityVals.forEach(function (value) {
+                var option = document.createElement("option");
+                option.text = value;
+                citySelect.add(option);
+              });
+
+              // CENTER
+              values.uCenterVals.sort();
+              values.uCenterVals.forEach(function (value) {
+                var option = document.createElement("option");
+                option.text = value;
+                centerSelect.add(option);
+              });
+
+              // TYPE
+              values.uTypeVals.sort();
+              values.uTypeVals.forEach(function (value) {
+                var option = document.createElement("option");
+                option.text = value;
+                typeSelect.add(option);
+              });
+
+
+              // return setDefinitionExpression();
+            }
+
+            function addToSelectAgain(values) {
+              
+              // update county
+              while (countySelect.options.length > 0) {
+                countySelect.remove(0);
+              }
+              
+              values.uCountyVals.sort();
+              values.uCountyVals.forEach(function (value) {
+                var option = document.createElement("option");
+                option.text = value;
+                countySelect.add(option);
+              });
+
+              // if main geometry is county
+              var defaultOption = document.createElement("option");
+              defaultOption.text = "-No Selection-";
+              if(primeGeography == 'COUNTY'){
+                countySelect.appendChild(defaultOption);
+              }else{
+                countySelect.insertBefore(defaultOption, countySelect.firstChild);
+                countySelect.selectedIndex = 0
+              }
+
+              // update city
+              while (citySelect.options.length > 0) {
+                citySelect.remove(0);
+              }
+
+              values.uCityVals.sort();
+              values.uCityVals.forEach(function (value) {
+                var option = document.createElement("option");
+                option.text = value;
+                citySelect.add(option);
+              });
+
+              // if main geometry is city
+              var defaultOption = document.createElement("option");
+              defaultOption.text = "-No Selection-";
+              if(primeGeography == 'CITY'){
+                citySelect.appendChild(defaultOption);
+              }else{
+                citySelect.insertBefore(defaultOption, citySelect.firstChild);
+                citySelect.selectedIndex = 0
+              }
+
+              // update center
+              while (centerSelect.options.length > 0) {
+                centerSelect.remove(0);
+              }
+              
+              values.uCenterVals.sort();
+              values.uCenterVals.forEach(function (value) {
+                var option = document.createElement("option");
+                option.text = value;
+                centerSelect.add(option);
+              });
+
+              // if main geometry is center
+              var defaultOption = document.createElement("option");
+              defaultOption.text = "-No Selection-";
+              if(primeGeography == 'CITY'){
+                centerSelect.appendChild(defaultOption);
+              }else{
+                centerSelect.insertBefore(defaultOption, centerSelect.firstChild);
+                centerSelect.selectedIndex = 0
+              }
+
+
+              return true
+            }
+
+
+          // on any drop down change execute global definition query
+          // only zoom-to for geographic query
+          // only show options
+
+            const defaultCountyQuery = "(COUNTY IS NULL OR COUNTY IS NOT NULL)";
+            const defaultCityQuery = "(CITY IS NULL OR CITY IS NOT NULL)";
+            const defaultCenterQuery = "(CENTER IS NULL OR CENTER IS NOT NULL)";
+
+            let countyQuery = defaultCountyQuery;
+            let cityQuery = defaultCityQuery;
+            let centerQuery = defaultCenterQuery;
+            let fullQuery = null;
+            let primeGeography = null;
+
+        // countySelect.addEventListener("change", () => {
+        //   map.layers.forEach((layer) => { // can this just be the housing Feature layer?
+        //     selectionText = countySelect.options[countySelect.selectedIndex].text;
+        //     county
+        //     // layer.definitionExpression = countySelect.value;
+        //     // activeQuery = countySelect.value;
+        //     // layer.definitionExpression = countySelect.value;
+        //   });
+        //   housingLayer.queryExtent().then((results) => {
+        //     view.goTo(results.extent);
+        //   });
+        // });
+
+        resetButton1.addEventListener("click", () => {
+          
+          activeQuery = initialDefinitionExpression
+          primeGeography = null;
+          housingLayer.definitionExpression = null;
+        
+          view.when(function () {
+                    return housingLayer.when(function () {
+                    var query = housingLayer.createQuery();
+                    return housingLayer.queryFeatures(query);
+                  });
+                })
+              .then(getValuesAgain)
+              .then(getUniqueValuesAgain)
+              .then(addToSelectAgain);
+        });
+
+        // countySelect.addEventListener("change", () => {
+        //   map.layers.forEach((layer) => { // can this just be the housing Feature layer?
+            
+
+        //     selectionText = countySelect.options[countySelect.selectedIndex].text;
+        //     if(selectionText === "-No Selection-"){
+        //       countyQuery = "COUNTY >= 'a'"
+        //     }else{
+        //       countyQuery = `COUNTY = '${selectionText}'`
+        //       primeGeography = 'COUNTY'
+        //     }
+        //     fullQuery = countyQuery
+        //     layer.definitionExpression = fullQuery;
+            
+        //     var query = housingLayer.createQuery();
+        //     query.where = fullQuery;
+
+        //     housingLayer.queryFeatures(query)
+        //     .then(getValuesAgain)
+        //     .then(getUniqueValuesAgain)
+        //     .then(addToSelectAgain);
+
+        //     // activeQuery = countySelect.value;
+        //     // layer.definitionExpression = countySelect.value;
+        //   });
+        //   housingLayer.queryExtent().then((results) => {
+        //     view.goTo(results.extent);
+        //   });
+        // });
+
+        countySelect.addEventListener("change", () => {
+          [housingLayer].forEach((layer) => { // fix this to include parcels and points in main app
+
+
+            selectionText = countySelect.options[countySelect.selectedIndex].text;
+            if(selectionText === "-No Selection-"){
+              countyQuery = defaultCountyQuery
+            }else{
+              countyQuery = `COUNTY = '${selectionText}'`
+              primeGeography = 'COUNTY'
+            }
+            fullQuery = countyQuery + ' AND ' + cityQuery + ' AND ' + centerQuery
+            console.log(fullQuery)
+            layer.definitionExpression = fullQuery;
+            
+            var query = housingLayer.createQuery();
+            query.where = fullQuery;
+
+            housingLayer.queryFeatures(query)
+            .then(getValuesAgain)
+            .then(getUniqueValuesAgain)
+            .then(addToSelectAgain);
+
+            // activeQuery = countySelect.value;
+            // layer.definitionExpression = countySelect.value;
+          });
+          housingLayer.queryExtent().then((results) => {
+            view.goTo(results.extent);
+          });
+        });
+
+        // typeSelect.addEventListener("change", () => {
+        //   map.layers.forEach((layer) => {
+        //     layer.definitionExpression = activeQuery + " AND " + typeSelect.value; // Seems like the query could keep growing dangerously
+        //   });
+        //   // housingLayer.queryExtent().then((results) => { 
+        //   //   view.goTo(results.extent);
+        //   // });
+        // });
+
+        view.ui.add("sidebarDiv", { position: "top-right" });
+
+      });
+
+    </script>
+  </head>
+
+  <body>
+    <div id="viewDiv"></div>
+
+    <div id="sidebarDiv" class="esri-widget">
+      
+      <h4 class="esri-heading">Filter by County</h4>
+      <select id="countySelect" class="esri-widget"  style="width: 200px;">
+        <option>-No Selection-</option>
+      </select>
+
+      <h4 class="esri-heading">Filter by City</h4>
+      <select id="citySelect" class="esri-widget"  style="width: 200px;">
+        <option>-No Selection-</option>
+      </select>
+
+      <h4 class="esri-heading">Filter by Center</h4>
+      <select id="centerSelect" class="esri-widget"  style="width: 200px;">
+        <option>-No Selection-</option>
+      </select>
+
+      
+
+      <h4 class="esri-heading">- - - - - - - - -</h4>
+      
+      <h4 class="esri-heading">Filter by Type</h4>
+      <select id="typeSelect" class="esri-widget"  style="width: 200px;">
+        <option>-No Selection-</option>
+      </select>
+
+      <h4 class="esri-heading">- - - - - - - - -</h4>
+      <br>
+      <input id="resetButton1" type="button" value="Reset Filters" class="esri-button" style="width: 200px;" />
+
+
+    </div>
+  </body>
