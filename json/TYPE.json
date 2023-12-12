@@ -1,0 +1,6 @@
+[
+	{
+		"TYPE":["single_family", "multi_family"],
+		"SUBTYPE":["apartment", "condo", "duplex", "mixed th/single_family", "mobile_home_park", "single_family", "single_family_adu", "townhome"]
+	}
+]
