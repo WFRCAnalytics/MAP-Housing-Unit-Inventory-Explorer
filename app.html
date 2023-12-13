@@ -143,6 +143,9 @@
         
       ) => {
 
+        // store the base url
+        const baseURL =  window.location.href;
+
         // store paths to jsons
         const jsonBase = 'json/BASE.json';
         const jsonCounty = 'json/COUNTY.json';
@@ -855,28 +858,34 @@
 
 
 
-        // // filter and zoom
-        // const initialDefinitionExpression =  "COUNTY IN ('Davis', 'Salt Lake', 'Weber')";
-        // const countySelect = document.getElementById("countySelect");
-        // let activeQuery = initialDefinitionExpression
-        // countySelect.addEventListener("change", () => {
-        //   map.layers.forEach((layer) => { // can this just be the housing Feature layer?
-        //     activeQuery = countySelect.value
-        //     layer.definitionExpression = countySelect.value;
-        //   });
-        //   PointsLayer.queryExtent().then((results) => {
-        //     view.goTo(results.extent);
-        //   });
-        // });
+        // Watch view's stationary property for becoming true.
+        reactiveUtils.when(() => view.stationary === true, () => {
+          // Get the new center of the view only when view is stationary.
+          if (view.center) {
+            lat = view.center.latitude.toFixed(3)
+            lon = view.center.longitude.toFixed(3)
+            x = view.center.x.toFixed(0)
+            y = view.center.y.toFixed(0)
+            zoom = view.zoom
+            scale = view.scale
+           
+            // console.log(`zoom: ${zoom}`);
+            // console.log(`scale: ${scale}`);
+            // console.log(`x: ${x}`);
+            // console.log(`y: ${y}`);
+            // console.log(`lat: ${lat}`);
+            // console.log(`lon: ${lon}`);
 
-        // typeSelect.addEventListener("change", () => {
-        //   map.layers.forEach((layer) => {
-        //     layer.definitionExpression = activeQuery + " AND " + typeSelect.value; // Seems like the query could keep growing dangerously
-        //   });
-        //   // housingLayer.queryExtent().then((results) => { 
-        //   //   view.goTo(results.extent);
-        //   // });
-        // });
+            newURL = baseURL + `/?x=${x}+&+y=${y}&zoom=${zoom}`;
+            const url = new URL(newURL)
+            var searchParams = url.searchParams;
+            if (searchParams && searchParams.keys().next().done === false) {
+            // window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
+            console.log(newURL);
+            }
+
+          }
+        });
 
         view.ui.add("sidebarDiv", { position: "top-left"});
 
