@@ -116,7 +116,7 @@
 	{
 		"NAME":"Church & Hwy 193 Town Center",
 		"COUNTY":["-No Selection-", "Davis"],
-		"CITY":["-No Selection-", "None", "Layton"],
+		"CITY":["-No Selection-", "Layton", "None"],
 		"CENTER":["-No Selection-", "Church & Hwy 193 Town Center"]
 	},
 	{
@@ -510,6 +510,12 @@
 		"CENTER":["-No Selection-", "Newgate Center"]
 	},
 	{
+		"NAME":"None",
+		"COUNTY":["-No Selection-", "Davis", "Salt Lake", "Weber"],
+		"CITY":["-No Selection-", "Bluffdale", "Bountiful", "Centerville", "Clearfield", "Clinton", "Copperton", "Cottonwood Heights", "Draper", "Emigration Canyon", "Farmington", "Farr West", "Fruit Heights", "Harrisville", "Herriman", "Holladay", "Hooper", "Kaysville", "Kearns Township", "Layton", "Magna Township", "Marriott-Slaterville", "Midvale", "Millcreek", "Murray", "None", "North Ogden", "North Salt Lake", "Ogden", "Plain City", "Pleasant View", "Riverdale", "Riverton", "Roy", "Salt Lake City", "Sandy", "South Jordan", "South Ogden", "South Salt Lake", "South Weber", "Sunset", "Syracuse", "Taylorsville", "Uintah", "Washington Terrace", "West Bountiful", "West Haven", "West Jordan", "West Point", "West Valley City", "White City Township", "Woods Cross"],
+		"CENTER":["-No Selection-", "None"]
+	},
+	{
 		"NAME":"North Ogden Downtown",
 		"COUNTY":["-No Selection-", "Weber"],
 		"CITY":["-No Selection-", "None", "North Ogden"],
@@ -518,13 +524,13 @@
 	{
 		"NAME":"North Ogden Southtown",
 		"COUNTY":["-No Selection-", "Weber"],
-		"CITY":["-No Selection-", "None", "Harrisville", "North Ogden"],
+		"CITY":["-No Selection-", "Harrisville", "None", "North Ogden"],
 		"CENTER":["-No Selection-", "North Ogden Southtown"]
 	},
 	{
 		"NAME":"North Salt Lake / Woods Cross Industrial District",
 		"COUNTY":["-No Selection-", "Davis"],
-		"CITY":["-No Selection-", "Woods Cross", "North Salt Lake"],
+		"CITY":["-No Selection-", "North Salt Lake", "Woods Cross"],
 		"CENTER":["-No Selection-", "North Salt Lake / Woods Cross Industrial District"]
 	},
 	{
@@ -716,7 +722,7 @@
 	{
 		"NAME":"Salt Lake City Northwest Quadrant",
 		"COUNTY":["-No Selection-", "Salt Lake"],
-		"CITY":["-No Selection-", "West Valley City", "Salt Lake City"],
+		"CITY":["-No Selection-", "Salt Lake City", "West Valley City"],
 		"CENTER":["-No Selection-", "Salt Lake City Northwest Quadrant"]
 	},
 	{
@@ -830,7 +836,7 @@
 	{
 		"NAME":"Union Park",
 		"COUNTY":["-No Selection-", "Salt Lake"],
-		"CITY":["-No Selection-", "Midvale", "Cottonwood Heights"],
+		"CITY":["-No Selection-", "Cottonwood Heights", "Midvale"],
 		"CENTER":["-No Selection-", "Union Park"]
 	},
 	{

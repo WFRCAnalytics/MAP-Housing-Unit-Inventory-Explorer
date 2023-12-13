@@ -20,16 +20,13 @@
         width: 100%;
       }
       #sidebarDiv {
-        width: 240px;
+        width: 250px;
         padding: 10px;
         height: 600px;
         overflow-y: auto;
         border: 2px solid #ccc;
       }
 
-      .filterBoxes {
-        width: 200px;
-      }
 
     </style>
 
@@ -93,6 +90,7 @@
       const jsonCenter = 'json/CENTER.json';
       const jsonType = 'json/TYPE.json';
       
+      // initialize geographic filter options
       fetchLocalJsonArray(jsonBase)
       .then(data => {
         const countyArray = data[0].COUNTY;
@@ -103,6 +101,7 @@
         populateSelectBox('centerSelect', centerArray);
       });
 
+      // initialize housing type options
       fetchLocalJsonArray(jsonType)
       .then(data => {
         const subtypeArray = data[0].SUBTYPE;
@@ -253,8 +252,6 @@
         const subtypeSelect = document.getElementById("subtypeSelect");
         const resetButton1 = document.getElementById("resetButton1");
         
-        
-
         // define default queries
         const defaultCountyQuery = "(COUNTY IS NULL OR COUNTY IS NOT NULL)";
         const defaultCityQuery = "(CITY IS NULL OR CITY IS NOT NULL)";
@@ -308,14 +305,18 @@
               populateSelectBox('citySelect', cityArray);
               populateSelectBox('centerSelect', centerArray);
 
-              subtypeSelect.value = null;
-
-              inputLR.value = null;
-              inputFR.value = null;
-              inputBRT.value = null;
-              inputFWYE.value = null;
-
             });
+
+            countyQuery = defaultCountyQuery; // work for now but should the select just be set to null instead?
+            cityQuery = defaultCityQuery;
+            centerQuery = defaultCenterQuery;
+            subtypeQuery = defaultSubtypeQuery;
+            
+            subtypeSelect.value = null;
+            inputLR.value = null;
+            inputFR.value = null;
+            inputBRT.value = null;
+            inputFWYE.value = null;
           });
         });
 
@@ -604,7 +605,7 @@
       <label>
         <b>Distance from TRAX (mi)</b>
         <br><br>
-        <calcite-input id="inputLR" width="auto" type="number" step=.5 min=0 clearable=true placeholder="enter a distance"></calcite-input>
+        <calcite-input id="inputLR" width="200px" type="number" step=.5 min=0 clearable=true placeholder="enter a distance"></calcite-input>
       </label>
       
       <br><br>
@@ -612,7 +613,7 @@
       <label>
         <b>Distance from Frontrunner (mi)</b>
         <br><br>
-        <calcite-input id="inputFR" width="auto" type="number" step=.5 min=0 clearable=true placeholder="enter a distance"></calcite-input>
+        <calcite-input id="inputFR" width="200px" type="number" step=.5 min=0 clearable=true placeholder="enter a distance"></calcite-input>
       </label>
 
       <br><br>
@@ -620,7 +621,7 @@
       <label>
         <b>Distance from BRT (mi)</b>
         <br><br>
-        <calcite-input id="inputBRT" width="auto" type="number" step=.5 min=0 clearable=true placeholder="enter a distance"></calcite-input>
+        <calcite-input id="inputBRT" width="200px" type="number" step=.5 min=0 clearable=true placeholder="enter a distance"></calcite-input>
       </label>
 
       <br><br>
@@ -628,7 +629,7 @@
       <label>
         <b>Distance from FWY Exit (mi)</b>
         <br><br>
-        <calcite-input id="inputFWYE" width="auto" type="number" step=.5 min=0 clearable=true placeholder="enter a distance"></calcite-input>
+        <calcite-input id="inputFWYE" width="200px" type="number" step=.5 min=0 clearable=true placeholder="enter a distance"></calcite-input>
       </label>
       
       <br><br>
