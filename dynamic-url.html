@@ -77,13 +77,17 @@
 
       
 
-      require(["esri/Map", "esri/layers/FeatureLayer", "esri/views/MapView", "esri/core/reactiveUtils"], (
+      require(["esri/Map", "esri/geometry/Point", "esri/layers/FeatureLayer", "esri/views/MapView", "esri/core/reactiveUtils"], (
         Map,
+        Point,
         FeatureLayer,
         MapView,
         reactiveUtils
       ) => {
-
+      
+      // store the base url
+      const providedURL =  window.location;
+      const urlParamsToggle = true;
       
       const jsonBase = 'json/BASE.json';
       const jsonCounty = 'json/COUNTY.json';
@@ -574,25 +578,21 @@
         // urlParams Functionality
         //===============================
 
-        const urlParamsToggle = true;
-        const baseURL =  window.location.href;
-
+    
         // test url for search params
         if (urlParamsToggle === true){
-          if (baseURL.includes('?') === true) {
-
-            console.log("The URL has query parameters.");
-            var searchParams = baseURL.searchParams;
+          if (providedURL.href.includes('?') === true) {
+            var newURL = new URL(providedURL)
+            var searchParams = newURL.searchParams;
             var xParam = parseInt(searchParams.get("x"));
             var yParam = parseInt(searchParams.get("y"));
             var zoomParam = parseInt(searchParams.get("zoom"));
-            
             
             let pt = new Point({
               x: xParam,
               y: yParam,
               spatialReference: {
-                wkid: view.spatialReference
+                wkid: 3857
               }
             });
 
@@ -602,43 +602,29 @@
           }
         } 
         
-        // let x = null;
-        // let y = null;
-        // let zoom =null;
 
-        // console.log("Current URL:", baseURL);
-        // let newURL = null;
 
-        // function generateNewURL() {
-        //   newURL = baseURL + `/?x=${x}+&+y=${y}&zoom=${zoom}`;
-        //   console.log(newURL)
-        // }
-        
-        // Watch view's stationary property for becoming true.
+        // Create URL params by watching when the extent is changed
         reactiveUtils.when(() => view.stationary === true, () => {
           // Get the new center of the view only when view is stationary.
           if (view.center) {
-            lat = view.center.latitude.toFixed(3)
-            lon = view.center.longitude.toFixed(3)
+            // lat = view.center.latitude.toFixed(3)
+            // lon = view.center.longitude.toFixed(3)
             x = view.center.x.toFixed(0)
             y = view.center.y.toFixed(0)
             zoom = view.zoom
             scale = view.scale
            
-            // console.log(`zoom: ${zoom}`);
-            // console.log(`scale: ${scale}`);
-            // console.log(`x: ${x}`);
-            // console.log(`y: ${y}`);
-            // console.log(`lat: ${lat}`);
-            // console.log(`lon: ${lon}`);
+            newURL = new URL(providedURL);
+            newURL.searchParams.set("x", x);
+            newURL.searchParams.set("y", y);
+            newURL.searchParams.set("zoom", zoom);
 
-            newURL = baseURL + `/?x=${x}+&+y=${y}&zoom=${zoom}`;
-            const url = new URL(newURL)
-            var searchParams = url.searchParams;
+            var searchParams = newURL.searchParams;
             if (searchParams && searchParams.keys().next().done === false) {
-            // window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
+            window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
+            // console.log(newURL.href)
             }
-
           }
         });
 

@@ -124,7 +124,9 @@
       }
 
 
-      require(["esri/Map", 
+      require(["esri/config",
+               "esri/Map", 
+               "esri/geometry/Point",
                "esri/layers/FeatureLayer", 
                "esri/views/MapView", 
                "esri/widgets/Legend",
@@ -132,7 +134,9 @@
                "esri/widgets/Expand",
                "esri/widgets/BasemapGallery",
                "esri/core/reactiveUtils"], (
+        esriConfig,
         Map,
+        Point,
         FeatureLayer,
         MapView,
         Legend,
@@ -143,8 +147,11 @@
         
       ) => {
 
+        esriConfig.apiKey = "AAPK5915b242a27845f389e0a11a17dc46b46gXNFj09FJVdb711lVLGhgoVFJBqdW6ow3bl71N1hx2llpMyogGBeF8kgvrKm3cY";
+
         // store the base url
-        const baseURL =  window.location.href;
+        const providedURL =  window.location;
+        const urlParamsToggle = true;
 
         // store paths to jsons
         const jsonBase = 'json/BASE.json';
@@ -856,39 +863,6 @@
             });
           });
 
-
-
-        // Watch view's stationary property for becoming true.
-        reactiveUtils.when(() => view.stationary === true, () => {
-          // Get the new center of the view only when view is stationary.
-          if (view.center) {
-            lat = view.center.latitude.toFixed(3)
-            lon = view.center.longitude.toFixed(3)
-            x = view.center.x.toFixed(0)
-            y = view.center.y.toFixed(0)
-            zoom = view.zoom
-            scale = view.scale
-           
-            // console.log(`zoom: ${zoom}`);
-            // console.log(`scale: ${scale}`);
-            // console.log(`x: ${x}`);
-            // console.log(`y: ${y}`);
-            // console.log(`lat: ${lat}`);
-            // console.log(`lon: ${lon}`);
-
-            newURL = baseURL + `/?x=${x}+&+y=${y}&zoom=${zoom}`;
-            const url = new URL(newURL)
-            var searchParams = url.searchParams;
-            if (searchParams && searchParams.keys().next().done === false) {
-            // window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
-            console.log(newURL);
-            }
-
-          }
-        });
-
-        view.ui.add("sidebarDiv", { position: "top-left"});
-
         // Add an event listener for the zoom change
         view.watch("zoom", function (newZoom) {
           // console.log("Zoom level changed to: ", newZoom);
@@ -905,6 +879,72 @@
             PointsLayer.visible = false;
           }
         });
+
+        //===============================
+        // urlParams Functionality
+        //===============================
+
+        // if provide URL has searchParams update the map
+        if (urlParamsToggle === true){
+          if (providedURL.href.includes('?') === true) {
+            var newURL = new URL(providedURL)
+            var searchParams = newURL.searchParams;
+            var geomParam = parseInt(searchParams.get("geom"));
+            var xParam = parseInt(searchParams.get("x"));
+            var yParam = parseInt(searchParams.get("y"));
+            var zoomParam = parseInt(searchParams.get("zoom"));
+            
+            let pt = new Point({
+              x: xParam,
+              y: yParam,
+              spatialReference: {
+                wkid: 3857
+              }
+            });
+
+            // override center and zoom
+            view.center = pt;
+            view.zoom = zoomParam;
+
+            if (geomParam === 'pcl'){
+              ParcelsLayer.visible = true;
+              PointsLayer.visible = false;
+            } if (geomParam === 'pt'){
+              ParcelsLayer.visible = false;
+              PointsLayer.visible = true;
+            }
+          }
+        } 
+        
+        // Create URL params by watching when the extent is changed
+        reactiveUtils.when(() => view.stationary === true, () => {
+          // Get the new center of the view only when view is stationary.
+          if (view.center) {
+            // lat = view.center.latitude.toFixed(3)
+            // lon = view.center.longitude.toFixed(3)
+            x = view.center.x.toFixed(0)
+            y = view.center.y.toFixed(0)
+            zoom = view.zoom
+            scale = view.scale
+           
+            newURL = new URL(providedURL);
+            if (ParcelsLayer.visible === true){newURL.searchParams.set("geom", 'pcl');};
+            if (PointsLayer.visible === true){newURL.searchParams.set("geom", 'pt');};
+            newURL.searchParams.set("x", x);
+            newURL.searchParams.set("y", y);
+            newURL.searchParams.set("zoom", zoom);
+
+            var searchParams = newURL.searchParams;
+            if (searchParams && searchParams.keys().next().done === false) {
+            window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
+            // console.log(newURL.href)
+            }
+          }
+        });
+
+        view.ui.add("sidebarDiv", { position: "top-left"});
+
+        
 
 
 
