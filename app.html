@@ -379,6 +379,7 @@
             outFields: ["*"],
             url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/hui_for_web_gdb/FeatureServer/0",
             renderer:parcelRenderer,
+            maxScale: 0,
             visible: false
           });
         
@@ -562,7 +563,7 @@
         const defaultBRTquery = "(DIST_BRT IS NULL OR DIST_BRT IS NOT NULL)";
         const defaultFWYEquery = "(DIST_FWYE IS NULL OR DIST_FWYE IS NOT NULL)";
 
-        // set initial selection for geograhpy filters - could switch to a placeholder?
+        // set initial selection for geography filters - could switch to a placeholder?
         let countySelectionCurrent = "-No Selection-";
         let citySelectionCurrent = "-No Selection-";
         let centerSelectionCurrent = "-No Selection-";
@@ -614,6 +615,11 @@
             inputFR.value = null;
             inputBRT.value = null;
             inputFWYE.value = null;
+
+            // reset the url
+            var baseUrl = providedURL.origin + providedURL.pathname;
+            console.log(baseUrl)
+            window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', baseUrl);
           });
         });
 
@@ -788,7 +794,7 @@
             generateFullQuery()
             console.log(fullQuery);
 
-            [PointsLayer].forEach((layer) => { 
+            [PointsLayer, ParcelsLayer].forEach((layer) => { 
               layer.definitionExpression = fullQuery;
             });
           });
@@ -865,7 +871,7 @@
 
         // Add an event listener for the zoom change
         view.watch("zoom", function (newZoom) {
-          // console.log("Zoom level changed to: ", newZoom);
+          console.log("Zoom level changed to: ", newZoom);
 
           if (newZoom >= 15){ 
             ParcelsLayer.visible = true;
@@ -874,47 +880,63 @@
           else if (newZoom < 15 && newZoom > 5){ 
             ParcelsLayer.visible = false;
             PointsLayer.visible = true;
-          }else{
-            ParcelsLayer.visible = false;
-            PointsLayer.visible = false;
           }
         });
+
+        view.ui.add("sidebarDiv", { position: "top-left"});
 
         //===============================
         // urlParams Functionality
         //===============================
+        view.when(() => {
+          // if provide URL has searchParams update the map
+          if (urlParamsToggle === true){
+            if (providedURL.href.includes('?') === true) {
+              var newURL = new URL(providedURL)
+              var searchParams = newURL.searchParams;
+              var geomParam = searchParams.get("geom");
 
-        // if provide URL has searchParams update the map
-        if (urlParamsToggle === true){
-          if (providedURL.href.includes('?') === true) {
-            var newURL = new URL(providedURL)
-            var searchParams = newURL.searchParams;
-            var geomParam = parseInt(searchParams.get("geom"));
-            var xParam = parseInt(searchParams.get("x"));
-            var yParam = parseInt(searchParams.get("y"));
-            var zoomParam = parseInt(searchParams.get("zoom"));
-            
-            let pt = new Point({
-              x: xParam,
-              y: yParam,
-              spatialReference: {
-                wkid: 3857
+              var countyParam = searchParams.get("cny");
+              var cityParam = searchParams.get("cty");
+              var centerParam = searchParams.get("ctr");
+
+              var xParam = parseInt(searchParams.get("x"));
+              var yParam = parseInt(searchParams.get("y"));
+              var zoomParam = parseInt(searchParams.get("zoom"));
+              
+              // if (countyParam != '-No Selection-'){countySelect.value = countyParam};
+              // countySelect.dispatchEvent(new Event('change'));
+
+              // if (cityParam != '-No Selection-'){citySelect.value = cityParam};
+              // citySelect.dispatchEvent(new Event('change'));
+
+              // if (centerParam != '-No Selection-'){centerSelect.value = centerParam};
+              // centerSelect.dispatchEvent(new Event('change'));
+    
+
+
+              let pt = new Point({
+                x: xParam,
+                y: yParam,
+                spatialReference: {
+                  wkid: 3857
+                }
+              });
+
+              // override center and zoom
+              view.center = pt;
+              view.zoom = zoomParam;
+
+              if (geomParam === 'pcl'){
+                ParcelsLayer.visible = true;
+                PointsLayer.visible = false;
+              } if (geomParam === 'pt'){
+                ParcelsLayer.visible = false;
+                PointsLayer.visible = true;
               }
-            });
-
-            // override center and zoom
-            view.center = pt;
-            view.zoom = zoomParam;
-
-            if (geomParam === 'pcl'){
-              ParcelsLayer.visible = true;
-              PointsLayer.visible = false;
-            } if (geomParam === 'pt'){
-              ParcelsLayer.visible = false;
-              PointsLayer.visible = true;
             }
-          }
-        } 
+          } 
+        });
         
         // Create URL params by watching when the extent is changed
         reactiveUtils.when(() => view.stationary === true, () => {
@@ -928,11 +950,16 @@
             scale = view.scale
            
             newURL = new URL(providedURL);
+            
             if (ParcelsLayer.visible === true){newURL.searchParams.set("geom", 'pcl');};
             if (PointsLayer.visible === true){newURL.searchParams.set("geom", 'pt');};
             newURL.searchParams.set("x", x);
             newURL.searchParams.set("y", y);
             newURL.searchParams.set("zoom", zoom);
+            // if (countySelect.value !== '-No Selection-' | countySelect !== null | countySelect !== ''){newURL.searchParams.set("cny", countySelect.value);};
+            // // newURL.searchParams.set("cny", countySelect.value);
+            // if (citySelect.value !== '-No Selection-'){newURL.searchParams.set("cty", citySelect.value);};
+            // if (centerSelect.value !== '-No Selection-'){newURL.searchParams.set("ctr", centerSelect.value);};
 
             var searchParams = newURL.searchParams;
             if (searchParams && searchParams.keys().next().done === false) {
@@ -941,14 +968,6 @@
             }
           }
         });
-
-        view.ui.add("sidebarDiv", { position: "top-left"});
-
-        
-
-
-
-        
 
         
 
