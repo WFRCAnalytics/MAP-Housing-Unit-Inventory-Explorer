@@ -33,7 +33,7 @@
       }
   
       #resultDiv {
-        min-width: 250px;
+        max-width: 300px;
         font-size: 14px;
         padding: 10px;
         overflow-y: auto;
@@ -597,137 +597,142 @@
       function queryStatistics() {
           const statDefinitions = [
             {
-              onStatisticField: "CASE WHEN SUBTYPE = 'single_family' THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN SUBTYPE IS NOT NULL THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "total",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN SUBTYPE = 'single_family' THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "single_family",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN SUBTYPE = 'duplex' THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN SUBTYPE = 'duplex' THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "duplex",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN SUBTYPE = 'single_family_adu' THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN SUBTYPE = 'single_family_adu' THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "single_family_adu",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN SUBTYPE = 'townhome' THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN SUBTYPE = 'townhome' THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "townhome",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN SUBTYPE = 'condo' THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN SUBTYPE = 'condo' THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "condo",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN SUBTYPE = 'mobile_home_park' THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN SUBTYPE = 'mobile_home_park' THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "mobile_home_park",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN SUBTYPE = 'mixed th/single_family' THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN SUBTYPE = 'mixed th/single_family' THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "mixed_th_single_family",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN SUBTYPE = 'apartment' THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN SUBTYPE = 'apartment' THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "apartment",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1840') THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1840') THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "year_1840",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1850') THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1850') THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "year_1850",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1860') THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1860') THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "year_1860",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1870') THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1870') THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "year_1870",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1880') THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1880') THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "year_1880",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1890') THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1890') THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "year_1890",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1900') THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1900') THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "year_1900",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1910') THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1910') THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "year_1910",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1920') THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1920') THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "year_1920",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1930') THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1930') THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "year_1930",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1940') THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1940') THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "year_1940",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1950') THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1950') THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "year_1950",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1960') THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1960') THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "year_1960",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1970') THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1970') THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "year_1970",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1980') THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1980') THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "year_1980",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1990') THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1990') THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "year_1990",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '2000') THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN (BLT_DECADE = '2000') THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "year_2000",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '2010') THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN (BLT_DECADE = '2010') THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "year_2010",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '2020') THEN 1 ELSE 0 END",
+              onStatisticField: "CASE WHEN (BLT_DECADE = '2020') THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "year_2020",
               statisticType: "sum"
             }
@@ -740,6 +745,8 @@
 
           return housingLayer.queryFeatures(query).then((result) => {
             const allStats = result.features[0].attributes;
+
+            document.getElementById("count").innerHTML = allStats.total;
             updateChart(typeChart, [
               allStats.single_family,
               allStats.duplex,
@@ -783,7 +790,7 @@
         function createYearChart() {
           const yearCanvas = document.getElementById("year-chart");
           yearChart = new Chart(yearCanvas.getContext("2d"), {
-            type: "horizontalBar",
+            type: "bar",
             data: {
               labels: ["1840's","1850's","1860's","1870's","1880's","1890's", 
                        "1900's","1910's","1920's","1930's","1940's", "1950's", "1960's", "1970's","1980's", "1990's", 
@@ -831,7 +838,7 @@
         function createTypeChart() {
           const typeCanvas = document.getElementById("type-chart");
           typeChart = new Chart(typeCanvas.getContext("2d"), {
-            type: "doughnut",
+            type: "pie",
             data: {
               labels: ["single_family", "duplex", "single_family_adu", "condo", 
                        "townhome", "mobile_home_park", "mixed th/single_family", "apartment"],
@@ -846,7 +853,7 @@
             },
             options: {
               responsive: false,
-              cutoutPercentage: 35,
+              cutoutPercentage: 25,
               legend: {
                 position: "bottom"
               },
@@ -871,16 +878,12 @@
         
 
         view.when(function() {
-          // predominanceLayer = findLayerByTitle("Educational Attainment by City");
-          // predominanceLayer.outFields = ["*"];
 
           // Update the pie chart after once the layer view dataUpdating becomes false
           view.whenLayerView(housingLayer).then((layerView) => {
             reactiveUtils.when(() => !layerView.dataUpdating, () => {
               queryStatistics();
-              // queryLayerViewStats(layerView).then(function (newData) {
-              //    updateChart(newData);
-            //  });
+
             });
           });
 
@@ -998,7 +1001,7 @@
 
       <div id="resultDiv" class="esri-widget">
         <div class="count">
-          Selected Buildings:
+          Total Units:
           <div class="count" id="count">0</div>
         </div>
         <div class="charts">
@@ -1008,6 +1011,8 @@
           <div>
             <canvas id="type-chart" width="250" height="300"></canvas>
           </div>
+          <br>
+          <p>These charts dynamically update  according to the <b>visible</b> features in the map.</p>
         </div>
       </div>
 
