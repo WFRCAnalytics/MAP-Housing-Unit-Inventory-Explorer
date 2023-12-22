@@ -96,10 +96,11 @@
 
       
 
-      require(["esri/Map", "esri/layers/FeatureLayer", "esri/views/MapView", "esri/core/promiseUtils", "esri/core/reactiveUtils"], (
+      require(["esri/Map", "esri/layers/FeatureLayer", "esri/views/MapView", "esri/widgets/Expand", "esri/core/promiseUtils", "esri/core/reactiveUtils"], (
         Map,
         FeatureLayer,
         MapView,
+        Expand,
         promiseUtils,
         reactiveUtils
       ) => {
@@ -584,7 +585,7 @@
             });
           });
 
-        view.ui.add("resultDiv", { position: "top-right"});
+        
         view.ui.add("sidebarDiv", { position: "top-left" });
 
       //=========================
@@ -963,6 +964,17 @@
           queryStatisticsForYearChart();
           queryStatisticsForTypeChart()
         });
+
+        const resultDiv = document.getElementById("resultDiv");
+        const chartExpand = new Expand({
+          expandIcon: "graph-bar-side-by-side",
+          expandTooltip: "Statistics",
+          view: view,
+          content: resultDiv,
+          expanded: true
+        });
+
+        view.ui.add(chartExpand, { position: "top-right"});
       });
 
       
