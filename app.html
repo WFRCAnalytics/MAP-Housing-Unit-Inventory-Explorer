@@ -160,6 +160,8 @@
         const jsonCenter = 'json/CENTER.json';
         const jsonType = 'json/TYPE.json';
         
+        let activeLayer;
+
         // initialize geographic filter options
         fetchLocalJsonArray(jsonBase)
         .then(data => {
@@ -876,10 +878,12 @@
           if (newZoom >= 15){ 
             ParcelsLayer.visible = true;
             PointsLayer.visible = false;
+            activeLayer = ParcelsLayer;
           }
           else if (newZoom < 15 && newZoom > 5){ 
             ParcelsLayer.visible = false;
             PointsLayer.visible = true;
+            activeLayer = PointsLayer;
           }
         });
 
@@ -930,9 +934,11 @@
               if (geomParam === 'pcl'){
                 ParcelsLayer.visible = true;
                 PointsLayer.visible = false;
+                activeLayer = ParcelsLayer;
               } if (geomParam === 'pt'){
                 ParcelsLayer.visible = false;
                 PointsLayer.visible = true;
+                activeLayer = PointsLayer;
               }
             }
           } 

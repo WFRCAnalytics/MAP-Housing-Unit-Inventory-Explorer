@@ -33,7 +33,7 @@
       }
   
       #resultDiv {
-        max-width: 300px;
+        max-width: 400px;
         font-size: 14px;
         padding: 10px;
         overflow-y: auto;
@@ -584,8 +584,8 @@
             });
           });
 
-        view.ui.add("resultDiv", { position: "top-left"});
-        view.ui.add("sidebarDiv", { position: "top-right" });
+        view.ui.add("resultDiv", { position: "top-right"});
+        view.ui.add("sidebarDiv", { position: "top-left" });
 
       //=========================
       // chart stuff
@@ -594,7 +594,113 @@
       let yearChart = null;
       let typeChart = null;
 
-      function queryStatistics() {
+      function queryStatisticsForYearChart() {
+
+          // create query definitions for stacked bar chart data
+          const decades = ["1840", "1850", "1860", "1870", "1880", "1890", "1900", "1910", "1920", "1930", "1940", "1950", "1960", "1970", "1980", "1990", "2000", "2010", "2020"];
+          const subtypes = ["single_family", "duplex", "single_family_adu", "condo", "townhome", "mobile_home_park", "mixed_th/single_family", "apartment"];
+          const yearChartDefinitions = [];
+          for (const decade of decades) {
+            for (const subtype of subtypes) {
+              const definition = {
+                onStatisticField: `CASE WHEN (BLT_DECADE = '${decade}' AND SUBTYPE = '${subtype}') THEN UNIT_COUNT ELSE 0 END`,
+                outStatisticFieldName: `year_${decade}_${subtype}`,
+                statisticType: "sum"
+              };
+
+              yearChartDefinitions.push(definition);
+            }
+          }
+
+          // query for stacked bar chart data
+          const yearChartQuery = housingLayer.createQuery();
+          yearChartQuery.geometry = view.extent;
+          yearChartQuery.outStatistics = yearChartDefinitions;
+
+          return housingLayer.queryFeatures(yearChartQuery).then((result) => {
+            const yearChartQueryResult = result.features[0].attributes;
+            // console.log(yearChartQueryResult)
+
+            const decadeTypeCountArray = [];
+            for (const property in yearChartQueryResult) {
+              if (yearChartQueryResult.hasOwnProperty(property)) {
+                const [year, ...typeParts] = property.split('_').slice(1);
+
+                decadeTypeCountArray.push({
+                  decade: +year,
+                  type: typeParts.join('_'),
+                  count: yearChartQueryResult[property]
+                });
+              }
+            }
+            // console.log(decadeTypeCountArray);
+
+
+              // Calculate the sum of counts for each decade
+              const decadeSums = decadeTypeCountArray.reduce((acc, entry) => {
+                acc[entry.decade] = (acc[entry.decade] || 0) + entry.count;
+                return acc;
+              }, {});
+
+              // Filter out objects with a sum of 0 and get an array of unique decades
+              const filteredArray = decadeTypeCountArray.filter(entry => decadeSums[entry.decade] !== 0);
+              const uniqueDecades = [...new Set(filteredArray.map(entry => entry.decade))];
+              // console.log(uniqueDecades);
+              
+              // create data objects for each housing type
+              const stackedChartDataObjects = [];
+              const typeData = {};
+              for (const entry of filteredArray) {
+                const { type, count, decade } = entry;
+
+                if (!typeData[type]) {
+                  typeData[type] = {
+                    label: type,
+                    data: [],
+                    backgroundColor:null
+                  };
+                }
+                typeData[type].data.push(count);
+
+                // If the decade is not already added to the data object, add it
+                if (typeData[type].data.length === 1) {
+                  typeData[type].decade = decade;
+                }
+              }
+              // Convert the object values to an array
+              for (const type in typeData) {
+                if (typeData.hasOwnProperty(type)) {
+                  stackedChartDataObjects.push(typeData[type]);
+                }
+              }
+              // console.log(stackedChartDataObjects);
+
+              // Update the backgroundColor attribute using the typeColorMap
+              const typeColorMap = {
+                "single_family": '#FAECA7',
+                "duplex": '#FC921F',
+                "single_family_adu": '#E60049',
+                "condo": '#BD7EBE',
+                "townhome": '#28C830',
+                "mobile_home_park": '#9E559C',
+                "mixed_th/single_family": '#1E8553',
+                "apartment": '#149ECE'
+              };
+              
+              const updatedDataArray = stackedChartDataObjects.map(item => ({
+                ...item,
+                backgroundColor: typeColorMap[item.label]
+              }));
+
+              // console.log(updatedDataArray);
+              updateStackedChart(yearChart, uniqueDecades,updatedDataArray)
+          
+          }, console.error);
+
+        }
+
+        function queryStatisticsForTypeChart() {
+
           const statDefinitions = [
             {
               onStatisticField: "CASE WHEN SUBTYPE IS NOT NULL THEN UNIT_COUNT ELSE 0 END",
@@ -735,18 +841,17 @@
               onStatisticField: "CASE WHEN (BLT_DECADE = '2020') THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "year_2020",
               statisticType: "sum"
-            }
-            
+            } 
           ];
+           
+          // query data for the pie chart
           const query = housingLayer.createQuery();
           query.geometry = view.extent;
-          // query.distance = bufferSize;
           query.outStatistics = statDefinitions;
-
           return housingLayer.queryFeatures(query).then((result) => {
             const allStats = result.features[0].attributes;
-
             document.getElementById("count").innerHTML = allStats.total;
+            
             updateChart(typeChart, [
               allStats.single_family,
               allStats.duplex,
@@ -757,27 +862,7 @@
               allStats.mixed_th_single_family,
               allStats.apartment
             ]);
-            updateChart(yearChart, [
-              allStats.year_1840,
-              allStats.year_1850,
-              allStats.year_1860,
-              allStats.year_1870,
-              allStats.year_1880,
-              allStats.year_1890,
-              allStats.year_1900,
-              allStats.year_1910,
-              allStats.year_1920,
-              allStats.year_1930,
-              allStats.year_1940,
-              allStats.year_1950,
-              allStats.year_1960,
-              allStats.year_1970,
-              allStats.year_1980,
-              allStats.year_1990,
-              allStats.year_2000,
-              allStats.year_2010,
-              allStats.year_2020
-            ]);
+
           }, console.error);
         }
 
@@ -787,28 +872,30 @@
           chart.update();
         }
 
+        // Updates the given chart with new data
+        function updateStackedChart(chart, labels, dataValues) {
+          chart.data.labels = labels;
+          chart.data.datasets = dataValues;
+          chart.update();
+        }
+
+        // instantiate the year stacked chart
         function createYearChart() {
           const yearCanvas = document.getElementById("year-chart");
           yearChart = new Chart(yearCanvas.getContext("2d"), {
             type: "bar",
             data: {
-              labels: ["1840's","1850's","1860's","1870's","1880's","1890's", 
-                       "1900's","1910's","1920's","1930's","1940's", "1950's", "1960's", "1970's","1980's", "1990's", 
-                       "2000's","2010's","2020's"],
+              labels: [],
               datasets: [
                 {
-                  label: "Unit Count",
+                  label: null,
                   backgroundColor: "#149dcf",
-                  stack: "Stack 0",
-                  data: [0,0,0,0,0, 
-                         0,0,0,0,0,
-                         0,0,0,0,0,
-                         0,0,0,0]
+                  data: []
                 }
               ]
             },
             options: {
-              responsive: false,
+              // responsive: false,
               legend: {
                 display: false
               },
@@ -835,10 +922,12 @@
             }
           });
         }
+
+        // instantiate the type pie chart
         function createTypeChart() {
           const typeCanvas = document.getElementById("type-chart");
           typeChart = new Chart(typeCanvas.getContext("2d"), {
-            type: "pie",
+            type: "doughnut",
             data: {
               labels: ["single_family", "duplex", "single_family_adu", "condo", 
                        "townhome", "mobile_home_park", "mixed th/single_family", "apartment"],
@@ -855,7 +944,7 @@
               responsive: false,
               cutoutPercentage: 25,
               legend: {
-                position: "bottom"
+                position: "top",
               },
               title: {
                 display: true,
@@ -865,74 +954,18 @@
           });
         }
 
-        function clearCharts() {
-          updateChart(typeChart, [0, 0, 0, 0, 0, 0, 0, 0]);
-          updateChart(yearChart, [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0]);
-          document.getElementById("count").innerHTML = 0;
-        }
-
+        // create the charts
         createYearChart();
         createTypeChart();
-        
-        queryStatistics();
-        
 
-        view.when(function() {
-
-          // Update the pie chart after once the layer view dataUpdating becomes false
-          view.whenLayerView(housingLayer).then((layerView) => {
-            reactiveUtils.when(() => !layerView.dataUpdating, () => {
-              queryStatistics();
-
-            });
-          });
-
-          // Add a LayerList instance to the view with
-          // custom text and a canvas element in the list item panel
-          // for rendering a chart to display query results
-
-          // layerList = new LayerList({
-          //   view: view,
-          //   container: document.createElement("div"),
-          //   listItemCreatedFunction: function(event) {
-          //     const item = event.item;
-
-          //     // add the pie chart to the Predominance layer list item panel
-          //     if (item.title === predominanceLayer.title) {
-          //       item.panel = {
-          //         content: [
-          //           [
-          //             "<b>Educational attainment</b> refers to the highest level of education that an individual has completed. ",
-          //             "This chart categorizes the population living within the current ",
-          //             "view extent by their educational attainment."
-          //           ].join(""),
-
-          //           document.createElement("canvas"),
-
-          //           [
-          //             "Notice that while one attainment level appears to dominate certain regions, it doesn't ",
-          //             "necessarily mean it represents the majority of the population. In fact, as ",
-          //             "you explore most areas, you will find the predominant educational attainment makes up ",
-          //             "just a fraction of the population due to the number of categories considered."
-          //           ].join("")
-          //         ],
-          //         className: "esri-icon-pie-chart",
-          //         open: item.visible
-          //       };
-          //     }
-          //   }
-          // });
-          // layerList.container.style = "height: 100%";
-          // let panelDiv = document.getElementById("panel");
-          // panelDiv.appendChild(layerList.container);
+        // when the extent is changed update the charts
+        reactiveUtils.when(() => view.stationary === true, () => {
+          queryStatisticsForYearChart();
+          queryStatisticsForTypeChart()
         });
-
       });
 
       
-
-
-
     </script>
   </head>
 
@@ -1006,10 +1039,10 @@
         </div>
         <div class="charts">
           <div>
-            <canvas id="year-chart" height="250" width="260"></canvas>
+            <canvas id="year-chart" height="250" width="300"></canvas>
           </div>
           <div>
-            <canvas id="type-chart" width="250" height="300"></canvas>
+            <canvas id="type-chart" width="400" height="300"></canvas>
           </div>
           <br>
           <p>These charts dynamically update  according to the <b>visible</b> features in the map.</p>
