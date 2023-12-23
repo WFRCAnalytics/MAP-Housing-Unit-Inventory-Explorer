@@ -1,0 +1,643 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>Filter and Zoom</title>
+
+    <script type="module" src="https://js.arcgis.com/calcite-components/1.9.2/calcite.esm.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.9.2/calcite.css"/>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/dark/main.css" />
+    <script src="https://js.arcgis.com/4.28/"></script>
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+      #sidebarDiv {
+        width: 250px;
+        padding: 10px;
+        height: 90vh;
+        overflow-y: auto;
+        border: 2px solid #ccc;
+      }
+
+
+    </style>
+
+    <script>
+
+      function fetchLocalJsonArray(filePath) {
+        return fetch(filePath)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .catch(error => {
+            console.error('Error reading JSON file:', error);
+          });
+      }
+
+      function populateSelectBox(selectName, array) {
+        const selectBox = document.getElementById(selectName);
+
+        // Clear existing options
+        selectBox.innerHTML = '';
+
+        // Populate with options from the array
+        array.forEach(item => {
+          const option = document.createElement('option');
+          // option.value = item.value;  // Set the value attribute if needed
+          option.text = item;    // Set the text content of the option
+          selectBox.appendChild(option);
+      });
+    }
+
+      function populateComboBox (comboBoxName, array) {
+          const comboBox = document.getElementById(comboBoxName);
+
+          // Populate with options from the array
+          array.forEach(item => {
+            const comboItem  = document.createElement('calcite-combobox-item');
+            // option.value = item.value;  // Set the value attribute if needed
+            comboItem.setAttribute('value', item)
+            comboItem.setAttribute('text-label', item)
+            comboBox.appendChild(comboItem);
+        });
+      }
+    
+
+
+      
+
+      require(["esri/Map", "esri/layers/FeatureLayer", "esri/views/MapView"], (
+        Map,
+        FeatureLayer,
+        MapView
+      ) => {
+
+      
+      const jsonBase = 'json/BASE.json';
+      const jsonCounty = 'json/COUNTY.json';
+      const jsonCity = 'json/CITY.json';
+      const jsonCenter = 'json/CENTER.json';
+      const jsonType = 'json/TYPE.json';
+      
+      // initialize geographic filter options
+      fetchLocalJsonArray(jsonBase)
+      .then(data => {
+        const countyArray = data[0].COUNTY;
+        const cityArray = data[0].CITY;
+        const centerArray = data[0].CENTER;
+        populateSelectBox('countySelect', countyArray);
+        populateSelectBox('citySelect', cityArray);
+        populateSelectBox('centerSelect', centerArray);
+      });
+
+      // initialize housing type options
+      fetchLocalJsonArray(jsonType)
+      .then(data => {
+        const subtypeArray = data[0].SUBTYPE;
+        populateComboBox('subtypeSelect', subtypeArray);
+      });
+
+  
+
+        // renderer used to setup the symbolizaton of the housing layers
+        dPixelSize = "6px"
+        dOutlineWidth = 1
+        transparency = 1
+        PtOutlineColor = [40,40,40]
+
+        const pointRenderer = {
+                type: "unique-value",
+                legendOptions: {
+                    title: "Housing Type"
+                },
+                field: "SUBTYPE",
+                uniqueValueInfos: [{
+                    value: "single_family",
+                    label: "Single Family",
+                    symbol: {
+                      type: "simple-marker",
+                      color: [250, 236, 167, transparency], // [R,G,B, Transparency]
+                      size: dPixelSize,
+                      outline: {
+                        color: PtOutlineColor,
+                        width: dOutlineWidth
+                    }
+                  }
+                }, {
+                    value: "duplex",
+                    label: "Duplex",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [252, 146, 31, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }, {
+                    value: "single_family_adu",
+                    label: "Single Family ADU",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [230, 0, 73, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }, {
+                    value: "townhome",
+                    label: "Townhome",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [40, 200, 48, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }, {
+                    value: "condo",
+                    label: "Condo",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [158, 85, 156, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }, {
+                    value: "mobile_home_park",
+                    label: "Mobile Home Park",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [91, 73, 196, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }, {
+                    value: 'mixed th/single_family',
+                    label: "Townhome/Single Family",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [30, 133, 83, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }, {
+                    value: "apartment",
+                    label: "Apartment",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [20, 158, 206, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }]
+              };
+
+
+
+        const housingLayer = new FeatureLayer({
+                outFields: ["*"],
+                url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/hui_for_web_gdb/FeatureServer/1",
+                renderer:pointRenderer
+              });
+
+
+
+        const map = new Map({
+          basemap: "topo-vector",
+          // layers: [statesFeatureLayer, countiesFeatureLayer]
+          layers: [housingLayer]
+        });
+
+        const view = new MapView({
+          container: "viewDiv",
+          map: map,
+          zoom: 16,
+          center: [-111.8587166, 40.7665529]
+        });
+
+        view.ui.move("zoom", "bottom-right");
+
+
+        // store ui objects as variables
+        const countySelect = document.getElementById("countySelect");
+        const citySelect = document.getElementById("citySelect");
+        const centerSelect = document.getElementById("centerSelect");
+        const subtypeSelect = document.getElementById("subtypeSelect");
+        const resetButton1 = document.getElementById("resetButton1");
+        
+        // define default queries
+        const defaultCountyQuery = "(COUNTY IS NULL OR COUNTY IS NOT NULL)";
+        const defaultCityQuery = "(CITY IS NULL OR CITY IS NOT NULL)";
+        const defaultCenterQuery = "(CENTER IS NULL OR CENTER IS NOT NULL)";
+
+        const defaultSubtypeQuery = "(SUBTYPE IS NULL OR SUBTYPE IS NOT NULL)";
+
+        const defaultLRquery = "(DIST_LR IS NULL OR DIST_LR IS NOT NULL)";
+        const defaultFRquery = "(DIST_FR IS NULL OR DIST_FR IS NOT NULL)";
+        const defaultBRTquery = "(DIST_BRT IS NULL OR DIST_BRT IS NOT NULL)";
+        const defaultFWYEquery = "(DIST_FWYE IS NULL OR DIST_FWYE IS NOT NULL)";
+
+        // set initial selection for geograhpy filters - could switch to a placeholder?
+        let countySelectionCurrent = "-No Selection-";
+        let citySelectionCurrent = "-No Selection-";
+        let centerSelectionCurrent = "-No Selection-";
+
+        let countyQuery = defaultCountyQuery;
+        let cityQuery = defaultCityQuery;
+        let centerQuery = defaultCenterQuery;
+        let subtypeQuery = defaultSubtypeQuery;
+
+        let LRquery = defaultLRquery;
+        let FRquery = defaultFRquery;
+        let BRTquery = defaultBRTquery;
+        let FWYEquery = defaultFWYEquery;
+
+        let fullQuery = null;
+
+        function generateFullQuery() {
+          fullQuery = countyQuery + ' AND ' + cityQuery + ' AND ' + centerQuery + ' AND ' + subtypeQuery + ' AND ' + LRquery + ' AND ' + FRquery + ' AND ' + BRTquery + ' AND ' + FWYEquery ;
+        }
+
+         // define initial definition expression
+        const initialDefinitionExpression = generateFullQuery()
+
+        // setup actions for the reset button
+        resetButton1.addEventListener("click", () => {
+          [housingLayer].forEach((layer) => {
+            
+            // clear the definition expression
+            layer.definitionExpression = null;
+            
+            fetchLocalJsonArray(jsonBase)
+            .then(data => {
+              
+              const countyArray = data[0].COUNTY;
+              const cityArray = data[0].CITY;
+              const centerArray = data[0].CENTER;
+              populateSelectBox('countySelect', countyArray);
+              populateSelectBox('citySelect', cityArray);
+              populateSelectBox('centerSelect', centerArray);
+
+            });
+
+            countyQuery = defaultCountyQuery; // work for now but should the select just be set to null instead?
+            cityQuery = defaultCityQuery;
+            centerQuery = defaultCenterQuery;
+            subtypeQuery = defaultSubtypeQuery;
+            
+            subtypeSelect.value = null;
+            inputLR.value = null;
+            inputFR.value = null;
+            inputBRT.value = null;
+            inputFWYE.value = null;
+          });
+        });
+
+
+        // COUNTY - filter and zoom features, update select options
+        countySelect.addEventListener("change", () => {
+          [housingLayer].forEach((layer) => { // fix this to include parcels and points in main app
+
+            selectionText = countySelect.options[countySelect.selectedIndex].text;
+            countySelectionCurrent = selectionText;
+            console.log(selectionText)
+
+            if(selectionText === "-No Selection-"){
+              countyQuery = defaultCountyQuery
+            }else{
+              countyQuery = `COUNTY = '${selectionText}'`
+            }
+
+            // update the main query
+            generateFullQuery()
+            console.log(fullQuery)
+            layer.definitionExpression = fullQuery;
+            
+            // update the select options
+            fetchLocalJsonArray(jsonCounty)
+            .then(data => {
+              const dataFiltered = data.find(item => item.NAME === selectionText);
+              const countyArray = dataFiltered.COUNTY;
+              const cityArray = dataFiltered.CITY;
+              const centerArray = dataFiltered.CENTER;
+
+              populateSelectBox('countySelect', countyArray);
+              populateSelectBox('citySelect', cityArray);
+              populateSelectBox('centerSelect', centerArray);
+
+              countySelect.value = countySelectionCurrent;
+              citySelect.value = citySelectionCurrent;
+              centerSelect.value = centerSelectionCurrent;
+            });
+          });
+          housingLayer.queryExtent().then((results) => {
+            view.goTo(results.extent);
+          });
+        });
+
+        // CITY - filter and zoom features, update select options
+        citySelect.addEventListener("change", () => {
+          [housingLayer].forEach((layer) => { // fix this to include parcels and points in main app
+
+            selectionText = citySelect.options[citySelect.selectedIndex].text;
+            citySelectionCurrent = selectionText;
+            console.log(selectionText)
+
+            if(selectionText === "-No Selection-"){
+              cityQuery = defaultCityQuery
+            }else{
+              cityQuery = `CITY = '${selectionText}'`
+            }
+
+            // update the main query
+            generateFullQuery()
+            console.log(fullQuery)
+            layer.definitionExpression = fullQuery;
+            
+            // update the select options
+            fetchLocalJsonArray(jsonCity)
+            .then(data => {
+              const dataFiltered = data.find(item => item.NAME === selectionText);
+              const countyArray = dataFiltered.COUNTY;
+              const cityArray = dataFiltered.CITY;
+              const centerArray = dataFiltered.CENTER;
+
+              populateSelectBox('countySelect', countyArray);
+              populateSelectBox('citySelect', cityArray);
+              populateSelectBox('centerSelect', centerArray);
+
+              countySelect.value = countySelectionCurrent;
+              citySelect.value = citySelectionCurrent;
+              centerSelect.value = centerSelectionCurrent;
+            });
+          });
+          housingLayer.queryExtent().then((results) => {
+            view.goTo(results.extent);
+          });
+        });
+
+        // CENTER - filter and zoom features, update select options
+        centerSelect.addEventListener("change", () => {
+          [housingLayer].forEach((layer) => { // fix this to include parcels and points in main app
+
+            selectionText = centerSelect.options[centerSelect.selectedIndex].text;
+            centerSelectionCurrent = selectionText;
+            console.log(selectionText)
+
+            if(selectionText === "-No Selection-"){
+              centerQuery = defaultCenterQuery
+            }else{
+              centerQuery = `CENTER = '${selectionText}'`
+            }
+
+            // update the main query
+            generateFullQuery()
+            console.log(fullQuery)
+            layer.definitionExpression = fullQuery;
+            
+            // update the select options
+            fetchLocalJsonArray(jsonCenter)
+            .then(data => {
+              const dataFiltered = data.find(item => item.NAME === selectionText);
+              const countyArray = dataFiltered.COUNTY;
+              const cityArray = dataFiltered.CITY;
+              const centerArray = dataFiltered.CENTER;
+
+              populateSelectBox('countySelect', countyArray);
+              populateSelectBox('citySelect', cityArray);
+              populateSelectBox('centerSelect', centerArray);
+
+              countySelect.value = countySelectionCurrent;
+              citySelect.value = citySelectionCurrent;
+              centerSelect.value = centerSelectionCurrent;
+            });
+          });
+          housingLayer.queryExtent().then((results) => {
+            view.goTo(results.extent);
+          });
+        });
+
+        // SUBTYPE Select
+        subtypeSelect.addEventListener("calciteComboboxChange", (event) => {
+          [housingLayer].forEach((layer) => { // fix this to include parcels and points in main app
+
+
+            selection = event.target.value;
+            // console.log(selection);
+
+            if (Array.isArray(selection) == false){
+              if(selection === null | selection === " " | selection === ""){
+                subtypeQuery = defaultSubtypeQuery
+              }else{
+                subtypeQuery = `SUBTYPE IN ('${selection}')`
+              }
+            }else{
+              selection = selection.map(value => `'${value}'`);
+              subtypeQuery = `SUBTYPE IN (${selection})`
+            }
+            
+            // update the main query
+            generateFullQuery()
+            console.log(fullQuery)
+            layer.definitionExpression = fullQuery;
+          });
+        });
+
+
+        
+
+        //initialize light rail dist filter
+        const inputLR  = document.getElementById("inputLR");
+        inputLR.value = null;
+        inputLR.addEventListener("calciteInputChange", function(){
+
+            userInput = inputLR.value;
+            console.log(typeof(userInput))
+
+            if (userInput === null | userInput === " " | userInput === ""){
+              LRquery = defaultLRquery;
+            }  else {
+              LRquery = `DIST_LR <= '${userInput}'`;
+            }
+            
+            // update the main query
+            generateFullQuery()
+            console.log(fullQuery);
+
+            [housingLayer].forEach((layer) => { 
+              layer.definitionExpression = fullQuery;
+            });
+          });
+
+
+        //initialize frontrunner dist filter
+        const inputFR  = document.getElementById("inputFR");
+        inputFR.value = null;
+        inputFR.addEventListener("calciteInputChange", function(){
+
+            userInput = inputFR.value;
+            console.log(userInput)
+
+            if (userInput === null | userInput === " " | userInput === ""){
+              FRquery = defaultFRquery;
+            }  else {
+              FRquery = `DIST_FR <= '${userInput}'`;
+            }
+            
+            // update the main query
+            generateFullQuery()
+            console.log(fullQuery);
+
+            [housingLayer].forEach((layer) => { 
+              layer.definitionExpression = fullQuery;
+            });
+          });
+
+        //initialize BRT dist filter
+        const inputBRT  = document.getElementById("inputBRT");
+        inputBRT.value = null;
+        inputBRT.addEventListener("calciteInputChange", function(){
+
+            userInput = inputBRT.value;
+            console.log(userInput)
+
+            if (userInput === null | userInput === " " | userInput === ""){
+              BRTquery = defaultBRTquery;
+            }  else {
+              BRTquery = `DIST_BRT <= '${userInput}'`;
+            }
+            
+            // update the main query
+            generateFullQuery()
+            console.log(fullQuery);
+
+            [housingLayer].forEach((layer) => { 
+              layer.definitionExpression = fullQuery;
+            });
+          });
+
+        //initialize FWYE dist filter
+        const inputFWYE  = document.getElementById("inputFWYE");
+        inputFWYE.value = null;
+        inputFWYE.addEventListener("calciteInputChange", function(){
+
+            userInput = inputFWYE.value;
+            console.log(userInput)
+
+            if (userInput === null | userInput === " " | userInput === ""){
+              FWYEquery = defaultFWYEquery;
+            } else {
+              FWYEquery = `DIST_FWYE <= '${userInput}'`;
+            }
+            
+            // update the main query
+            generateFullQuery()
+            console.log(fullQuery);
+
+            [housingLayer].forEach((layer) => { 
+              layer.definitionExpression = fullQuery;
+            });
+          });
+
+
+        view.ui.add("sidebarDiv", { position: "top-left" });
+
+      });
+
+    </script>
+  </head>
+
+  <body>
+    <div id="viewDiv"></div>
+
+    <div id="sidebarDiv" class="esri-widget">
+      
+      <h4 class="esri-heading">Filter by County</h4>
+      <select id="countySelect" class="esri-widget"  style="width: 200px;">
+      </select>
+
+      <h4 class="esri-heading">Filter by City</h4>
+      <select id="citySelect" class="esri-widget"  style="width: 200px;">
+      </select>
+
+      <h4 class="esri-heading">Filter by Center</h4>
+      <select id="centerSelect" class="esri-widget"  style="width: 200px;">
+      </select>
+
+      <h4 class="esri-heading">- - - - - - - - -</h4>
+      
+      <label>
+        <b>Filter by Housing Type</b>
+        <br><br>
+        <calcite-combobox  id="subtypeSelect" placeholder="select housing types" style="width: 200px;">
+        </calcite-combobox>
+      </label>
+
+      <h4 class="esri-heading">- - - - - - - - -</h4>
+  
+      <label>
+        <b>Distance from TRAX (mi)</b>
+        <br><br>
+        <calcite-input id="inputLR" width="200px" type="number" step=.5 min=0 clearable=true placeholder="enter a distance"></calcite-input>
+      </label>
+      
+      <br><br>
+      
+      <label>
+        <b>Distance from Frontrunner (mi)</b>
+        <br><br>
+        <calcite-input id="inputFR" width="200px" type="number" step=.5 min=0 clearable=true placeholder="enter a distance"></calcite-input>
+      </label>
+
+      <br><br>
+
+      <label>
+        <b>Distance from BRT (mi)</b>
+        <br><br>
+        <calcite-input id="inputBRT" width="200px" type="number" step=.5 min=0 clearable=true placeholder="enter a distance"></calcite-input>
+      </label>
+
+      <br><br>
+
+      <label>
+        <b>Distance from FWY Exit (mi)</b>
+        <br><br>
+        <calcite-input id="inputFWYE" width="200px" type="number" step=.5 min=0 clearable=true placeholder="enter a distance"></calcite-input>
+      </label>
+      
+      <br><br>
+
+      <input id="resetButton1" type="button" value="Reset Filters" class="esri-button" style="width: 200px;" />
+
+
+    </div>
+  </body>
