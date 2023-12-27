@@ -2,7 +2,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
-    <title>Filter and Zoom</title>
+    <title>Filter and Zoom 2</title>
 
     <script type="module" src="https://js.arcgis.com/calcite-components/1.9.2/calcite.esm.js"></script>
     <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.9.2/calcite.css"/>
@@ -31,6 +31,23 @@
     </style>
 
     <script>
+      function setCalciteSelectValue(selectElement, newValue) {
+        // const selectElement = document.getElementById(selectId);
+        
+        // Find the option with the specified value
+        const optionToSelect = Array.from(selectElement.children)
+          .find(option => option.value === newValue);
+
+        if (optionToSelect) {
+          // Set the 'selected' attribute on the option
+          optionToSelect.setAttribute('selected', '');
+
+          // Dispatch a 'change' event to simulate user interaction
+          const changeEvent = new Event('change', { bubbles: true });
+          selectElement.dispatchEvent(changeEvent);
+        }
+      }
+
 
       function fetchLocalJsonArray(filePath) {
         return fetch(filePath)
@@ -53,9 +70,11 @@
 
         // Populate with options from the array
         array.forEach(item => {
-          const option = document.createElement('option');
+          const option = document.createElement('calcite-option');
           // option.value = item.value;  // Set the value attribute if needed
-          option.text = item;    // Set the text content of the option
+          option.setAttribute('value', item)
+          option.setAttribute('label', item)
+          // option.text = item;    // Set the text content of the option
           selectBox.appendChild(option);
       });
     }
@@ -267,9 +286,9 @@
         const defaultFWYEquery = "(DIST_FWYE IS NULL OR DIST_FWYE IS NOT NULL)";
 
         // set initial selection for geograhpy filters - could switch to a placeholder?
-        let countySelectionCurrent = "-No Selection-";
-        let citySelectionCurrent = "-No Selection-";
-        let centerSelectionCurrent = "-No Selection-";
+        let countySelectionCurrent = "None";
+        let citySelectionCurrent = "None";
+        let centerSelectionCurrent = "None";
 
         let countyQuery = defaultCountyQuery;
         let cityQuery = defaultCityQuery;
@@ -294,6 +313,11 @@
         resetButton1.addEventListener("click", () => {
           [housingLayer].forEach((layer) => {
             
+            countyActive = false
+            cityActive = false
+            centerActive = false
+            
+
             // clear the definition expression
             layer.definitionExpression = null;
             
@@ -322,19 +346,28 @@
           });
         });
 
+        let countyActive = false;
+        let cityActive = false;
+        let centerActive = false;
 
         // COUNTY - filter and zoom features, update select options
-        countySelect.addEventListener("change", () => {
+        countySelect.addEventListener("calciteSelectChange", () => {
           [housingLayer].forEach((layer) => { // fix this to include parcels and points in main app
 
-            selectionText = countySelect.options[countySelect.selectedIndex].text;
+            ;
+
+            // selectionText = countySelect.options[countySelect.selectedIndex].text;
+            selectionText = event.target.value;
+
             countySelectionCurrent = selectionText;
             console.log(selectionText)
 
-            if(selectionText === "-No Selection-"){
+            if(selectionText === "None"){
               countyQuery = defaultCountyQuery
+              countyActive = false
             }else{
               countyQuery = `COUNTY = '${selectionText}'`
+              countyActive = true
             }
 
             // update the main query
@@ -349,14 +382,16 @@
               const countyArray = dataFiltered.COUNTY;
               const cityArray = dataFiltered.CITY;
               const centerArray = dataFiltered.CENTER;
+              
 
-              populateSelectBox('countySelect', countyArray);
-              populateSelectBox('citySelect', cityArray);
-              populateSelectBox('centerSelect', centerArray);
+              if ((cityActive !== true) && (centerActive !== true)){
+                populateSelectBox('citySelect', cityArray);
+                populateSelectBox('centerSelect', centerArray);   
+              }           
+              setCalciteSelectValue(countySelect, countySelectionCurrent)
+              setCalciteSelectValue(citySelect, citySelectionCurrent)
+              setCalciteSelectValue(centerSelect, centerSelectionCurrent)
 
-              countySelect.value = countySelectionCurrent;
-              citySelect.value = citySelectionCurrent;
-              centerSelect.value = centerSelectionCurrent;
             });
           });
           housingLayer.queryExtent().then((results) => {
@@ -365,17 +400,20 @@
         });
 
         // CITY - filter and zoom features, update select options
-        citySelect.addEventListener("change", () => {
+        citySelect.addEventListener("calciteSelectChange", () => {
           [housingLayer].forEach((layer) => { // fix this to include parcels and points in main app
 
-            selectionText = citySelect.options[citySelect.selectedIndex].text;
+            // selectionText = citySelect.options[citySelect.selectedIndex].text;
+            selectionText = event.target.value;
             citySelectionCurrent = selectionText;
             console.log(selectionText)
 
-            if(selectionText === "-No Selection-"){
-              cityQuery = defaultCityQuery
+            if(selectionText === "None"){
+              cityQuery = defaultCityQuery;
+              cityActive = false;
             }else{
-              cityQuery = `CITY = '${selectionText}'`
+              cityQuery = `CITY = '${selectionText}'`;
+              cityActive = true;
             }
 
             // update the main query
@@ -391,13 +429,20 @@
               const cityArray = dataFiltered.CITY;
               const centerArray = dataFiltered.CENTER;
 
-              populateSelectBox('countySelect', countyArray);
-              populateSelectBox('citySelect', cityArray);
-              populateSelectBox('centerSelect', centerArray);
+             
+              if ((countyActive !== true) && (centerActive !== true)){
+                populateSelectBox('countySelect', countyArray);
+                populateSelectBox('centerSelect', centerArray);              
+              } if ((countyActive === true)){
+                  populateSelectBox('countySelect', countyArray);
+                  populateSelectBox('centerSelect', centerArray);
+              } if ((centerActive === true)){
+                  populateSelectBox('centerSelect', centerArray);
+              }
 
-              countySelect.value = countySelectionCurrent;
-              citySelect.value = citySelectionCurrent;
-              centerSelect.value = centerSelectionCurrent;
+              setCalciteSelectValue(countySelect, countySelectionCurrent)
+              setCalciteSelectValue(citySelect, citySelectionCurrent)
+              setCalciteSelectValue(centerSelect, centerSelectionCurrent)
             });
           });
           housingLayer.queryExtent().then((results) => {
@@ -406,17 +451,19 @@
         });
 
         // CENTER - filter and zoom features, update select options
-        centerSelect.addEventListener("change", () => {
+        centerSelect.addEventListener("calciteSelectChange", () => {
           [housingLayer].forEach((layer) => { // fix this to include parcels and points in main app
 
-            selectionText = centerSelect.options[centerSelect.selectedIndex].text;
+            selectionText = event.target.value;
             centerSelectionCurrent = selectionText;
             console.log(selectionText)
 
-            if(selectionText === "-No Selection-"){
-              centerQuery = defaultCenterQuery
+            if(selectionText === "None"){
+              centerQuery = defaultCenterQuery;
+              centerActive = false;
             }else{
               centerQuery = `CENTER = '${selectionText}'`
+              centerActive = true;
             }
 
             // update the main query
@@ -432,13 +479,23 @@
               const cityArray = dataFiltered.CITY;
               const centerArray = dataFiltered.CENTER;
 
-              populateSelectBox('countySelect', countyArray);
-              populateSelectBox('citySelect', cityArray);
-              populateSelectBox('centerSelect', centerArray);
+              
+              
+              
+              if ((countyActive !== true) && (cityActive !== true)){
+                populateSelectBox('countySelect', countyArray);
+                populateSelectBox('citySelect', cityArray);          
+              } if ((countyActive === true)){
+                  populateSelectBox('countySelect', countyArray);
+                  populateSelectBox('citySelect', cityArray);
+              } if ((cityActive === true)){
+                  populateSelectBox('citySelect', cityArray);
+              }
 
-              countySelect.value = countySelectionCurrent;
-              citySelect.value = citySelectionCurrent;
-              centerSelect.value = centerSelectionCurrent;
+              setCalciteSelectValue(countySelect, countySelectionCurrent)
+              setCalciteSelectValue(citySelect, citySelectionCurrent)
+              setCalciteSelectValue(centerSelect, centerSelectionCurrent)
+
             });
           });
           housingLayer.queryExtent().then((results) => {
@@ -582,23 +639,23 @@
     <div id="sidebarDiv" class="esri-widget">
       
       <h4 class="esri-heading">Filter by County</h4>
-      <select id="countySelect" class="esri-widget"  style="width: 200px;">
-      </select>
+      <calcite-select id="countySelect"   style="width: 200px;">
+      </calcite-select>
 
       <h4 class="esri-heading">Filter by City</h4>
-      <select id="citySelect" class="esri-widget"  style="width: 200px;">
-      </select>
+      <calcite-select id="citySelect" style="width: 200px;">
+      </calcite-select>
 
       <h4 class="esri-heading">Filter by Center</h4>
-      <select id="centerSelect" class="esri-widget"  style="width: 200px;">
-      </select>
+      <calcite-select id="centerSelect"  style="width: 200px;">
+      </calcite-select>
 
       <h4 class="esri-heading">- - - - - - - - -</h4>
       
       <label>
         <b>Filter by Housing Type</b>
         <br><br>
-        <calcite-combobox  id="subtypeSelect" placeholder="select housing types" style="width: 200px;">
+        <calcite-combobox  id="subtypeSelect" placeholder="select housing types"  style="width: 200px;">
         </calcite-combobox>
       </label>
 
