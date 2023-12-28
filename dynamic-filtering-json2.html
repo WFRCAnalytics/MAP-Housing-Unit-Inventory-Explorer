@@ -20,11 +20,76 @@
         width: 100%;
       }
       #sidebarDiv {
-        width: 250px;
+        width: 35vw;
         padding: 10px;
-        height: 90vh;
-        overflow-y: auto;
+        height: 65vh;
+        /* overflow-y: auto; */
         border: 2px solid #ccc;
+        background-color: #323232;
+      }
+
+      #resetButton, #andButton, #orButton{
+        color:white;
+        
+      }
+
+      .grid-container {
+        display: grid;
+        grid-template-columns: repeat(2, 50%); /* Two columns with equal width */
+        grid-gap: 2vh; /* Adjust the gap between grid items as needed */
+      }
+      .grid-container2 {
+        display: grid;
+        grid-template-columns: repeat(2, 50%);
+        grid-gap: .5vh;
+        
+      }
+      
+
+      /* Style for each grid item */
+      .grid-item {
+        height: 10vh;
+        width: 15vw;
+        border: 1px solid #ccc;
+        padding: 5px;
+        text-align: center;
+        /* white-space: normal; */
+        font-size: 1vw;
+        color:white;
+      }
+
+      /* Style for each grid item */
+      .grid-item2 {
+        height: 5vh;
+        width: 15vw;
+        border: 1px solid #ccc;
+        padding: 5px;
+        text-align: center;
+        /* white-space: normal; */
+        font-size: 1vw;
+        color:white;
+      }
+      .child1 {
+      height: 40%; 
+      /* background-color: lightblue; */
+      /* border: 1px solid #2305cc; */
+      }
+      .child2 {
+        height: 60%; 
+        /* background-color: rgb(192, 135, 13); */
+        /* border: 1px solid #d80303; */
+      }
+      .child3 {
+        height: 100%; 
+        width: 100%;
+        
+        /* background-color: rgb(192, 135, 13); */
+        /* border: 1px solid #d80303; */
+      }
+      .child4 {
+        height: 100%; 
+        width: 95%;
+        /* border: 1px solid #d80303; */
       }
 
 
@@ -271,7 +336,9 @@
         const citySelect = document.getElementById("citySelect");
         const centerSelect = document.getElementById("centerSelect");
         const subtypeSelect = document.getElementById("subtypeSelect");
-        const resetButton1 = document.getElementById("resetButton1");
+        const resetButton = document.getElementById("resetButton");
+        const andButton = document.getElementById("andButton");
+        const orButton = document.getElementById("orButton");
         
         // define default queries
         const defaultCountyQuery = "(COUNTY IS NULL OR COUNTY IS NOT NULL)";
@@ -284,6 +351,7 @@
         const defaultFRquery = "(DIST_FR IS NULL OR DIST_FR IS NOT NULL)";
         const defaultBRTquery = "(DIST_BRT IS NULL OR DIST_BRT IS NOT NULL)";
         const defaultFWYEquery = "(DIST_FWYE IS NULL OR DIST_FWYE IS NOT NULL)";
+        const defaultLogicOperator =  "AND";
 
         // set initial selection for geograhpy filters - could switch to a placeholder?
         let countySelectionCurrent = "None";
@@ -299,18 +367,20 @@
         let FRquery = defaultFRquery;
         let BRTquery = defaultBRTquery;
         let FWYEquery = defaultFWYEquery;
+        let logicOperator =  defaultLogicOperator;
+        
 
         let fullQuery = null;
 
         function generateFullQuery() {
-          fullQuery = countyQuery + ' AND ' + cityQuery + ' AND ' + centerQuery + ' AND ' + subtypeQuery + ' AND ' + LRquery + ' AND ' + FRquery + ' AND ' + BRTquery + ' AND ' + FWYEquery ;
+          fullQuery = countyQuery + ' AND ' + cityQuery + ' AND ' + centerQuery + ' AND ' + subtypeQuery + ' AND (' + LRquery + ' ' + logicOperator + ' ' + FRquery + ' ' + logicOperator + ' ' + BRTquery + ' ' + logicOperator + ' ' + FWYEquery + ')' ;
         }
 
          // define initial definition expression
         const initialDefinitionExpression = generateFullQuery()
 
         // setup actions for the reset button
-        resetButton1.addEventListener("click", () => {
+        resetButton.addEventListener("click", () => {
           [housingLayer].forEach((layer) => {
             
             countyActive = false
@@ -337,14 +407,42 @@
             cityQuery = defaultCityQuery;
             centerQuery = defaultCenterQuery;
             subtypeQuery = defaultSubtypeQuery;
+            subtypeQuery = defaultSubtypeQuery;
+            LRquery = defaultLRquery;
+            FRquery = defaultFRquery;
+            BRTquery = defaultBRTquery;
+            FWYEquery = defaultFWYEquery;
+            logicOperator =  defaultLogicOperator;
             
             subtypeSelect.value = null;
             inputLR.value = null;
             inputFR.value = null;
             inputBRT.value = null;
             inputFWYE.value = null;
+            logicOperator = "And"; 
+            generateFullQuery()
+            andButton.style.backgroundColor = "#0079c1";
+            orButton.style.backgroundColor = "#797979";
+            
           });
         });
+
+        // setup actions for the AND button
+        andButton.addEventListener("click", () => {
+            logicOperator = "And"; 
+            generateFullQuery()
+            andButton.style.backgroundColor = "#0079c1";
+            orButton.style.backgroundColor = "#797979";
+        });
+
+        // setup actions for the OR button
+        orButton.addEventListener("click", () => {
+            logicOperator = "Or";
+            generateFullQuery()
+            orButton.style.backgroundColor = "#0079c1";
+            andButton.style.backgroundColor = "#797979";
+        });
+
 
         let countyActive = false;
         let cityActive = false;
@@ -636,64 +734,108 @@
   <body>
     <div id="viewDiv"></div>
 
-    <div id="sidebarDiv" class="esri-widget">
+    <div id="sidebarDiv" class="grid-container">
+      <div class="grid-item">
+        <div class="child1">
+          <b>County</b>
+        </div>
+        <div class="child2">
+          <calcite-select id="countySelect"></calcite-select>
+        </div>
+      </div>
+    
+      <div class="grid-item">
+        <div class="child1">
+          <b>To TRAX (mi)</b>
+        </div>
+        <div class="child2">
+          <calcite-input id="inputLR" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance"></calcite-input>
+        </div>
+      </div>
+    
+      <div class="grid-item">
+        <div class="child1">
+          <b>City</b>
+        </div>
+        <div class="child2">
+          <calcite-select id="citySelect"></calcite-select>
+        </div>
+      </div>
+    
+      <div class="grid-item">
+        <label>
+          <div class="child1">
+            <b>To FrontRunner (mi)</b>
+          </div>
+          <div class="child2">
+            <calcite-input id="inputFR" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance"></calcite-input>
+          </div>
+        </label>
+      </div>
+    
+      <div class="grid-item">
+        <div class="child1">
+          <b>Center</b>
+        </div>
+        <div class="child2">
+          <calcite-select id="centerSelect"></calcite-select>
+        </div>
+      </div>
+    
+      <div class="grid-item">
+        <label>
+          <div class="child1">
+            <b>To BRT (mi)</b>
+          </div>
+          <div class="child2">
+            <calcite-input id="inputBRT" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance"></calcite-input>
+          </div>
+        </label>
+      </div>
+    
+      <div class="grid-item">
+        <label>
+          <div class="child1">
+            <b>Housing Type</b>
+          </div>
+          <div class="child2">
+            <calcite-combobox id="subtypeSelect" placeholder="select housing types"></calcite-combobox>
+          </div>
+        </label>
+      </div>
+    
+      <div class="grid-item">
+        <label>
+          <div class="child1">
+            <b>To FWY Exit (mi)</b>
+          </div>
+          <div class="child2">
+            <calcite-input id="inputFWYE" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance"></calcite-input>
+          </div>
+        </label>
+      </div>
+
+      <div class="grid-item2">
+       
+          <div class="child3">
+            <input id="resetButton" type="button" value="Clear Filters" class="esri-button" style="background-color: #0079c1;"/>
+          </div>
+       
+      </div>
+
+      <div class="grid-item2">
+        <div  class="grid-container2">
+          <div class="child4">
+            <input id="andButton" type="button" value="And" class="esri-button" style="background-color: #0079c1;"/>
+          </div>
+
+          <div class="child4">
+            <input id="orButton" type="button" value="Or" class="esri-button" style="background-color: #797979;"/>
+          </div>
+        </div>
       
-      <h4 class="esri-heading">Filter by County</h4>
-      <calcite-select id="countySelect"   style="width: 200px;">
-      </calcite-select>
+      </div>
 
-      <h4 class="esri-heading">Filter by City</h4>
-      <calcite-select id="citySelect" style="width: 200px;">
-      </calcite-select>
-
-      <h4 class="esri-heading">Filter by Center</h4>
-      <calcite-select id="centerSelect"  style="width: 200px;">
-      </calcite-select>
-
-      <h4 class="esri-heading">- - - - - - - - -</h4>
-      
-      <label>
-        <b>Filter by Housing Type</b>
-        <br><br>
-        <calcite-combobox  id="subtypeSelect" placeholder="select housing types"  style="width: 200px;">
-        </calcite-combobox>
-      </label>
-
-      <h4 class="esri-heading">- - - - - - - - -</h4>
-  
-      <label>
-        <b>Distance from TRAX (mi)</b>
-        <br><br>
-        <calcite-input id="inputLR" width="200px" type="number" step=.5 min=0 clearable=true placeholder="enter a distance"></calcite-input>
-      </label>
-      
-      <br><br>
-      
-      <label>
-        <b>Distance from Frontrunner (mi)</b>
-        <br><br>
-        <calcite-input id="inputFR" width="200px" type="number" step=.5 min=0 clearable=true placeholder="enter a distance"></calcite-input>
-      </label>
-
-      <br><br>
-
-      <label>
-        <b>Distance from BRT (mi)</b>
-        <br><br>
-        <calcite-input id="inputBRT" width="200px" type="number" step=.5 min=0 clearable=true placeholder="enter a distance"></calcite-input>
-      </label>
-
-      <br><br>
-
-      <label>
-        <b>Distance from FWY Exit (mi)</b>
-        <br><br>
-        <calcite-input id="inputFWYE" width="200px" type="number" step=.5 min=0 clearable=true placeholder="enter a distance"></calcite-input>
-      </label>
-      
-      <br><br>
-
-      <input id="resetButton1" type="button" value="Reset Filters" class="esri-button" style="width: 200px;" />
 
 
     </div>
