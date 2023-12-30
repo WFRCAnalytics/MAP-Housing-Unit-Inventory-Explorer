@@ -4,96 +4,13 @@
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
     <title>Filter and Zoom 2</title>
 
-    <script type="module" src="https://js.arcgis.com/calcite-components/1.9.2/calcite.esm.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.9.2/calcite.css"/>
+    <script type="module" src="https://js.arcgis.com/calcite-components/2.1.0/calcite.esm.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/2.1.0/calcite.css" />
 
     <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/dark/main.css" />
     <script src="https://js.arcgis.com/4.28/"></script>
-
-    <style>
-      html,
-      body,
-      #viewDiv {
-        padding: 0;
-        margin: 0;
-        height: 100%;
-        width: 100%;
-      }
-      #sidebarDiv {
-        width: 35vw;
-        padding: 10px;
-        height: 65vh;
-        /* overflow-y: auto; */
-        border: 2px solid #ccc;
-        background-color: #323232;
-      }
-
-      #resetButton, #andButton, #orButton{
-        color:white;
-        
-      }
-
-      .grid-container {
-        display: grid;
-        grid-template-columns: repeat(2, 50%); /* Two columns with equal width */
-        grid-gap: 2vh; /* Adjust the gap between grid items as needed */
-      }
-      .grid-container2 {
-        display: grid;
-        grid-template-columns: repeat(2, 50%);
-        grid-gap: .5vh;
-        
-      }
-      
-
-      /* Style for each grid item */
-      .grid-item {
-        height: 10vh;
-        width: 15vw;
-        border: 1px solid #ccc;
-        padding: 5px;
-        text-align: center;
-        /* white-space: normal; */
-        font-size: 1vw;
-        color:white;
-      }
-
-      /* Style for each grid item */
-      .grid-item2 {
-        height: 5vh;
-        width: 15vw;
-        border: 1px solid #ccc;
-        padding: 5px;
-        text-align: center;
-        /* white-space: normal; */
-        font-size: 1vw;
-        color:white;
-      }
-      .child1 {
-      height: 40%; 
-      /* background-color: lightblue; */
-      /* border: 1px solid #2305cc; */
-      }
-      .child2 {
-        height: 60%; 
-        /* background-color: rgb(192, 135, 13); */
-        /* border: 1px solid #d80303; */
-      }
-      .child3 {
-        height: 100%; 
-        width: 100%;
-        
-        /* background-color: rgb(192, 135, 13); */
-        /* border: 1px solid #d80303; */
-      }
-      .child4 {
-        height: 100%; 
-        width: 95%;
-        /* border: 1px solid #d80303; */
-      }
-
-
-    </style>
+    <script src="js/renderers.js"></script>
+    <link rel="stylesheet" href="css/style.css">
 
     <script>
       function setCalciteSelectValue(selectElement, newValue) {
@@ -157,17 +74,14 @@
         });
       }
     
-
-
-      
-
-      require(["esri/Map", "esri/layers/FeatureLayer", "esri/views/MapView"], (
+      require(["esri/Map", "esri/layers/FeatureLayer", "esri/views/MapView", "esri/layers/support/FeatureReductionCluster", "esri/rest/support/Query"], (
         Map,
         FeatureLayer,
-        MapView
+        MapView,
+        FeatureReductionCluster,
+        Query
       ) => {
 
-      
       const jsonBase = 'json/BASE.json';
       const jsonCounty = 'json/COUNTY.json';
       const jsonCity = 'json/CITY.json';
@@ -193,143 +107,73 @@
       });
 
   
+        const countiesLayer = new FeatureLayer({
+                outFields: ["CO_NAME"],
+                url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/Boundaries_gdb/FeatureServer/1",
+                renderer:countyRenderer,
+                maxScale: 50000,
+                visible: false
+              });
+              
+        const citiesLayer = new FeatureLayer({
+                outFields: ["NAME"],
+                url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/Boundaries_gdb/FeatureServer/0",
+                renderer:cityRenderer,
+                maxScale: 20000,
+                minScale: 100000,
+                visible: false
+        
+              });
 
-        // renderer used to setup the symbolizaton of the housing layers
-        dPixelSize = "6px"
-        dOutlineWidth = 1
-        transparency = 1
-        PtOutlineColor = [40,40,40]
+        const centersLayer = new FeatureLayer({
+                outFields: ["AreaName"],
+                url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/Boundaries_gdb/FeatureServer/2",
+                renderer:centerRenderer,
+                maxScale: 2000,
+                minScale: 50000,
+                visible: false
+              });
 
-        const pointRenderer = {
-                type: "unique-value",
-                legendOptions: {
-                    title: "Housing Type"
-                },
-                field: "SUBTYPE",
-                uniqueValueInfos: [{
-                    value: "single_family",
-                    label: "Single Family",
-                    symbol: {
-                      type: "simple-marker",
-                      color: [250, 236, 167, transparency], // [R,G,B, Transparency]
-                      size: dPixelSize,
-                      outline: {
-                        color: PtOutlineColor,
-                        width: dOutlineWidth
+        
+              ptReduction = {
+                type: "cluster",
+                clusterRadius: "75px",
+                maxScale: 100000,
+                popupTemplate: {
+                  content: "This cluster represents <b>{cluster_count}</b> features.",
+                  fieldInfos: [{
+                    fieldName: "cluster_count",
+                    format: {
+                      digitSeparator: true,
+                      places: 0
                     }
-                  }
-                }, {
-                    value: "duplex",
-                    label: "Duplex",
-                    symbol: {
-                        type: "simple-marker",
-                        color: [252, 146, 31, transparency],
-                        size: dPixelSize,
-                        outline: {
-                          color: PtOutlineColor,
-                          width: dOutlineWidth
-                      }
-                    }
-                }, {
-                    value: "single_family_adu",
-                    label: "Single Family ADU",
-                    symbol: {
-                        type: "simple-marker",
-                        color: [230, 0, 73, transparency],
-                        size: dPixelSize,
-                        outline: {
-                          color: PtOutlineColor,
-                          width: dOutlineWidth
-                      }
-                    }
-                }, {
-                    value: "townhome",
-                    label: "Townhome",
-                    symbol: {
-                        type: "simple-marker",
-                        color: [40, 200, 48, transparency],
-                        size: dPixelSize,
-                        outline: {
-                          color: PtOutlineColor,
-                          width: dOutlineWidth
-                      }
-                    }
-                }, {
-                    value: "condo",
-                    label: "Condo",
-                    symbol: {
-                        type: "simple-marker",
-                        color: [158, 85, 156, transparency],
-                        size: dPixelSize,
-                        outline: {
-                          color: PtOutlineColor,
-                          width: dOutlineWidth
-                      }
-                    }
-                }, {
-                    value: "mobile_home_park",
-                    label: "Mobile Home Park",
-                    symbol: {
-                        type: "simple-marker",
-                        color: [91, 73, 196, transparency],
-                        size: dPixelSize,
-                        outline: {
-                          color: PtOutlineColor,
-                          width: dOutlineWidth
-                      }
-                    }
-                }, {
-                    value: 'mixed th/single_family',
-                    label: "Townhome/Single Family",
-                    symbol: {
-                        type: "simple-marker",
-                        color: [30, 133, 83, transparency],
-                        size: dPixelSize,
-                        outline: {
-                          color: PtOutlineColor,
-                          width: dOutlineWidth
-                      }
-                    }
-                }, {
-                    value: "apartment",
-                    label: "Apartment",
-                    symbol: {
-                        type: "simple-marker",
-                        color: [20, 158, 206, transparency],
-                        size: dPixelSize,
-                        outline: {
-                          color: PtOutlineColor,
-                          width: dOutlineWidth
-                      }
-                    }
-                }]
+                  }]
+                }
               };
-
-
 
         const housingLayer = new FeatureLayer({
                 outFields: ["*"],
                 url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/hui_for_web_gdb/FeatureServer/1",
-                renderer:pointRenderer
+                renderer:pointRenderer,
+                // featureReduction: ptReduction
+                
               });
 
 
-
         const map = new Map({
-          basemap: "topo-vector",
-          // layers: [statesFeatureLayer, countiesFeatureLayer]
-          layers: [housingLayer]
+          basemap: "satellite",
+          layers: [centersLayer, citiesLayer, countiesLayer, housingLayer]
         });
 
         const view = new MapView({
           container: "viewDiv",
           map: map,
-          zoom: 16,
+          zoom: 13,
           center: [-111.8587166, 40.7665529]
         });
 
+        // move the zoom icon
         view.ui.move("zoom", "bottom-right");
-
 
         // store ui objects as variables
         const countySelect = document.getElementById("countySelect");
@@ -363,18 +207,27 @@
         let centerQuery = defaultCenterQuery;
         let subtypeQuery = defaultSubtypeQuery;
 
-        let LRquery = defaultLRquery;
-        let FRquery = defaultFRquery;
-        let BRTquery = defaultBRTquery;
-        let FWYEquery = defaultFWYEquery;
+        let LRquery = null;
+        let FRquery = null;
+        let BRTquery = null;
+        let FWYEquery = null;
         let logicOperator =  defaultLogicOperator;
         
-
         let fullQuery = null;
 
         function generateFullQuery() {
-          fullQuery = countyQuery + ' AND ' + cityQuery + ' AND ' + centerQuery + ' AND ' + subtypeQuery + ' AND (' + LRquery + ' ' + logicOperator + ' ' + FRquery + ' ' + logicOperator + ' ' + BRTquery + ' ' + logicOperator + ' ' + FWYEquery + ')' ;
-        }
+       
+          const queryComponents = [countyQuery, cityQuery, centerQuery, subtypeQuery];
+          const distArray = [LRquery, FRquery, BRTquery, FWYEquery].filter(item => item !== null);
+
+          const hasDistValues = distArray.length > 0;
+
+          const distQuery = hasDistValues
+              ? ` AND (${distArray.join(` ${logicOperator} `)})`
+              : '';
+
+          fullQuery = queryComponents.join(' AND ') + distQuery;
+        };
 
          // define initial definition expression
         const initialDefinitionExpression = generateFullQuery()
@@ -408,10 +261,10 @@
             centerQuery = defaultCenterQuery;
             subtypeQuery = defaultSubtypeQuery;
             subtypeQuery = defaultSubtypeQuery;
-            LRquery = defaultLRquery;
-            FRquery = defaultFRquery;
-            BRTquery = defaultBRTquery;
-            FWYEquery = defaultFWYEquery;
+            LRquery = null;
+            FRquery = null;
+            BRTquery = null;
+            FWYEquery = null;
             logicOperator =  defaultLogicOperator;
             
             subtypeSelect.value = null;
@@ -421,7 +274,7 @@
             inputFWYE.value = null;
             logicOperator = "And"; 
             generateFullQuery()
-            andButton.style.backgroundColor = "#0079c1";
+            andButton.style.backgroundColor = "#00619B";
             orButton.style.backgroundColor = "#797979";
             
           });
@@ -429,18 +282,24 @@
 
         // setup actions for the AND button
         andButton.addEventListener("click", () => {
+          [housingLayer].forEach((layer) => {  
             logicOperator = "And"; 
             generateFullQuery()
+            layer.definitionExpression = fullQuery;
             andButton.style.backgroundColor = "#0079c1";
             orButton.style.backgroundColor = "#797979";
+          });
         });
 
         // setup actions for the OR button
         orButton.addEventListener("click", () => {
+          [housingLayer].forEach((layer) => {  
             logicOperator = "Or";
             generateFullQuery()
+            layer.definitionExpression = fullQuery;
             orButton.style.backgroundColor = "#0079c1";
             andButton.style.backgroundColor = "#797979";
+          });
         });
 
 
@@ -492,9 +351,16 @@
 
             });
           });
-          housingLayer.queryExtent().then((results) => {
-            view.goTo(results.extent);
-          });
+          // housingLayer.queryExtent().then((results) => {
+          //   view.goTo(results.extent);
+          // });
+
+          // zoom to the boundary layer (faster but zooms farther out)
+          const query = new Query();
+            query.where = `CO_NAME = '${selectionText}'`;
+            countiesLayer.queryExtent(query).then(function(results){
+              view.goTo(results.extent);
+            });
         });
 
         // CITY - filter and zoom features, update select options
@@ -543,9 +409,14 @@
               setCalciteSelectValue(centerSelect, centerSelectionCurrent)
             });
           });
-          housingLayer.queryExtent().then((results) => {
-            view.goTo(results.extent);
-          });
+          
+            // zoom to the boundary layer instead
+            const query = new Query();
+            query.where = `NAME = '${selectionText}'`;
+            citiesLayer.queryExtent(query).then(function(results){
+              view.goTo(results.extent);
+            });
+
         });
 
         // CENTER - filter and zoom features, update select options
@@ -577,9 +448,7 @@
               const cityArray = dataFiltered.CITY;
               const centerArray = dataFiltered.CENTER;
 
-              
-              
-              
+            
               if ((countyActive !== true) && (cityActive !== true)){
                 populateSelectBox('countySelect', countyArray);
                 populateSelectBox('citySelect', cityArray);          
@@ -596,9 +465,14 @@
 
             });
           });
-          housingLayer.queryExtent().then((results) => {
+          
+          // zoom to the boundary layer instead
+          const query = new Query();
+          query.where = `AreaName = '${selectionText}'`;
+          centersLayer.queryExtent(query).then(function(results){
             view.goTo(results.extent);
           });
+
         });
 
         // SUBTYPE Select
@@ -639,7 +513,7 @@
             console.log(typeof(userInput))
 
             if (userInput === null | userInput === " " | userInput === ""){
-              LRquery = defaultLRquery;
+              LRquery = null;
             }  else {
               LRquery = `DIST_LR <= '${userInput}'`;
             }
@@ -663,7 +537,7 @@
             console.log(userInput)
 
             if (userInput === null | userInput === " " | userInput === ""){
-              FRquery = defaultFRquery;
+              FRquery = null;
             }  else {
               FRquery = `DIST_FR <= '${userInput}'`;
             }
@@ -686,7 +560,7 @@
             console.log(userInput)
 
             if (userInput === null | userInput === " " | userInput === ""){
-              BRTquery = defaultBRTquery;
+              BRTquery = null;
             }  else {
               BRTquery = `DIST_BRT <= '${userInput}'`;
             }
@@ -709,7 +583,7 @@
             console.log(userInput)
 
             if (userInput === null | userInput === " " | userInput === ""){
-              FWYEquery = defaultFWYEquery;
+              FWYEquery = null;
             } else {
               FWYEquery = `DIST_FWYE <= '${userInput}'`;
             }
@@ -799,7 +673,7 @@
             <b>Housing Type</b>
           </div>
           <div class="child2">
-            <calcite-combobox id="subtypeSelect" placeholder="select housing types"></calcite-combobox>
+            <calcite-combobox id="subtypeSelect" placeholder="select housing types" selection-display="single" selection-mode="multiple"></calcite-combobox>
           </div>
         </label>
       </div>
@@ -818,7 +692,7 @@
       <div class="grid-item2">
        
           <div class="child3">
-            <input id="resetButton" type="button" value="Clear Filters" class="esri-button" style="background-color: #0079c1;"/>
+            <input id="resetButton" type="button" value="Clear Filters" class="esri-button" style="background-color: #00619B;"/>
           </div>
        
       </div>
@@ -826,7 +700,7 @@
       <div class="grid-item2">
         <div  class="grid-container2">
           <div class="child4">
-            <input id="andButton" type="button" value="And" class="esri-button" style="background-color: #0079c1;"/>
+            <input id="andButton" type="button" value="And" class="esri-button" style="background-color: #00619B;"/>
           </div>
 
           <div class="child4">
