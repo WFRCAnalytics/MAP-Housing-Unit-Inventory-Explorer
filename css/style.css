@@ -4,9 +4,73 @@ body,
 #viewDiv {
 padding: 0;
 margin: 0;
-height: 100%;
+height: 98.2%;
 width: 100%;
 }
+
+#timeSlider {
+    position: absolute;
+    width: 70vw;
+    left: 5%;
+    right: 5%;
+    bottom: 0px;
+}
+
+#info {
+    z-index: 99;
+    /* position: absolute; */
+    /* top: 10px; */
+    left: 0;
+    right: 0;
+    text-align: right;
+    height: 45;
+    /* padding: 10px 15px 5px 15px; */
+    /* margin-left: auto; */
+    /* margin-right: auto; */
+    /* width: 100%; */
+    background: rgb(53, 53, 53, 1);
+    font-size: 25pt;
+    display:flex;
+    border: 2px solid #ccc;
+   
+  }
+
+  #title {
+    /* display: inline-block; */
+    width: 100%;
+    vertical-align: middle;
+    font-size: 16pt;
+    font-weight: 500;
+    color:white;
+  }
+
+/* #titleText {
+    font-size: 16pt;
+    font-weight: 500;
+} */
+
+#topbar {
+    background: #fff;
+    padding: 10px;
+  }
+
+#infoDiv {
+padding: 10px;
+width: 320px;
+height: 420px;
+font-size: 14px;
+overflow-y: auto;
+overflow-x: hidden;
+}
+
+#instructionsDiv{
+width: 240px;
+padding: 10px;
+height: 300px;
+/* margin-top: 2000px; */
+}
+
+
 #sidebarDiv {
 width: 35vw;
 padding: 10px;
@@ -14,6 +78,34 @@ height: 65vh;
 /* overflow-y: auto; */
 border: 2px solid #ccc;
 background-color: #353535;
+}
+
+#resultDiv {
+    display:flex;
+    flex-direction: column;
+    height:80vh;
+    width: 40vh;
+    font-size: 14px;
+    padding: 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: rgba(53, 53, 53, 1);
+    border: 2px solid #ccc;
+  }
+
+.section {
+flex: 1;
+/* position: relative; */
+/* border: 1px solid #ccc; */
+/* box-sizing: border-box; */
+}
+
+.count {
+flex: 1;
+white-space: nowrap;
+font-size: 14px;
+font-weight: bold;
+display: inline-block;
 }
 
 #resetButton, #andButton, #orButton{

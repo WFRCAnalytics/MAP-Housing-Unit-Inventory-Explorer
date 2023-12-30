@@ -238,3 +238,84 @@ const centerRenderer = {
               }
           }]
         };
+
+// renderer used to setup the symbolizaton of the housing layers
+const parcelTransparency = .5;
+const parcelRenderer = {
+            type: "unique-value",
+            legendOptions: {
+                title: "Housing Type"
+            },
+            field: "SUBTYPE",
+            uniqueValueInfos: [{
+                value: "single_family",
+                label: "Single Family",
+                symbol: {
+                    type: "simple-fill",
+                    color: [250, 236, 167, parcelTransparency], // [R,G,B, Transparency]
+                }
+            }, {
+                value: "duplex",
+                label: "Duplex",
+                symbol: {
+                    type: "simple-fill",
+                    color: [252, 146, 31, parcelTransparency]
+                }
+            }, {
+                value: "single_family_adu",
+                label: "Single Family ADU",
+                symbol: {
+                    type: "simple-fill",
+                    color: [230, 0, 73,parcelTransparency]
+                }
+            }, {
+                value: "townhome",
+                label: "Townhome",
+                symbol: {
+                    type: "simple-fill",
+                    color: [40, 200, 48,parcelTransparency]
+                }
+            }, {
+                value: "condo",
+                label: "Condo",
+                symbol: {
+                    type: "simple-fill",
+                    color: [158, 85, 156,parcelTransparency]
+                }
+            }, {
+                value: "mobile_home_park",
+                label: "Mobile Home Park",
+                symbol: {
+                    type: "simple-fill",
+                    color: [91, 73, 196,parcelTransparency]
+                }
+            }, {
+                value: 'mixed th/single_family',
+                label: "Townhome/Single Family",
+                symbol: {
+                    type: "simple-fill",
+                    color: [30, 133, 83,parcelTransparency]
+                }
+            }, {
+                value: "apartment",
+                label: "Apartment",
+                symbol: {
+                    type: "simple-fill",
+                    color: [20, 158, 206,parcelTransparency]
+                }
+            }]
+          };
+
+// arcade functions used to modify text in the popup window
+const arcadeExpressionInfos = [
+  {
+    name: "capitalize-subtype-arcade",
+    title: "Subtype",
+    expression: "Proper($feature.SUBTYPE)"
+  },
+  {
+    name: "format-type-arcade",
+    title: "Type",
+    expression: "Proper(Replace($feature.TYPE, '_', ' '))"
+  }
+];
