@@ -72,7 +72,7 @@ height: 300px;
 
 
 #sidebarDiv {
-width: 35vw;
+width: 32vw;
 padding: 10px;
 height: 65vh;
 /* overflow-y: auto; */
@@ -115,7 +115,7 @@ color:white;
 .grid-container {
 display: grid;
 grid-template-columns: repeat(2, 50%); /* Two columns with equal width */
-grid-gap: 2vh; /* Adjust the gap between grid items as needed */
+grid-gap: 1vh; /* Adjust the gap between grid items as needed */
 }
 
 .grid-container2 {

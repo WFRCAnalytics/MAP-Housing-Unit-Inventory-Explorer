@@ -780,7 +780,18 @@
           }
         });
 
-        view.ui.add("sidebarDiv", { position: "top-left"});
+
+
+        const sidebarDiv = document.getElementById("sidebarDiv");
+        const sidebarExpand = new Expand({
+          expandIcon: "sliders-horizontal",
+          expandTooltip: "Filters",
+          view: view,
+          content: sidebarDiv,
+          expanded: true,
+          // group: "top-left"
+        });
+        view.ui.add(sidebarExpand, { position: "top-left"});
 
       //=========================
       // chart stuff
@@ -1427,7 +1438,7 @@
     <div id="resultDiv" class="esri-widget">
       
       <div class="count">
-        Total Units:
+        Total Units in View:
         <div class="count" id="count">0</div>
       </div>
 
