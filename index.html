@@ -395,6 +395,7 @@
               : '';
 
           fullQuery = queryComponents.join(' AND ') + distQuery;
+          console.log(fullQuery);
         };
 
          // define initial definition expression
@@ -403,15 +404,16 @@
         // setup actions for the reset button
         resetButton.addEventListener("click", () => {
           [PointsLayer, ParcelsLayer].forEach((layer) => {
-            
-            countyActive = false
-            cityActive = false
-            centerActive = false
-            
+          
             // clear the definition expression
             layer.definitionExpression = null;
-            
-            fetchLocalJsonArray(jsonBase)
+          });
+
+          countyActive = false
+          cityActive = false
+          centerActive = false
+
+          fetchLocalJsonArray(jsonBase)
             .then(data => {
               
               const countyArray = data[0].COUNTY;
@@ -443,8 +445,9 @@
             generateFullQuery()
             andButton.style.backgroundColor = "#00619B";
             orButton.style.backgroundColor = "#797979";
-            
-          });
+
+          newURL.searchParams.delete('cny');
+          window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
         });
 
         // setup actions for the AND button
@@ -485,12 +488,20 @@
             console.log(selectionText)
 
             if(selectionText === "None"){
+              newURL.searchParams.delete('cny');
+              window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
+
               countyQuery = defaultCountyQuery
               countyActive = false
             }else{
+              newURL.searchParams.set("cny", selectionText)
+              window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
+
               countyQuery = `COUNTY = '${selectionText}'`
               countyActive = true
             }
+
+            ;
 
             // update the main query
             generateFullQuery()
@@ -663,6 +674,8 @@
             console.log(fullQuery)
             layer.definitionExpression = fullQuery;
           });
+          queryStatisticsForYearChart();
+          queryStatisticsForTypeChart();
         });
 
 
@@ -1199,8 +1212,6 @@
 
         // when the extent is changed update the charts
         reactiveUtils.when(() => view.stationary === true, () => {
-          
-          
           queryStatisticsForYearChart();
           queryStatisticsForTypeChart();
         });
@@ -1237,9 +1248,22 @@
               var xParam = parseInt(searchParams.get("x"));
               var yParam = parseInt(searchParams.get("y"));
               var zoomParam = parseInt(searchParams.get("zoom"));
+              var countyParam = searchParams.get("cny");
               
-              // if (countyParam != '-No Selection-'){countySelect.value = countyParam};
-              // countySelect.dispatchEvent(new Event('change'));
+              if (countyParam != 'None'){
+                
+                countySelect.value = countyParam;
+                countyQuery = `COUNTY = '${countyParam}'`
+                console.log(countyParam)
+                // countySelect.dispatchEvent(new Event('change'));
+
+              };
+
+              generateFullQuery();
+              [PointsLayer, ParcelsLayer].forEach((layer) => { 
+              layer.definitionExpression = fullQuery;
+              });
+              
 
               // if (cityParam != '-No Selection-'){citySelect.value = cityParam};
               // citySelect.dispatchEvent(new Event('change'));
