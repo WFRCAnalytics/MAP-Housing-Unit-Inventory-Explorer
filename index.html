@@ -3,8 +3,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
     <title>Housing Inventory Explorer</title>
-    <script type="module" src="https://js.arcgis.com/calcite-components/1.9.2/calcite.esm.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.9.2/calcite.css"/>
+    <script type="module" src="https://js.arcgis.com/calcite-components/2.1.0/calcite.esm.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/2.1.0/calcite.css"/>
     <!-- Load the Chart.js library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
     <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/dark/main.css" />
@@ -1187,7 +1187,7 @@
               }
             }
           });
-          typeCanvas.style.backgroundColor = 'rgba(100,100,100,1)';
+          typeCanvas.style.backgroundColor = 'rgba(75,75,75,1)';
           typeCanvas.style.border = '1px solid #ccc';
         }
 
@@ -1337,7 +1337,7 @@
     
       <div class="grid-item">
         <div class="child1">
-          <b>To TRAX (mi)</b>
+          <b>From TRAX (mi)</b>
         </div>
         <div class="child2">
           <calcite-input id="inputLR" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance"></calcite-input>
@@ -1356,7 +1356,7 @@
       <div class="grid-item">
         <label>
           <div class="child1">
-            <b>To FrontRunner (mi)</b>
+            <b>From FrontRunner (mi)</b>
           </div>
           <div class="child2">
             <calcite-input id="inputFR" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance"></calcite-input>
@@ -1376,7 +1376,7 @@
       <div class="grid-item">
         <label>
           <div class="child1">
-            <b>To BRT (mi)</b>
+            <b>From BRT (mi)</b>
           </div>
           <div class="child2">
             <calcite-input id="inputBRT" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance"></calcite-input>
@@ -1398,7 +1398,7 @@
       <div class="grid-item">
         <label>
           <div class="child1">
-            <b>To FWY Exit (mi)</b>
+            <b>From FWY Exit (mi)</b>
           </div>
           <div class="child2">
             <calcite-input id="inputFWYE" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance"></calcite-input>

@@ -100,6 +100,8 @@ flex: 1;
 /* box-sizing: border-box; */
 }
 
+
+
 .count {
 flex: 1;
 white-space: nowrap;
@@ -139,7 +141,7 @@ color:white;
 
 /* Style for each grid item */
 .grid-item2 {
-height: 5vh;
+height: 5.5vh;
 width: 15vw;
 border: 1px solid #ccc;
 padding: 5px;
@@ -157,6 +159,7 @@ height: 40%;
 height: 60%; 
 /* background-color: rgb(192, 135, 13); */
 /* border: 1px solid #d80303; */
+
 }
 .child3 {
 height: 100%; 
