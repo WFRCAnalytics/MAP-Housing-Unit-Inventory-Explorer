@@ -447,6 +447,8 @@
             orButton.style.backgroundColor = "#797979";
 
           newURL.searchParams.delete('cny');
+          newURL.searchParams.delete('cty');
+          newURL.searchParams.delete('ctr');
           window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
         });
 
@@ -481,7 +483,7 @@
 
             ;
 
-            // selectionText = countySelect.options[countySelect.selectedIndex].text;
+            
             selectionText = event.target.value;
 
             countySelectionCurrent = selectionText;
@@ -494,6 +496,7 @@
               countyQuery = defaultCountyQuery
               countyActive = false
             }else{
+              // update URL params
               newURL.searchParams.set("cny", selectionText)
               window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
 
@@ -549,9 +552,13 @@
             console.log(selectionText)
 
             if(selectionText === "None"){
+              newURL.searchParams.delete('cty');
+              window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
               cityQuery = defaultCityQuery;
               cityActive = false;
             }else{
+              newURL.searchParams.set("cty", selectionText)
+              window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
               cityQuery = `CITY = '${selectionText}'`;
               cityActive = true;
             }
@@ -604,9 +611,16 @@
             console.log(selectionText)
 
             if(selectionText === "None"){
+              newURL.searchParams.delete('ctr');
+              window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
+
               centerQuery = defaultCenterQuery;
               centerActive = false;
             }else{
+              // update URL params
+              newURL.searchParams.set("ctr", selectionText)
+              window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
+
               centerQuery = `CENTER = '${selectionText}'`
               centerActive = true;
             }
@@ -1248,28 +1262,31 @@
               var xParam = parseInt(searchParams.get("x"));
               var yParam = parseInt(searchParams.get("y"));
               var zoomParam = parseInt(searchParams.get("zoom"));
-              var countyParam = searchParams.get("cny");
+   
               
-              if (countyParam != 'None'){
-                
+              if ((countyParam != 'None') && countyParam){
                 countySelect.value = countyParam;
                 countyQuery = `COUNTY = '${countyParam}'`
-                console.log(countyParam)
-                // countySelect.dispatchEvent(new Event('change'));
+                console.log(countyParam);
+              };
 
+              if ((cityParam != 'None') && cityParam){
+                citySelect.value = cityParam;
+                cityQuery = `CITY = '${cityParam}'`
+              };
+
+              if ((centerParam != 'None')&& centerParam){
+                centerSelect.value = centerParam;
+                centerQuery = `CENTER = '${centerParam}'`
               };
 
               generateFullQuery();
               [PointsLayer, ParcelsLayer].forEach((layer) => { 
-              layer.definitionExpression = fullQuery;
+                layer.definitionExpression = fullQuery;
               });
               
 
-              // if (cityParam != '-No Selection-'){citySelect.value = cityParam};
-              // citySelect.dispatchEvent(new Event('change'));
-
-              // if (centerParam != '-No Selection-'){centerSelect.value = centerParam};
-              // centerSelect.dispatchEvent(new Event('change'));
+  
     
 
 
@@ -1316,10 +1333,7 @@
             newURL.searchParams.set("x", x);
             newURL.searchParams.set("y", y);
             newURL.searchParams.set("zoom", zoom);
-            // if (countySelect.value !== '-No Selection-' | countySelect !== null | countySelect !== ''){newURL.searchParams.set("cny", countySelect.value);};
-            // // newURL.searchParams.set("cny", countySelect.value);
-            // if (citySelect.value !== '-No Selection-'){newURL.searchParams.set("cty", citySelect.value);};
-            // if (centerSelect.value !== '-No Selection-'){newURL.searchParams.set("ctr", centerSelect.value);};
+       
 
             var searchParams = newURL.searchParams;
             if (searchParams && searchParams.keys().next().done === false) {
