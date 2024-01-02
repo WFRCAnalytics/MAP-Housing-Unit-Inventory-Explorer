@@ -471,9 +471,7 @@
 
               countyQuery = `COUNTY = '${selectionText}'`
               countyActive = true
-            }
-
-            ;
+            };
 
             // update the main query
             generateFullQuery()
@@ -504,10 +502,10 @@
 
           // zoom to the boundary layer (faster but zooms farther out)
           const query = new Query();
-            query.where = `CO_NAME = '${selectionText}'`;
-            countiesLayer.queryExtent(query).then(function(results){
-              view.goTo(results.extent);
-            });
+          query.where = `CO_NAME = '${selectionText}'`;
+          countiesLayer.queryExtent(query).then(function(results){
+            view.goTo(results.extent);
+          });
         });
 
         // CITY - filter and zoom features, update select options
@@ -669,8 +667,16 @@
             console.log(typeof(userInput))
 
             if (userInput === null | userInput === " " | userInput === ""){
+              newURL.searchParams.delete('lr');
+              window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
+              
               LRquery = defaultLRquery;
+              
             }  else {
+              // update URL params
+              newURL.searchParams.set("lr", userInput)
+              window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
+
               LRquery = `DIST_LR <= '${userInput}'`;
             }
             
@@ -1255,6 +1261,11 @@
               var cityParam = searchParams.get("cty");
               var centerParam = searchParams.get("ctr");
 
+              var lrParam = searchParams.get("lr");
+              var frParam = searchParams.get("fr");
+              var fwyParam = searchParams.get("brt");
+              var fwyParam = searchParams.get("fwy");
+
               var xParam = parseInt(searchParams.get("x"));
               var yParam = parseInt(searchParams.get("y"));
               var zoomParam = parseInt(searchParams.get("zoom"));
@@ -1276,15 +1287,16 @@
                 centerQuery = `CENTER = '${centerParam}'`
               };
 
+              if ((lrParam != 'None')&& lrParam){
+                inputLR.value = lrParam;
+                LRquery = `DIST_LR <= '${lrParam}'`
+              };
+
               generateFullQuery();
               [PointsLayer, ParcelsLayer].forEach((layer) => { 
                 layer.definitionExpression = fullQuery;
               });
               
-
-  
-    
-
 
               let pt = new Point({
                 x: xParam,
