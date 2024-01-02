@@ -308,14 +308,82 @@ const parcelRenderer = {
 
 // arcade functions used to modify text in the popup window
 const arcadeExpressionInfos = [
-  {
-    name: "capitalize-subtype-arcade",
-    title: "Subtype",
-    expression: "Proper($feature.SUBTYPE)"
-  },
-  {
-    name: "format-type-arcade",
-    title: "Type",
-    expression: "Proper(Replace($feature.TYPE, '_', ' '))"
-  }
-];
+    {
+      name: "capitalize-subtype-arcade",
+      title: "Subtype",
+      expression: "Proper(Replace($feature.SUBTYPE, '_', ' '))"
+    },
+    {
+      name: "format-type-arcade",
+      title: "Type",
+      expression: "Proper(Replace($feature.TYPE, '_', ' '))"
+    },
+    {
+        name: "format-value-arcade",
+        title: "Total Assessed Value",
+        expression: 
+        "'$'+ Text($feature.TOT_VALUE, '###,###')"
+    }
+  ];
+
+const parcelPopupTemplate = {
+    title: "{expression/capitalize-subtype-arcade} in {CITY}",
+    content: [{
+          type: "fields",
+          fieldInfos: [
+            {
+              fieldName: "expression/format-type-arcade",
+              // label: "Type"
+            },
+            {
+              fieldName: "expression/capitalize-subtype-arcade",
+            },
+            {
+              fieldName:'APX_BLT_YR',
+              label: "Approximate Year Built"
+            },
+            {
+              fieldName:"UNIT_COUNT",
+              label: "Number of Units"
+            },
+            {
+              fieldName:"TOT_BD_FT2",
+              label: "Total Bldg Square Ft.",
+              format: {
+                digitSeparator: true, // Uses a comma separator in numbers >999
+                places: 0 // Sets the number of decimal places to 0 and rounds up
+              }
+            },
+            {
+              fieldName:'ACRES',
+              label: "Acres",
+              format: {
+                digitSeparator: true, // Uses a comma separator in numbers >999
+                places: 1 // Sets the number of decimal places to 0 and rounds up
+              }
+            },
+            {
+              fieldName:"expression/format-value-arcade",
+            },  
+            {
+              fieldName:"COUNTY",
+              label: "County"
+            },
+            {
+              fieldName:"CITY",
+              label: "City"
+            },
+            {
+              fieldName:"CENTER",
+              label: "Center"
+            },
+            {
+              fieldName:"CENTERTYPE",
+              label: "Center Type"
+            },
+          ],
+        }
+      ],
+      expressionInfos: arcadeExpressionInfos
+    }
+

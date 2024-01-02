@@ -9,11 +9,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
     <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/dark/main.css" />
     <script src="https://js.arcgis.com/4.28/"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="js/symbology.js"></script>
     <link rel="stylesheet" href="css/style.css">
-
-
 
     <script>
       // sets the calcite select boxes to a specified value
@@ -141,7 +138,7 @@
                 outFields: ["CO_NAME"],
                 url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/Boundaries_gdb/FeatureServer/1",
                 renderer:countyRenderer,
-                maxScale: 50000,
+                // maxScale: 50000,
                 visible: false
               });
               
@@ -149,8 +146,8 @@
                 outFields: ["NAME"],
                 url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/Boundaries_gdb/FeatureServer/0",
                 renderer:cityRenderer,
-                maxScale: 20000,
-                minScale: 100000,
+                // maxScale: 20000,
+                // minScale: 100000,
                 visible: false
         
               });
@@ -159,8 +156,8 @@
                 outFields: ["AreaName"],
                 url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/Boundaries_gdb/FeatureServer/2",
                 renderer:centerRenderer,
-                maxScale: 2000,
-                minScale: 50000,
+                // maxScale: 2000,
+                // minScale: 50000,
                 visible: false
               });
 
@@ -169,14 +166,15 @@
             url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/hui_for_web_gdb/FeatureServer/0",
             renderer:parcelRenderer,
             maxScale: 0,
-            visible: false
+            visible: false,
+            popupTemplate:parcelPopupTemplate
           });
         
         const PointsLayer = new FeatureLayer({
             url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/hui_for_web_gdb/FeatureServer/1",
             renderer:pointRenderer,
             outFields: ["*"],
-            visible: true
+            visible: true,
           });
 
 
@@ -218,7 +216,7 @@
           group: "top-right"
         });
 
-        // add the wind rose chart div
+        // add the App Info chart div
         const infoDiv = document.getElementById("infoDiv");
         const infoDivExpand = new Expand({
           expandIcon: "information",
@@ -244,40 +242,7 @@
           }
         );
 
-        // Add the expand instance to the ui
-        view.ui.add(infoDivExpand, "top-right");
-        view.ui.add(bgExpand, "top-right");
-
-        view.when(() => {
-                // get the first layer in the collection of operational layers in the WebMap
-                // when the resources in the MapView have loaded.
-                const legend = new Legend({
-                  view: view,
-                  layerInfos: [
-                    {
-                      layer: PointsLayer,
-                      title: ""
-                    },
-                    {
-                      layer: ParcelsLayer,
-                      title: ""
-                    }
-                  ]
-                });
-
-                const legendExpand = new Expand({
-                expandIcon: "legend",
-                expandTooltip: "Legend",
-                view: view,
-                content: legend,
-                group: "top-right"
-                });
-
-                // Add widget to the bottom right corner of the view
-                view.ui.add(legendExpand, "top-right");
-              });
-        
-        
+  
         // when the view object is created, create a time slider
         view.when(() => {
                     timeSlider = new TimeSlider({
@@ -297,7 +262,7 @@
                       playRate: 2000, 
                       stops: {
                         interval: {
-                          value: 1,
+                          value: 10,
                           unit: "years"
                         }
                       },
@@ -308,11 +273,11 @@
                         const normal = new Intl.DateTimeFormat("en-us", options);
                         switch (type) {
                           case "min":
-                            element.setAttribute("style", "color: #ff642e;");
+                            element.setAttribute("style", "color: #00619B;font-size: 14px;");
                             element.innerText = normal.format(value);
                             break;
                           case "max":
-                            element.setAttribute("style", "color: #ff642e;");
+                            element.setAttribute("style", "color: #00619B;font-size: 14px;");
                             element.innerText = normal.format(value);
                             break;
                           case "extent":
@@ -336,11 +301,21 @@
                     });
                   
                   view.ui.add(timeSliderExpand, "bottom-left");
-
+                  
+                  // watch the time slider for changes
+                  reactiveUtils.watch(
+                    () => timeSlider.timeExtent,
+                    (timeExtent) => {
+                      console.log(timeExtent.start.getFullYear());
+                      console.log(timeExtent.end.getFullYear())
+                    }
+                  );
 
                   // Option 2: add the time slider (non-expandable) to the view, manual allows for div placement
                   // view.ui.add(timeSlider, "manual");
-                });
+        });
+
+        
         
         // store ui objects as variables
         const countySelect = document.getElementById("countySelect");
@@ -395,7 +370,7 @@
               : '';
 
           fullQuery = queryComponents.join(' AND ') + distQuery;
-          console.log(fullQuery);
+          // console.log(fullQuery);
         };
 
          // define initial definition expression
@@ -425,7 +400,7 @@
 
             });
 
-            countyQuery = defaultCountyQuery; // work for now but should the select just be set to null instead?
+            countyQuery = defaultCountyQuery;
             cityQuery = defaultCityQuery;
             centerQuery = defaultCenterQuery;
             subtypeQuery = defaultSubtypeQuery;
@@ -474,16 +449,10 @@
           });
         });
 
-        
-
-
         // COUNTY - filter and zoom features, update select options
         countySelect.addEventListener("calciteSelectChange", () => {
           [PointsLayer, ParcelsLayer].forEach((layer) => { // fix this to include parcels and points in main app
 
-            ;
-
-            
             selectionText = event.target.value;
 
             countySelectionCurrent = selectionText;
@@ -519,7 +488,6 @@
               const cityArray = dataFiltered.CITY;
               const centerArray = dataFiltered.CENTER;
               
-
               if ((cityActive !== true) && (centerActive !== true)){
                 populateSelectBox('citySelect', cityArray);
                 populateSelectBox('centerSelect', centerArray);   
@@ -692,9 +660,6 @@
           queryStatisticsForTypeChart();
         });
 
-
-        
-
         //initialize light rail dist filter
         const inputLR  = document.getElementById("inputLR");
         inputLR.value = null;
@@ -808,7 +773,6 @@
         });
 
 
-
         const sidebarDiv = document.getElementById("sidebarDiv");
         const sidebarExpand = new Expand({
           expandIcon: "sliders-horizontal",
@@ -830,9 +794,7 @@
       const yearCanvas = document.getElementById("year-chart");
       const typeCanvas = document.getElementById("type-chart");
 
-
       function queryStatisticsForYearChart() {
-
 
           yearChart.options.title.text = "Built Decade (Loading...)"
           yearChart.update();
@@ -1098,7 +1060,7 @@
           query.outStatistics = statDefinitions;
           return activeLayer.queryFeatures(query).then((result) => {
             const allStats = result.features[0].attributes;
-            document.getElementById("count").innerHTML = allStats.total;
+            document.getElementById("countDiv").innerHTML = allStats.total;
           
             typeChart.options.title.text = "Housing Type"
             typeChart.update();
@@ -1153,7 +1115,8 @@
               title: {
                 display: true,
                 text: "Built Decade",
-                fontColor:"#FFFFFF"
+                fontColor:"#FFFFFF",
+                fontSize:13
               },
               scales: {
                 xAxes: [
@@ -1207,18 +1170,20 @@
                 display:false,
                 position: "top",
               },
+              layout: {
+                padding:{bottom: 15}
+               },
               title: {
                 display: true,
                 text: "Housing Type",
-                fontColor:"#FFFFFF"
+                fontColor:"#FFFFFF",
+                fontSize:13
               }
             }
           });
           typeCanvas.style.backgroundColor = 'rgba(75,75,75,1)';
           typeCanvas.style.border = '1px solid #ccc';
         }
-
-        
 
         // create the charts
         createYearChart();
@@ -1230,6 +1195,7 @@
           queryStatisticsForTypeChart();
         });
 
+        // create an expand object for the charts
         const resultDiv = document.getElementById("resultDiv");
         const chartExpand = new Expand({
           expandIcon: "graph-bar-side-by-side",
@@ -1240,8 +1206,38 @@
           group: "top-right"
         });
 
+        view.when(() => {
+                // get the first layer in the collection of operational layers in the WebMap
+                // when the resources in the MapView have loaded.
+                const legend = new Legend({
+                  view: view,
+                  layerInfos: [
+                    {
+                      layer: PointsLayer,
+                      title: ""
+                    },
+                    {
+                      layer: ParcelsLayer,
+                      title: ""
+                    }
+                  ]
+                });
+
+                const legendExpand = new Expand({
+                expandIcon: "legend",
+                expandTooltip: "Legend",
+                view: view,
+                content: legend,
+                group: "top-right"
+                });
+
+                // Add widget to the bottom right corner of the view
+                view.ui.add(legendExpand, "top-right");
+              });
+        
+        view.ui.add(infoDivExpand, "top-right");
         view.ui.add(chartExpand, { position: "top-right"});
-   
+        view.ui.add(bgExpand, "top-right");
 
 
         //===============================
@@ -1463,22 +1459,24 @@
       </div>
     </div>
 
-    <div id="infoDiv" class="esri-widget">
-      <h4 class="esri-widget__heading esri-editor__title">Summary</h4>
+    <div id="infoDiv" class="esri-widget" >
+      <h4 class="esri-widget__heading esri-editor__title" style="text-align:center">About this App:</h4>
       <div class="esri-widget">
-        <p>This map highlights the basic types and quantities of existing housing in Davis, Salt Lake and Weber counties. The filters below allow for a closer look at counties, cities, trends over time, and transit station and freeway distance buffers. </p>
+        <p>This map highlights the basic types and quantities of existing housing in Davis, Salt Lake and Weber counties. The Filters widget on the left allows for a closer look at the units within Counties, Cities, or Wasatch Choice Centers. It also allows one to filter by proximity to transit stations and freeway exits. </p>
         <p> WFRC uses the County Assessor <a href="https://gis.utah.gov/data/cadastre/parcels/"> tax parcel GIS data</a> gathered annually by UGRC as a key input to its land use models and forecasts.</p>
-        <p>The Housing Unit Inventory shown in this webmap is derived from January 1, 2020 residential data from the Assessor’s tax parcels, adding in unit count estimates for rental properties and grouping housing units together that share adjoining ‘common areas’ (e.g. condos and HOAs).</p>
+        <p>The Housing Unit Inventory shown in this webmap is derived from January 1, 2022 residential data from the Assessor’s tax parcels, adding in unit count estimates for rental properties and grouping housing units together that share adjoining ‘common areas’ (e.g. condos and HOAs).</p>
         <p>For more information about this dataset, consult our <a href="https://docs.google.com/document/d/1W-ZdTamoB-rMPg91OTFyEO3OlI5LE0Vq7meF3oKFgVM/edit">metadata</a> or contact <a href="mailto:analytics@wfrc.org"> analytics@wfrc.org</a>.</p>
       </div>
     </div>
 
     <div id="resultDiv" class="esri-widget">
       
-      <div class="count">
+      <div>
         Total Units in View:
-        <div class="count" id="count">0</div>
+        <div class="count" id="countDiv">0</div>
       </div>
+
+      <br>
 
       <div class="section">
         <canvas id="year-chart" height="250" width="300"></canvas>
@@ -1486,11 +1484,11 @@
 
       <br>
       <div class="section">
-        <canvas id="type-chart" height="200" ></canvas>
+        <canvas id="type-chart" height="250" ></canvas>
       </div>
       
-      <div class="section" id="chart-info" ></div>
-        <p>These charts dynamically update  according to the <b>visible</b> features in the map.</p>
+      <div class="section" >
+        <p>These charts dynamically update according to the <b>visible</b> features in the map. Hover over an element in the chart to view its description.</p>
         
 
       </div>

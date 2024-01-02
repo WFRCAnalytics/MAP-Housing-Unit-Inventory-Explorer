@@ -1,0 +1,1084 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>Stats</title>
+    <script type="module" src="https://js.arcgis.com/calcite-components/1.9.2/calcite.esm.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.9.2/calcite.css"/>
+    <!-- Load the Chart.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css" />
+    <script src="https://js.arcgis.com/4.28/"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+      #sidebarDiv {
+        width: 250px;
+        padding: 10px;
+        height: 600px;
+        overflow-y: auto;
+        border: 2px solid #ccc;
+      }
+  
+      #resultDiv {
+        max-width: 400px;
+        font-size: 14px;
+        padding: 10px;
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+      .count {
+        white-space: nowrap;
+        font-size: 14px;
+        font-weight: bold;
+        display: inline-block;
+      }
+
+      .overlay1 {
+      pointer-events: none;
+      position: rel;
+      top: 150;
+      left: 190;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0); /* Semi-transparent background */
+      /* display: flex; */
+      align-items: center;
+      justify-content: center;
+      
+      z-index: 99; /* Ensure the overlay is on top */
+    }
+
+
+    </style>
+
+    <script>
+
+      function fetchLocalJsonArray(filePath) {
+        return fetch(filePath)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .catch(error => {
+            console.error('Error reading JSON file:', error);
+          });
+      }
+
+      function populateSelectBox(selectName, array) {
+        const selectBox = document.getElementById(selectName);
+
+        // Clear existing options
+        selectBox.innerHTML = '';
+
+        // Populate with options from the array
+        array.forEach(item => {
+          const option = document.createElement('option');
+          // option.value = item.value;  // Set the value attribute if needed
+          option.text = item;    // Set the text content of the option
+          selectBox.appendChild(option);
+      });
+    }
+
+      function populateComboBox (comboBoxName, array) {
+          const comboBox = document.getElementById(comboBoxName);
+
+          // Populate with options from the array
+          array.forEach(item => {
+            const comboItem  = document.createElement('calcite-combobox-item');
+            // option.value = item.value;  // Set the value attribute if needed
+            comboItem.setAttribute('value', item)
+            comboItem.setAttribute('text-label', item)
+            comboBox.appendChild(comboItem);
+        });
+      }
+    
+
+
+      
+
+      require(["esri/Map", "esri/layers/FeatureLayer", "esri/views/MapView", "esri/widgets/Expand", "esri/core/promiseUtils", "esri/core/reactiveUtils"], (
+        Map,
+        FeatureLayer,
+        MapView,
+        Expand,
+        promiseUtils,
+        reactiveUtils
+      ) => {
+
+      
+      const jsonBase = 'json/BASE.json';
+      const jsonCounty = 'json/COUNTY.json';
+      const jsonCity = 'json/CITY.json';
+      const jsonCenter = 'json/CENTER.json';
+      const jsonType = 'json/TYPE.json';
+      
+      // initialize geographic filter options
+      fetchLocalJsonArray(jsonBase)
+      .then(data => {
+        const countyArray = data[0].COUNTY;
+        const cityArray = data[0].CITY;
+        const centerArray = data[0].CENTER;
+        populateSelectBox('countySelect', countyArray);
+        populateSelectBox('citySelect', cityArray);
+        populateSelectBox('centerSelect', centerArray);
+      });
+
+      // initialize housing type options
+      fetchLocalJsonArray(jsonType)
+      .then(data => {
+        const subtypeArray = data[0].SUBTYPE;
+        populateComboBox('subtypeSelect', subtypeArray);
+      });
+
+  
+
+        // renderer used to setup the symbolizaton of the housing layers
+        dPixelSize = "6px"
+        dOutlineWidth = 1
+        transparency = 1
+        PtOutlineColor = [40,40,40]
+
+        const pointRenderer = {
+                type: "unique-value",
+                legendOptions: {
+                    title: "Housing Type"
+                },
+                field: "SUBTYPE",
+                uniqueValueInfos: [{
+                    value: "single_family",
+                    label: "Single Family",
+                    symbol: {
+                      type: "simple-marker",
+                      color: [250, 236, 167, transparency], // [R,G,B, Transparency]
+                      size: dPixelSize,
+                      outline: {
+                        color: PtOutlineColor,
+                        width: dOutlineWidth
+                    }
+                  }
+                }, {
+                    value: "duplex",
+                    label: "Duplex",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [252, 146, 31, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }, {
+                    value: "single_family_adu",
+                    label: "Single Family ADU",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [230, 0, 73, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }, {
+                    value: "townhome",
+                    label: "Townhome",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [40, 200, 48, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }, {
+                    value: "condo",
+                    label: "Condo",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [158, 85, 156, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }, {
+                    value: "mobile_home_park",
+                    label: "Mobile Home Park",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [91, 73, 196, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }, {
+                    value: 'mixed th/single_family',
+                    label: "Townhome/Single Family",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [30, 133, 83, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }, {
+                    value: "apartment",
+                    label: "Apartment",
+                    symbol: {
+                        type: "simple-marker",
+                        color: [20, 158, 206, transparency],
+                        size: dPixelSize,
+                        outline: {
+                          color: PtOutlineColor,
+                          width: dOutlineWidth
+                      }
+                    }
+                }]
+              };
+
+
+
+        const housingLayer = new FeatureLayer({
+                outFields: ["*"],
+                url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/hui_for_web_gdb/FeatureServer/1",
+                renderer:pointRenderer
+              });
+
+
+
+        const map = new Map({
+          basemap: "topo-vector",
+          // layers: [statesFeatureLayer, countiesFeatureLayer]
+          layers: [housingLayer]
+        });
+
+        const view = new MapView({
+          container: "viewDiv",
+          map: map,
+          zoom: 16,
+          center: [-111.8587166, 40.7665529]
+        });
+
+
+        // store ui objects as variables
+        const countySelect = document.getElementById("countySelect");
+        const citySelect = document.getElementById("citySelect");
+        const centerSelect = document.getElementById("centerSelect");
+        const subtypeSelect = document.getElementById("subtypeSelect");
+        const resetButton1 = document.getElementById("resetButton1");
+        
+        // define default queries
+        const defaultCountyQuery = "(COUNTY IS NULL OR COUNTY IS NOT NULL)";
+        const defaultCityQuery = "(CITY IS NULL OR CITY IS NOT NULL)";
+        const defaultCenterQuery = "(CENTER IS NULL OR CENTER IS NOT NULL)";
+
+        const defaultSubtypeQuery = "(SUBTYPE IS NULL OR SUBTYPE IS NOT NULL)";
+
+        const defaultLRquery = "(DIST_LR IS NULL OR DIST_LR IS NOT NULL)";
+        const defaultFRquery = "(DIST_FR IS NULL OR DIST_FR IS NOT NULL)";
+        const defaultBRTquery = "(DIST_BRT IS NULL OR DIST_BRT IS NOT NULL)";
+        const defaultFWYEquery = "(DIST_FWYE IS NULL OR DIST_FWYE IS NOT NULL)";
+
+        // set initial selection for geograhpy filters - could switch to a placeholder?
+        let countySelectionCurrent = "-No Selection-";
+        let citySelectionCurrent = "-No Selection-";
+        let centerSelectionCurrent = "-No Selection-";
+
+        let countyQuery = defaultCountyQuery;
+        let cityQuery = defaultCityQuery;
+        let centerQuery = defaultCenterQuery;
+        let subtypeQuery = defaultSubtypeQuery;
+
+        let LRquery = defaultLRquery;
+        let FRquery = defaultFRquery;
+        let BRTquery = defaultBRTquery;
+        let FWYEquery = defaultFWYEquery;
+
+        let fullQuery = null;
+
+        function generateFullQuery() {
+          fullQuery = countyQuery + ' AND ' + cityQuery + ' AND ' + centerQuery + ' AND ' + subtypeQuery + ' AND ' + LRquery + ' AND ' + FRquery + ' AND ' + BRTquery + ' AND ' + FWYEquery ;
+        }
+
+         // define initial definition expression
+        const initialDefinitionExpression = generateFullQuery()
+
+        // setup actions for the reset button
+        resetButton1.addEventListener("click", () => {
+          [housingLayer].forEach((layer) => {
+            
+            // clear the definition expression
+            layer.definitionExpression = null;
+            
+            fetchLocalJsonArray(jsonBase)
+            .then(data => {
+              
+              const countyArray = data[0].COUNTY;
+              const cityArray = data[0].CITY;
+              const centerArray = data[0].CENTER;
+              populateSelectBox('countySelect', countyArray);
+              populateSelectBox('citySelect', cityArray);
+              populateSelectBox('centerSelect', centerArray);
+
+            });
+
+            countyQuery = defaultCountyQuery; // work for now but should the select just be set to null instead?
+            cityQuery = defaultCityQuery;
+            centerQuery = defaultCenterQuery;
+            subtypeQuery = defaultSubtypeQuery;
+            
+            subtypeSelect.value = null;
+            inputLR.value = null;
+            inputFR.value = null;
+            inputBRT.value = null;
+            inputFWYE.value = null;
+          });
+        });
+
+
+        // COUNTY - filter and zoom features, update select options
+        countySelect.addEventListener("change", () => {
+          [housingLayer].forEach((layer) => { // fix this to include parcels and points in main app
+
+            selectionText = countySelect.options[countySelect.selectedIndex].text;
+            countySelectionCurrent = selectionText;
+            console.log(selectionText)
+
+            if(selectionText === "-No Selection-"){
+              countyQuery = defaultCountyQuery
+            }else{
+              countyQuery = `COUNTY = '${selectionText}'`
+            }
+
+            // update the main query
+            generateFullQuery()
+            console.log(fullQuery)
+            layer.definitionExpression = fullQuery;
+            
+            // update the select options
+            fetchLocalJsonArray(jsonCounty)
+            .then(data => {
+              const dataFiltered = data.find(item => item.NAME === selectionText);
+              const countyArray = dataFiltered.COUNTY;
+              const cityArray = dataFiltered.CITY;
+              const centerArray = dataFiltered.CENTER;
+
+              populateSelectBox('countySelect', countyArray);
+              populateSelectBox('citySelect', cityArray);
+              populateSelectBox('centerSelect', centerArray);
+
+              countySelect.value = countySelectionCurrent;
+              citySelect.value = citySelectionCurrent;
+              centerSelect.value = centerSelectionCurrent;
+            });
+          });
+          housingLayer.queryExtent().then((results) => {
+            view.goTo(results.extent);
+          });
+        });
+
+        // CITY - filter and zoom features, update select options
+        citySelect.addEventListener("change", () => {
+          [housingLayer].forEach((layer) => { // fix this to include parcels and points in main app
+
+            selectionText = citySelect.options[citySelect.selectedIndex].text;
+            citySelectionCurrent = selectionText;
+            console.log(selectionText)
+
+            if(selectionText === "-No Selection-"){
+              cityQuery = defaultCityQuery
+            }else{
+              cityQuery = `CITY = '${selectionText}'`
+            }
+
+            // update the main query
+            generateFullQuery()
+            console.log(fullQuery)
+            layer.definitionExpression = fullQuery;
+            
+            // update the select options
+            fetchLocalJsonArray(jsonCity)
+            .then(data => {
+              const dataFiltered = data.find(item => item.NAME === selectionText);
+              const countyArray = dataFiltered.COUNTY;
+              const cityArray = dataFiltered.CITY;
+              const centerArray = dataFiltered.CENTER;
+
+              populateSelectBox('countySelect', countyArray);
+              populateSelectBox('citySelect', cityArray);
+              populateSelectBox('centerSelect', centerArray);
+
+              countySelect.value = countySelectionCurrent;
+              citySelect.value = citySelectionCurrent;
+              centerSelect.value = centerSelectionCurrent;
+            });
+          });
+          housingLayer.queryExtent().then((results) => {
+            view.goTo(results.extent);
+          });
+        });
+
+        // CENTER - filter and zoom features, update select options
+        centerSelect.addEventListener("change", () => {
+          [housingLayer].forEach((layer) => { // fix this to include parcels and points in main app
+
+            selectionText = centerSelect.options[centerSelect.selectedIndex].text;
+            centerSelectionCurrent = selectionText;
+            console.log(selectionText)
+
+            if(selectionText === "-No Selection-"){
+              centerQuery = defaultCenterQuery
+            }else{
+              centerQuery = `CENTER = '${selectionText}'`
+            }
+
+            // update the main query
+            generateFullQuery()
+            console.log(fullQuery)
+            layer.definitionExpression = fullQuery;
+            
+            // update the select options
+            fetchLocalJsonArray(jsonCenter)
+            .then(data => {
+              const dataFiltered = data.find(item => item.NAME === selectionText);
+              const countyArray = dataFiltered.COUNTY;
+              const cityArray = dataFiltered.CITY;
+              const centerArray = dataFiltered.CENTER;
+
+              populateSelectBox('countySelect', countyArray);
+              populateSelectBox('citySelect', cityArray);
+              populateSelectBox('centerSelect', centerArray);
+
+              countySelect.value = countySelectionCurrent;
+              citySelect.value = citySelectionCurrent;
+              centerSelect.value = centerSelectionCurrent;
+            });
+          });
+          housingLayer.queryExtent().then((results) => {
+            view.goTo(results.extent);
+          });
+        });
+
+        // SUBTYPE Select
+        subtypeSelect.addEventListener("calciteComboboxChange", (event) => {
+          [housingLayer].forEach((layer) => { // fix this to include parcels and points in main app
+
+
+            selection = event.target.value;
+            // console.log(selection);
+
+            if (Array.isArray(selection) == false){
+              if(selection === null | selection === " " | selection === ""){
+                subtypeQuery = defaultSubtypeQuery
+              }else{
+                subtypeQuery = `SUBTYPE IN ('${selection}')`
+              }
+            }else{
+              selection = selection.map(value => `'${value}'`);
+              subtypeQuery = `SUBTYPE IN (${selection})`
+            }
+            
+            // update the main query
+            generateFullQuery()
+            console.log(fullQuery)
+            layer.definitionExpression = fullQuery;
+          });
+        });
+
+        //initialize light rail dist filter
+        const inputLR  = document.getElementById("inputLR");
+        inputLR.value = null;
+        inputLR.addEventListener("calciteInputChange", function(){
+
+            userInput = inputLR.value;
+            console.log(typeof(userInput))
+
+            if (userInput === null | userInput === " " | userInput === ""){
+              LRquery = defaultLRquery;
+            }  else {
+              LRquery = `DIST_LR <= '${userInput}'`;
+            }
+            
+            // update the main query
+            generateFullQuery()
+            console.log(fullQuery);
+
+            [housingLayer].forEach((layer) => { 
+              layer.definitionExpression = fullQuery;
+            });
+          });
+
+
+        //initialize frontrunner dist filter
+        const inputFR  = document.getElementById("inputFR");
+        inputFR.value = null;
+        inputFR.addEventListener("calciteInputChange", function(){
+
+            userInput = inputFR.value;
+            console.log(userInput)
+
+            if (userInput === null | userInput === " " | userInput === ""){
+              FRquery = defaultFRquery;
+            }  else {
+              FRquery = `DIST_FR <= '${userInput}'`;
+            }
+            
+            // update the main query
+            generateFullQuery()
+            console.log(fullQuery);
+
+            [housingLayer].forEach((layer) => { 
+              layer.definitionExpression = fullQuery;
+            });
+          });
+
+        //initialize BRT dist filter
+        const inputBRT  = document.getElementById("inputBRT");
+        inputBRT.value = null;
+        inputBRT.addEventListener("calciteInputChange", function(){
+
+            userInput = inputBRT.value;
+            console.log(userInput)
+
+            if (userInput === null | userInput === " " | userInput === ""){
+              BRTquery = defaultBRTquery;
+            }  else {
+              BRTquery = `DIST_BRT <= '${userInput}'`;
+            }
+            
+            // update the main query
+            generateFullQuery()
+            console.log(fullQuery);
+
+            [housingLayer].forEach((layer) => { 
+              layer.definitionExpression = fullQuery;
+            });
+          });
+
+        //initialize FWYE dist filter
+        const inputFWYE  = document.getElementById("inputFWYE");
+        inputFWYE.value = null;
+        inputFWYE.addEventListener("calciteInputChange", function(){
+
+            userInput = inputFWYE.value;
+            console.log(userInput)
+
+            if (userInput === null | userInput === " " | userInput === ""){
+              FWYEquery = defaultFWYEquery;
+            } else {
+              FWYEquery = `DIST_FWYE <= '${userInput}'`;
+            }
+            
+            // update the main query
+            generateFullQuery()
+            console.log(fullQuery);
+
+            [housingLayer].forEach((layer) => { 
+              layer.definitionExpression = fullQuery;
+            });
+          });
+
+        
+        view.ui.add("sidebarDiv", { position: "top-left" });
+
+      //=========================
+      // chart stuff
+      //=========================
+
+      let yearChart = null;
+      let typeChart = null;
+
+      function queryStatisticsForYearChart() {
+
+          // create query definitions for stacked bar chart data
+          const decades = ["1840", "1850", "1860", "1870", "1880", "1890", "1900", "1910", "1920", "1930", "1940", "1950", "1960", "1970", "1980", "1990", "2000", "2010", "2020"];
+          const subtypes = ["single_family", "duplex", "single_family_adu", "condo", "townhome", "mobile_home_park", "mixed_th/single_family", "apartment"];
+          const yearChartDefinitions = [];
+          for (const decade of decades) {
+            for (const subtype of subtypes) {
+              const definition = {
+                onStatisticField: `CASE WHEN (BLT_DECADE = '${decade}' AND SUBTYPE = '${subtype}') THEN UNIT_COUNT ELSE 0 END`,
+                outStatisticFieldName: `year_${decade}_${subtype}`,
+                statisticType: "sum"
+              };
+
+              yearChartDefinitions.push(definition);
+            }
+          }
+
+          // query for stacked bar chart data
+          const yearChartQuery = housingLayer.createQuery();
+          yearChartQuery.geometry = view.extent;
+          yearChartQuery.outStatistics = yearChartDefinitions;
+
+          return housingLayer.queryFeatures(yearChartQuery).then((result) => {
+            const yearChartQueryResult = result.features[0].attributes;
+            // console.log(yearChartQueryResult)
+
+            const decadeTypeCountArray = [];
+            for (const property in yearChartQueryResult) {
+              if (yearChartQueryResult.hasOwnProperty(property)) {
+                const [year, ...typeParts] = property.split('_').slice(1);
+
+                decadeTypeCountArray.push({
+                  decade: +year,
+                  type: typeParts.join('_'),
+                  count: yearChartQueryResult[property]
+                });
+              }
+            }
+            // console.log(decadeTypeCountArray);
+
+
+              // Calculate the sum of counts for each decade
+              const decadeSums = decadeTypeCountArray.reduce((acc, entry) => {
+                acc[entry.decade] = (acc[entry.decade] || 0) + entry.count;
+                return acc;
+              }, {});
+
+              // Filter out objects with a sum of 0 and get an array of unique decades
+              const filteredArray = decadeTypeCountArray.filter(entry => decadeSums[entry.decade] !== 0);
+              const uniqueDecades = [...new Set(filteredArray.map(entry => entry.decade))];
+              // console.log(uniqueDecades);
+              
+              // create data objects for each housing type
+              const stackedChartDataObjects = [];
+              const typeData = {};
+              for (const entry of filteredArray) {
+                const { type, count, decade } = entry;
+
+                if (!typeData[type]) {
+                  typeData[type] = {
+                    label: type,
+                    data: [],
+                    backgroundColor:null
+                  };
+                }
+                typeData[type].data.push(count);
+
+                // If the decade is not already added to the data object, add it
+                if (typeData[type].data.length === 1) {
+                  typeData[type].decade = decade;
+                }
+              }
+              // Convert the object values to an array
+              for (const type in typeData) {
+                if (typeData.hasOwnProperty(type)) {
+                  stackedChartDataObjects.push(typeData[type]);
+                }
+              }
+              // console.log(stackedChartDataObjects);
+
+              // Update the backgroundColor attribute using the typeColorMap
+              const typeColorMap = {
+                "single_family": '#FAECA7',
+                "duplex": '#FC921F',
+                "single_family_adu": '#E60049',
+                "condo": '#BD7EBE',
+                "townhome": '#28C830',
+                "mobile_home_park": '#9E559C',
+                "mixed_th/single_family": '#1E8553',
+                "apartment": '#149ECE'
+              };
+              
+              const updatedDataArray = stackedChartDataObjects.map(item => ({
+                ...item,
+                backgroundColor: typeColorMap[item.label]
+              }));
+
+              // console.log(updatedDataArray);
+              updateStackedChart(yearChart, uniqueDecades,updatedDataArray)
+          
+          }, console.error);
+
+        }
+
+        function queryStatisticsForTypeChart() {
+
+          const statDefinitions = [
+            {
+              onStatisticField: "CASE WHEN SUBTYPE IS NOT NULL THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "total",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN SUBTYPE = 'single_family' THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "single_family",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN SUBTYPE = 'duplex' THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "duplex",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN SUBTYPE = 'single_family_adu' THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "single_family_adu",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN SUBTYPE = 'townhome' THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "townhome",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN SUBTYPE = 'condo' THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "condo",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN SUBTYPE = 'mobile_home_park' THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "mobile_home_park",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN SUBTYPE = 'mixed th/single_family' THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "mixed_th_single_family",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN SUBTYPE = 'apartment' THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "apartment",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1840') THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_1840",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1850') THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_1850",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1860') THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_1860",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1870') THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_1870",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1880') THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_1880",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1890') THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_1890",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1900') THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_1900",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1910') THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_1910",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1920') THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_1920",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1930') THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_1930",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1940') THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_1940",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1950') THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_1950",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1960') THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_1960",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1970') THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_1970",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1980') THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_1980",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1990') THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_1990",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE = '2000') THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_2000",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE = '2010') THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_2010",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE = '2020') THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_2020",
+              statisticType: "sum"
+            } 
+          ];
+           
+          // query data for the pie chart
+          const query = housingLayer.createQuery();
+          query.geometry = view.extent;
+          query.outStatistics = statDefinitions;
+          return housingLayer.queryFeatures(query).then((result) => {
+            const allStats = result.features[0].attributes;
+            document.getElementById("count").innerHTML = allStats.total;
+            
+            updateChart(typeChart, [
+              allStats.single_family,
+              allStats.duplex,
+              allStats.single_family_adu,
+              allStats.condo,
+              allStats.townhome,
+              allStats.mobile_home_park,
+              allStats.mixed_th_single_family,
+              allStats.apartment
+            ]);
+
+          }, console.error);
+        }
+
+        // Updates the given chart with new data
+        function updateChart(chart, dataValues) {
+          chart.data.datasets[0].data = dataValues;
+          chart.update();
+        }
+
+        // Updates the given chart with new data
+        function updateStackedChart(chart, labels, dataValues) {
+          chart.data.labels = labels;
+          chart.data.datasets = dataValues;
+          chart.update();
+        }
+
+        // instantiate the year stacked chart
+        function createYearChart() {
+          const yearCanvas = document.getElementById("year-chart");
+          yearChart = new Chart(yearCanvas.getContext("2d"), {
+            type: "bar",
+            data: {
+              labels: [],
+              datasets: [
+                {
+                  label: null,
+                  backgroundColor: "#149dcf",
+                  data: []
+                }
+              ]
+            },
+            options: {
+              // responsive: false,
+              legend: {
+                display: false
+              },
+              title: {
+                display: true,
+                text: "Built Decade"
+              },
+              scales: {
+                xAxes: [
+                  {
+                    stacked: true,
+                    ticks: {
+                      beginAtZero: true,
+                      precision: 0
+                    }
+                  }
+                ],
+                yAxes: [
+                  {
+                    stacked: true
+                  }
+                ]
+              }
+            }
+          });
+        }
+
+        // instantiate the type pie chart
+        function createTypeChart() {
+          const typeCanvas = document.getElementById("type-chart");
+          typeChart = new Chart(typeCanvas.getContext("2d"), {
+            type: "doughnut",
+            data: {
+              labels: ["single_family", "duplex", "single_family_adu", "condo", 
+                       "townhome", "mobile_home_park", "mixed th/single_family", "apartment"],
+              datasets: [
+                {
+                  backgroundColor: ["#FAECA7", "#FC921F", "#E60049", "#BD7EBE", 
+                                    "#28C830", "#9E559C", '#1E8553', '#149ECE'],
+                  borderWidth: 0,
+                  data: [0, 0, 0, 0, 0, 0, 0, 0]
+                }
+              ]
+            },
+            options: {
+              responsive: false,
+              cutoutPercentage: 25,
+              legend: {
+                position: "top",
+              },
+              title: {
+                display: true,
+                text: "Housing Type"
+              }
+            }
+          });
+        }
+
+        // create the charts
+        createYearChart();
+        createTypeChart();
+
+        // when the extent is changed update the charts
+        reactiveUtils.when(() => view.stationary === true, () => {
+          queryStatisticsForYearChart();
+          queryStatisticsForTypeChart()
+        });
+
+        const resultDiv = document.getElementById("resultDiv");
+        const chartExpand = new Expand({
+          expandIcon: "graph-bar-side-by-side",
+          expandTooltip: "Statistics",
+          view: view,
+          content: resultDiv,
+          expanded: true
+        });
+
+        view.ui.add(chartExpand, { position: "top-right"});
+      });
+
+      
+    </script>
+  </head>
+
+  <body>
+    <div id="viewDiv"></div>
+
+    <div id="sidebarDiv" class="esri-widget">
+      
+      <h4 class="esri-heading">Filter by County</h4>
+      <select id="countySelect" class="esri-widget"  style="width: 200px;">
+      </select>
+
+      <h4 class="esri-heading">Filter by City</h4>
+      <select id="citySelect" class="esri-widget"  style="width: 200px;">
+      </select>
+
+      <h4 class="esri-heading">Filter by Center</h4>
+      <select id="centerSelect" class="esri-widget"  style="width: 200px;">
+      </select>
+
+      <h4 class="esri-heading">- - - - - - - - -</h4>
+      
+      <label>
+        <b>Filter by Housing Type</b>
+        <br><br>
+        <calcite-combobox  id="subtypeSelect" placeholder="select housing types" style="width: 200px;">
+        </calcite-combobox>
+      </label>
+
+      <h4 class="esri-heading">- - - - - - - - -</h4>
+  
+      <label>
+        <b>Distance from TRAX (mi)</b>
+        <br><br>
+        <calcite-input id="inputLR" width="200px" type="number" step=.5 min=0 clearable=true placeholder="enter a distance"></calcite-input>
+      </label>
+      
+      <br><br>
+      
+      <label>
+        <b>Distance from Frontrunner (mi)</b>
+        <br><br>
+        <calcite-input id="inputFR" width="200px" type="number" step=.5 min=0 clearable=true placeholder="enter a distance"></calcite-input>
+      </label>
+
+      <br><br>
+
+      <label>
+        <b>Distance from BRT (mi)</b>
+        <br><br>
+        <calcite-input id="inputBRT" width="200px" type="number" step=.5 min=0 clearable=true placeholder="enter a distance"></calcite-input>
+      </label>
+
+      <br><br>
+
+      <label>
+        <b>Distance from FWY Exit (mi)</b>
+        <br><br>
+        <calcite-input id="inputFWYE" width="200px" type="number" step=.5 min=0 clearable=true placeholder="enter a distance"></calcite-input>
+      </label>
+      
+      <br><br>
+
+      <input id="resetButton1" type="button" value="Reset Filters" class="esri-button" style="width: 200px;" />
+
+
+      <div id="resultDiv" class="esri-widget">
+        <div class="count">
+          Total Units:
+          <div class="count" id="count">0</div>
+        </div>
+        <div class="charts">
+          <div>
+            <canvas id="year-chart" height="250" width="300"></canvas>
+            <div class="overlay1">
+              <i  id="year-chart-spinner"  class="fa-solid fa-gear fa-spin" style='color:#7f0b0b;font-size:48px;'></i>
+            </div>
+          </div>
+          <div>
+            <canvas id="type-chart" width="400" height="300"></canvas>
+            <div class="overlay1"> 
+              <i id="type-chart-spinner" class="fa-solid fa-gear fa-spin" style='font-size:48px;'></i>
+            </div>
+          </div>
+          <br>
+          <p>These charts dynamically update  according to the <b>visible</b> features in the map.</p>
+        </div>
+      </div>
+
+    </div>
+  </body>
