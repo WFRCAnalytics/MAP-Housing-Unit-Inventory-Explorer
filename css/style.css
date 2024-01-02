@@ -56,8 +56,8 @@ width: 100%;
 
 #infoDiv {
 padding: 10px;
-width: 320px;
-height: 60vh;
+width: 20vw;
+height: 85vh;
 font-size: 14px;
 overflow-y: auto;
 overflow-x: hidden;
