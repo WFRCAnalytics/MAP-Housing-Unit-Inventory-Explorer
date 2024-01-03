@@ -105,6 +105,7 @@
 
         // store the base url
         const providedURL =  window.location;
+        let newURL = new URL(providedURL)
         const urlParamsToggle = true;
 
         // store paths to jsons
@@ -424,6 +425,11 @@
           newURL.searchParams.delete('cny');
           newURL.searchParams.delete('cty');
           newURL.searchParams.delete('ctr');
+          newURL.searchParams.delete('lr');
+          newURL.searchParams.delete('fr');
+          newURL.searchParams.delete('brt');
+          newURL.searchParams.delete('fwye');
+          andButton.click()
           window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
         });
 
@@ -432,8 +438,10 @@
           [PointsLayer, ParcelsLayer].forEach((layer) => {  
             logicOperator = "And"; 
             generateFullQuery()
+            newURL.searchParams.set("op", logicOperator)
+            window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
             layer.definitionExpression = fullQuery;
-            andButton.style.backgroundColor = "#0079c1";
+            andButton.style.backgroundColor = "#00619B";
             orButton.style.backgroundColor = "#797979";
           });
         });
@@ -442,9 +450,11 @@
         orButton.addEventListener("click", () => {
           [PointsLayer, ParcelsLayer].forEach((layer) => {  
             logicOperator = "Or";
+            newURL.searchParams.set("op", logicOperator)
+            window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
             generateFullQuery()
             layer.definitionExpression = fullQuery;
-            orButton.style.backgroundColor = "#0079c1";
+            orButton.style.backgroundColor = "#00619B";
             andButton.style.backgroundColor = "#797979";
           });
         });
@@ -699,8 +709,15 @@
             console.log(userInput)
 
             if (userInput === null | userInput === " " | userInput === ""){
+              
+              newURL.searchParams.delete('fr');
+              window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
+
               FRquery = defaultFRquery;
             }  else {
+              // update URL params
+              newURL.searchParams.set("fr", userInput)
+              window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
               FRquery = `DIST_FR <= '${userInput}'`;
             }
             
@@ -722,8 +739,14 @@
             console.log(userInput)
 
             if (userInput === null | userInput === " " | userInput === ""){
+              newURL.searchParams.delete('brt');
+              window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
+              
               BRTquery = defaultBRTquery;
             }  else {
+              // update URL params
+              newURL.searchParams.set("brt", userInput)
+              window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
               BRTquery = `DIST_BRT <= '${userInput}'`;
             }
             
@@ -745,8 +768,15 @@
             console.log(userInput)
 
             if (userInput === null | userInput === " " | userInput === ""){
+              newURL.searchParams.delete('fwye');
+              window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
+              
               FWYEquery = defaultFWYEquery;
             } else {
+              // update URL params
+              newURL.searchParams.set("fwye", userInput)
+              window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
+
               FWYEquery = `DIST_FWYE <= '${userInput}'`;
             }
             
@@ -1263,8 +1293,9 @@
 
               var lrParam = searchParams.get("lr");
               var frParam = searchParams.get("fr");
-              var fwyParam = searchParams.get("brt");
-              var fwyParam = searchParams.get("fwy");
+              var brtParam = searchParams.get("brt");
+              var fwyeParam = searchParams.get("fwye");
+              var logOpParam = searchParams.get("op");
 
               var xParam = parseInt(searchParams.get("x"));
               var yParam = parseInt(searchParams.get("y"));
@@ -1274,7 +1305,7 @@
               if ((countyParam != 'None') && countyParam){
                 countySelect.value = countyParam;
                 countyQuery = `COUNTY = '${countyParam}'`
-                console.log(countyParam);
+                // console.log(countyParam);
               };
 
               if ((cityParam != 'None') && cityParam){
@@ -1282,14 +1313,39 @@
                 cityQuery = `CITY = '${cityParam}'`
               };
 
-              if ((centerParam != 'None')&& centerParam){
+              if ((centerParam != 'None') && centerParam){
                 centerSelect.value = centerParam;
                 centerQuery = `CENTER = '${centerParam}'`
               };
 
-              if ((lrParam != 'None')&& lrParam){
+              if ((lrParam != 'None') && lrParam){
                 inputLR.value = lrParam;
                 LRquery = `DIST_LR <= '${lrParam}'`
+              };
+
+              if ((frParam != 'None') && frParam){
+                inputFR.value = frParam;
+                FRquery = `DIST_FR <= '${frParam}'`
+              };
+
+              if ((brtParam != 'None') && brtParam){
+                inputBRT.value = brtParam;
+                BRTquery = `DIST_BRT <= '${brtParam}'`
+              };
+
+              if ((fwyeParam != 'None') && fwyeParam){
+                inputFWYE.value = fwyeParam;
+                FWYEquery = `DIST_FWYE <= '${fwyeParam}'`
+              };
+
+              if ((logOpParam != 'None') && logOpParam){
+                if (logOpParam === "And"){
+                  andButton.click()
+                }
+                if (logOpParam === "Or"){
+                  orButton.click()
+                }
+                logicOperator = logOpParam;
               };
 
               generateFullQuery();
@@ -1334,7 +1390,7 @@
             zoom = view.zoom
             scale = view.scale
            
-            newURL = new URL(providedURL);
+            // newURL = new URL(providedURL);
             
             if (ParcelsLayer.visible === true){newURL.searchParams.set("geom", 'pcl');};
             if (PointsLayer.visible === true){newURL.searchParams.set("geom", 'pt');};
@@ -1342,7 +1398,6 @@
             newURL.searchParams.set("y", y);
             newURL.searchParams.set("zoom", zoom);
        
-
             var searchParams = newURL.searchParams;
             if (searchParams && searchParams.keys().next().done === false) {
             window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
