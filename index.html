@@ -425,6 +425,7 @@
           newURL.searchParams.delete('cny');
           newURL.searchParams.delete('cty');
           newURL.searchParams.delete('ctr');
+          newURL.searchParams.delete('type');
           newURL.searchParams.delete('lr');
           newURL.searchParams.delete('fr');
           newURL.searchParams.delete('brt');
@@ -646,15 +647,23 @@
           [PointsLayer, ParcelsLayer].forEach((layer) => { // fix this to include parcels and points in main app
 
             selection = event.target.value;
-            // console.log(selection);
+            console.log(selection);
 
             if (Array.isArray(selection) == false){
               if(selection === null | selection === " " | selection === ""){
                 subtypeQuery = defaultSubtypeQuery
               }else{
+                // update URL params
+                
+                newURL.searchParams.set("type", selection)
+                window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
+
                 subtypeQuery = `SUBTYPE IN ('${selection}')`
               }
             }else{
+              // const joinedString = selection.join('-');
+              newURL.searchParams.set("type", selection)
+                window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
               selection = selection.map(value => `'${value}'`);
               subtypeQuery = `SUBTYPE IN (${selection})`
             }
@@ -1290,6 +1299,8 @@
               var countyParam = searchParams.get("cny");
               var cityParam = searchParams.get("cty");
               var centerParam = searchParams.get("ctr");
+              var subtypeParam = searchParams.get("type");
+              console.log(subtypeParam)
 
               var lrParam = searchParams.get("lr");
               var frParam = searchParams.get("fr");
@@ -1301,7 +1312,6 @@
               var yParam = parseInt(searchParams.get("y"));
               var zoomParam = parseInt(searchParams.get("zoom"));
    
-              
               if ((countyParam != 'None') && countyParam){
                 countySelect.value = countyParam;
                 countyQuery = `COUNTY = '${countyParam}'`
@@ -1313,11 +1323,25 @@
                 cityQuery = `CITY = '${cityParam}'`
               };
 
+              // center url params
               if ((centerParam != 'None') && centerParam){
                 centerSelect.value = centerParam;
                 centerQuery = `CENTER = '${centerParam}'`
               };
+              
+              // subtype url params
+              if ((subtypeParam != 'None') && subtypeParam){
+                if (subtypeParam.includes(',')) {
+                  subtypeParam = subtypeParam.split(',');
+                  subtypeSelect.value = subtypeParam;
+                subtypeQuery = `SUBTYPE IN (${subtypeParam})`
+                } else{
+                  subtypeSelect.value = subtypeParam;
+                  subtypeQuery = `SUBTYPE IN ('${subtypeParam}')`
+                }
+              };
 
+              // light rail url params
               if ((lrParam != 'None') && lrParam){
                 inputLR.value = lrParam;
                 LRquery = `DIST_LR <= '${lrParam}'`
