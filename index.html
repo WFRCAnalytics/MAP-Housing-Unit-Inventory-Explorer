@@ -193,8 +193,35 @@
           center: [-111.98, 40.94]
         });
 
-        if (providedURL.href.includes('?') === false) {
+        if (newURL.searchParams.toString() === '') {
           activeLayer = PointsLayer;
+          console.log('no url params')
+        }else{
+          // var newURL = new URL(providedURL)
+          console.log('has url params')
+              var searchParams = newURL.searchParams;
+              var geomParam = searchParams.get("geom");
+
+              var countyParam = searchParams.get("cny");
+              var cityParam = searchParams.get("cty");
+              var centerParam = searchParams.get("ctr");
+              var subtypeParam = searchParams.get("type");
+
+              var lrParam = searchParams.get("lr");
+              var frParam = searchParams.get("fr");
+              var brtParam = searchParams.get("brt");
+              var fwyeParam = searchParams.get("fwye");
+              var logOpParam = searchParams.get("op");
+
+              var xParam = parseInt(searchParams.get("x"));
+              var yParam = parseInt(searchParams.get("y"));
+              var zoomParam = parseInt(searchParams.get("zoom"));
+
+              if (geomParam === 'pcl'){
+                activeLayer = ParcelsLayer;
+              } if (geomParam === 'pt'){
+                activeLayer = PointsLayer;
+              }
         }
 
         // view.ui.move("zoom", "top-right");
@@ -651,6 +678,9 @@
 
             if (Array.isArray(selection) == false){
               if(selection === null | selection === " " | selection === ""){
+
+                newURL.searchParams.delete('type');
+              window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
                 subtypeQuery = defaultSubtypeQuery
               }else{
                 // update URL params
@@ -942,8 +972,8 @@
               }));
 
               // console.log(updatedDataArray);
-              yearChart.options.title.text = "Built Decade"
-              yearChart.update();
+              
+              // yearChart.update();
 
               updateStackedChart(yearChart, uniqueDecades,updatedDataArray)
           
@@ -1107,8 +1137,7 @@
             const allStats = result.features[0].attributes;
             document.getElementById("countDiv").innerHTML = allStats.total;
           
-            typeChart.options.title.text = "Housing Type"
-            typeChart.update();
+            
 
             updateChart(typeChart, [
               allStats.single_family,
@@ -1127,6 +1156,7 @@
         // Updates the given chart with new data
         function updateChart(chart, dataValues) {
           chart.data.datasets[0].data = dataValues;
+          typeChart.options.title.text = "Housing Type"
           chart.update();
         }
 
@@ -1134,6 +1164,7 @@
         function updateStackedChart(chart, labels, dataValues) {
           chart.data.labels = labels;
           chart.data.datasets = dataValues;
+          chart.options.title.text = "Built Decade"
           chart.update();
         }
 
@@ -1240,6 +1271,15 @@
           queryStatisticsForTypeChart();
         });
 
+        // // Another method of updating the charts, when data is done updating
+        // view.whenLayerView(activeLayer).then((layerView) => {
+        //     reactiveUtils.when(() => !layerView.dataUpdating, () => {
+        //       queryStatisticsForYearChart();
+        //       queryStatisticsForTypeChart();
+
+        //     });
+        //   });
+
         // create an expand object for the charts
         const resultDiv = document.getElementById("resultDiv");
         const chartExpand = new Expand({
@@ -1291,26 +1331,25 @@
         view.when(() => {
           // if provide URL has searchParams update the map
           if (urlParamsToggle === true){
-            if (providedURL.href.includes('?') === true) {
-              var newURL = new URL(providedURL)
-              var searchParams = newURL.searchParams;
-              var geomParam = searchParams.get("geom");
+            if (newURL.searchParams.toString() !== '') {
+              // var newURL = new URL(providedURL)
+              // var searchParams = newURL.searchParams;
+              // var geomParam = searchParams.get("geom");
 
-              var countyParam = searchParams.get("cny");
-              var cityParam = searchParams.get("cty");
-              var centerParam = searchParams.get("ctr");
-              var subtypeParam = searchParams.get("type");
-              console.log(subtypeParam)
+              // var countyParam = searchParams.get("cny");
+              // var cityParam = searchParams.get("cty");
+              // var centerParam = searchParams.get("ctr");
+              // var subtypeParam = searchParams.get("type");
 
-              var lrParam = searchParams.get("lr");
-              var frParam = searchParams.get("fr");
-              var brtParam = searchParams.get("brt");
-              var fwyeParam = searchParams.get("fwye");
-              var logOpParam = searchParams.get("op");
+              // var lrParam = searchParams.get("lr");
+              // var frParam = searchParams.get("fr");
+              // var brtParam = searchParams.get("brt");
+              // var fwyeParam = searchParams.get("fwye");
+              // var logOpParam = searchParams.get("op");
 
-              var xParam = parseInt(searchParams.get("x"));
-              var yParam = parseInt(searchParams.get("y"));
-              var zoomParam = parseInt(searchParams.get("zoom"));
+              // var xParam = parseInt(searchParams.get("x"));
+              // var yParam = parseInt(searchParams.get("y"));
+              // var zoomParam = parseInt(searchParams.get("zoom"));
    
               if ((countyParam != 'None') && countyParam){
                 countySelect.value = countyParam;
@@ -1393,11 +1432,9 @@
               if (geomParam === 'pcl'){
                 ParcelsLayer.visible = true;
                 PointsLayer.visible = false;
-                activeLayer = ParcelsLayer;
               } if (geomParam === 'pt'){
                 ParcelsLayer.visible = false;
                 PointsLayer.visible = true;
-                activeLayer = PointsLayer;
               }
             }
           } 
