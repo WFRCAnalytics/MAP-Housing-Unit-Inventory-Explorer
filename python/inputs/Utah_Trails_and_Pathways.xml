@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?><metadata>
+    <idinfo>
+        <citation>
+            <citeinfo>
+                <title>TrailsAndPathways</title>
+                <geoform>vector digital data</geoform>
+            </citeinfo>
+        </citation>
+        <descript>
+            <abstract>Last Update: 11/06/2023This trails map layer represents off-road recreational trail features and important road connections that augment Utah’s recreational trail network. This map layer features many of Utah’s recreational trails but is not yet complete. Currently, the trails information primary depicts trails used by hiking and mountain biker users. It began with map data purchased from a private entity (Orbital View, Inc), for which full rights were purchased by the GOED Office of Outdoor Recreation in July 2014. Since the original purchase, subsequent substantive updates have included: 2014 Revisions from National Park service; 2015 additions from Emery County; June 2016 additions from Cache County US Forest Service Geodata Hub (all forests except Sawtooth in NW Box Elder County), and Mountainland Association of Governments (Utah and Wasatch counties). Significant updates were made in 2018 as part of the multimodal project. These included pathways and off-road bike trails in the project area. Additional trails can be submitted to Utah UGRC for inclusion in this map layer.Note: Presently, the planned approach for on street bicycle lanes and routes is to incorporate them in the the statewide roads GIS layer using left and right side attributes. On street bike infrastructure is not expected to be represented in this map layer.More information about this layer can be found here: https://gis.utah.gov/data/recreation/trails/</abstract>
+            <purpose>This trails map layer represents name, location, and allowed use information for Utah off-road recreational trail features and important road connections that augment the off-road trails. This map layer features over 20,000 miles of Utah’s recreational trails, it is not yet complete.</purpose>
+        </descript>
+        <spdom>
+            <bounding>
+                <westbc>-114.252205</westbc>
+                <eastbc>-108.876445</eastbc>
+                <northbc>42.092713</northbc>
+                <southbc>36.915389</southbc>
+            </bounding>
+        </spdom>
+        <keywords>
+            <theme>
+                <themekt>None</themekt>
+                <themekey>SGID</themekey>
+                <themekey>Recreation</themekey>
+                <themekey>Paths</themekey>
+                <themekey>Hiking</themekey>
+                <themekey>Biking</themekey>
+                <themekey>Horseback Riding</themekey>
+                <themekey>UGRC</themekey>
+            </theme>
+        </keywords>
+        <accconst>None</accconst>
+        <useconst>The data, including but not limited to geographic data, tabular data, and analytical data, are provided &amp;quot;as is&amp;quot; and &amp;quot;as available&amp;quot;, with no guarantees relating to the availability, completeness, or accuracy of data, and without any express or implied warranties. These data are provided as a public service for informational purposes only. You are solely responsible for obtaining the proper evaluation of a location and associated data by a qualified professional. UGRC reserves the right to change, revise, suspend or discontinue published data and services without notice at any time. Neither UGRC nor the State of Utah are responsible for any misuse or misrepresentation of the data. UGRC and the State of Utah are not obligated to provide you with any maintenance or support. The user assumes the entire risk as to the quality and performance of the data. You agree to hold the State of Utah harmless for any claims, liability, costs, and damages relating to your use of the data. You agree that your sole remedy for any dissatisfaction or claims is to discontinue use of the data.This work is licensed under a Creative Commons Attribution 4.0 International License.</useconst>
+        <datacred>UGRC, WFRC</datacred>
+        <native> Version 6.2 (Build 9200) ; Esri ArcGIS 10.7.1.11595</native>
+    </idinfo>
+    <spdoinfo>
+        <direct>Vector</direct>
+        <ptvctinf>
+            <sdtsterm>
+                <sdtstype>String</sdtstype>
+                <ptvctcnt>41736</ptvctcnt>
+            </sdtsterm>
+        </ptvctinf>
+    </spdoinfo>
+    <eainfo>
+        <detailed>
+            <enttyp>
+                <enttypl>TrailsAndPathways</enttypl>
+            </enttyp>
+            <attr>
+                <attrlabl>OBJECTID</attrlabl>
+                <attrdef>Internal feature number.</attrdef>
+                <attrdefs>Esri</attrdefs>
+                <attrdomv>
+                                        
+                    
+                    <udom>Sequential unique whole numbers that are automatically generated.</udom>
+                                        
+                
+                </attrdomv>
+            </attr>
+            <attr>
+                <attrlabl>PrimaryName</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>ID</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>Status</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>DesignatedUses</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>SurfaceType</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>Class</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>CartoCode</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>OtherRestrictions</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>HorseAllowed</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>MotorizedAllowed</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>HikeDifficulty</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>BikeDifficulty</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>ADAAccessible</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>OwnerSteward</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>County</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>RecreationArea</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>SystemName</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>TransNetwork</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>Comments</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>DataSource</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>Unique_ID</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>created_user</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>created_date</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>last_edited_user</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>last_edited_date</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>Shape</attrlabl>
+                <attrdef>Feature geometry.</attrdef>
+                <attrdefs>Esri</attrdefs>
+                <attrdomv>
+                                        
+                    
+                    <udom>Coordinates defining the features.</udom>
+                                        
+                
+                </attrdomv>
+            </attr>
+            <attr>
+                <attrlabl>Shape.STLength()</attrlabl>
+            </attr>
+        </detailed>
+    </eainfo>
+    <metainfo>
+        <metd>20231106</metd>
+        <metstdn>FGDC Content Standard for Digital Geospatial Metadata</metstdn>
+        <metstdv>FGDC-STD-001-1998</metstdv>
+        <mettc>local time</mettc>
+    </metainfo>
+</metadata>

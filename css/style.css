@@ -72,7 +72,7 @@ height: 300px;
 }
 
 
-#sidebarDiv {
+#sidebarDivOld {
 width: 32vw;
 padding: 10px;
 height: 65vh;
@@ -114,62 +114,70 @@ display: inline-block;
 color:white;
 }
 
-.grid-container {
-display: grid;
-grid-template-columns: repeat(2, 50%); /* Two columns with equal width */
-grid-gap: 1vh; /* Adjust the gap between grid items as needed */
-}
 
-.grid-container2 {
+.logicDiv {
 display: grid;
-grid-template-columns: repeat(2, 50%);
+grid-template-columns: .5fr 1fr 1fr;
 grid-gap: .5vh;
 
 }
 
-/* Style for each grid item */
-.grid-item {
-height: 10vh;
-width: 15vw;
+
+#sbHeader{
+  font-weight: bold;
+  text-decoration: underline;
+  font-size: 18px;
+}
+#resetDiv{
+  text-align: center;
+  width: 100%;
+  display: flex;
+      justify-content: center;
+      align-items: center;
+}
+
+#sidebarDiv {
+  width: 28vw;
+  padding: 10px;
+  height: 70vh;
+  overflow-y: auto;
+  border: 2px solid #ccc;
+  background-color: #353535;
+  color: #ffffff
+}
+
+.sbContainer1 {
+display: grid;
+grid-template-rows: repeat(6, 1fr);
+grid-template-columns: .75fr 2fr;
+/* gap: 10px; */
+column-gap: 10px;
+row-gap: 4px;
+padding: 9px;
 border: 1px solid #ccc;
-padding: 5px;
-text-align: center;
-/* white-space: normal; */
-font-size: 1vw;
-color:white;
 }
 
-/* Style for each grid item */
-.grid-item2 {
-height: 5.5vh;
-width: 15vw;
+.sbContainer2 {
+display: grid;
+grid-template-rows: repeat(7, 1fr);
+grid-template-columns: .75fr 2fr;
+/* gap: 10px; */
+column-gap: 10px;
+row-gap: 4px;
+padding: 9px;
 border: 1px solid #ccc;
-padding: 5px;
+}
+
+.sbItem {
+/* border: 1px solid #cccccc60; */
+/* padding: 10px; */
 text-align: center;
-/* white-space: normal; */
-font-size: 1vw;
-color:white;
 }
-.child1 {
-height: 40%; 
-/* background-color: lightblue; */
-/* border: 1px solid #2305cc; */
-}
-.child2 {
-height: 60%; 
-/* background-color: rgb(192, 135, 13); */
-/* border: 1px solid #d80303; */
 
-}
-.child3 {
-height: 100%; 
-width: 100%;
-
-/* background-color: rgb(192, 135, 13); */
-/* border: 1px solid #d80303; */
-}
-.child4 {
-height: 100%; 
-width: 95%;
-/* border: 1px solid #d80303; */
-}
+.sbItemHeader {
+  /* border: 1px solid #cccccc60; */
+  /* padding: 10px; */
+  text-align: right;
+  line-height: 2;
+  /* font-size: .9vw; */
+  }
