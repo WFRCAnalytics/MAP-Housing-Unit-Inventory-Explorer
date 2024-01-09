@@ -121,6 +121,7 @@
         const jsonCity = 'json/CITY.json';
         const jsonCenter = 'json/CENTER.json';
         const jsonType = 'json/TYPE.json';
+        const jsonCenterType = 'json/CENTER_TYPE.json';
         
         let activeLayer;
 
@@ -140,6 +141,13 @@
         .then(data => {
           const subtypeArray = data[0].SUBTYPE;
           populateComboBox('subtypeSelect', subtypeArray);
+        });
+
+        // initialize housing type options
+        fetchLocalJsonArray(jsonCenterType)
+        .then(data => {
+          const centerTypeArray = data[0].CENTERTYPE;
+          populateComboBox('centerTypeSelect', centerTypeArray);
         });
 
         const countiesLayer = new FeatureLayer({
@@ -216,6 +224,8 @@
               var cityParam = searchParams.get("cty");
               var centerParam = searchParams.get("ctr");
               var subtypeParam = searchParams.get("type");
+              var centerTypeParam = searchParams.get("cen");
+              
 
               var lrParam = searchParams.get("lr");
               var frParam = searchParams.get("fr");
@@ -368,6 +378,7 @@
         const citySelect = document.getElementById("citySelect");
         const centerSelect = document.getElementById("centerSelect");
         const subtypeSelect = document.getElementById("subtypeSelect");
+        const centerTypeSelect = document.getElementById("centerTypeSelect");
         const resetButton = document.getElementById("resetButton");
         
         // define default queries
@@ -375,6 +386,7 @@
         const defaultCityQuery = "(CITY IS NULL OR CITY IS NOT NULL)";
         const defaultCenterQuery = "(CENTER IS NULL OR CENTER IS NOT NULL)";
         const defaultSubtypeQuery = "(SUBTYPE IS NULL OR SUBTYPE IS NOT NULL)";
+        const defaultCenterTypeQuery = "(CENTERTYPE IS NULL OR CENTERTYPE IS NOT NULL)";
 
         const defaultLRquery = null;
         const defaultFRquery = null;
@@ -395,6 +407,7 @@
         let cityQuery = defaultCityQuery;
         let centerQuery = defaultCenterQuery;
         let subtypeQuery = defaultSubtypeQuery;
+        let centerTypeQuery = defaultCenterTypeQuery;
 
         let LRquery = null;
         let FRquery = null;
@@ -413,7 +426,7 @@
 
         function generateFullQuery() {
        
-          const queryComponents = [countyQuery, cityQuery, centerQuery, subtypeQuery];
+          const queryComponents = [countyQuery, cityQuery, centerQuery, subtypeQuery, centerTypeQuery];
           const distArray = [LRquery, FRquery, BRTquery, FWYEquery, PARKquery, TRAILquery].filter(item => item !== null);
 
           const hasDistValues = distArray.length > 0;
@@ -465,7 +478,7 @@
             cityQuery = defaultCityQuery;
             centerQuery = defaultCenterQuery;
             subtypeQuery = defaultSubtypeQuery;
-            subtypeQuery = defaultSubtypeQuery;
+            centerTypeQuery = defaultCenterTypeQuery;
             LRquery = null;
             FRquery = null;
             BRTquery = null;
@@ -476,6 +489,7 @@
             yearQuery = defaultYearQuery;
             
             subtypeSelect.value = null;
+            centerTypeSelect.value = null;
             inputLR.value = null;
             inputFR.value = null;
             inputBRT.value = null;
@@ -759,6 +773,44 @@
                 window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
               selection = selection.map(value => `'${value}'`);
               subtypeQuery = `SUBTYPE IN (${selection})`
+            }
+            
+            // update the main query
+            generateFullQuery()
+            console.log(fullQuery)
+            layer.definitionExpression = fullQuery;
+          });
+          queryStatisticsForYearChart();
+          queryStatisticsForTypeChart();
+        });
+
+        // SUBTYPE Select
+        centerTypeSelect.addEventListener("calciteComboboxChange", (event) => {
+          [PointsLayer, ParcelsLayer].forEach((layer) => { // fix this to include parcels and points in main app
+
+            selection = event.target.value;
+            console.log(selection);
+
+            if (Array.isArray(selection) == false){
+              if(selection === null | selection === " " | selection === ""){
+
+                newURL.searchParams.delete('cen');
+              window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
+                centerTypeQuery = defaultCenterTypeQuery
+              }else{
+                // update URL params
+                
+                newURL.searchParams.set("cen", selection)
+                window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
+
+                centerTypeQuery = `CENTERTYPE IN ('${selection}')`
+              }
+            }else{
+              // const joinedString = selection.join('-');
+              newURL.searchParams.set("cen", selection)
+                window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
+              selection = selection.map(value => `'${value}'`);
+              centerTypeQuery = `CENTERTYPE IN (${selection})`
             }
             
             // update the main query
@@ -1513,6 +1565,18 @@
                 }
               };
 
+              // centertype url params
+              if ((centerTypeParam != 'None') && centerTypeParam){
+                if (centerTypeParam.includes(',')) {
+                  centerTypeParam = centerTypeParam.split(',');
+                  centerTypeSelect.value = centerTypeParam;
+                  centerTypeQuery = `CENTERTYPE IN (${centerTypeParam})`
+                } else{
+                  centerTypeSelect.value = centerTypeParam;
+                  centerTypeQuery = `CENTERTYPE IN ('${centerTypeParam}')`
+                }
+              };
+
               // light rail url params
               if ((lrParam != 'None') && lrParam){
                 inputLR.value = lrParam;
@@ -1638,10 +1702,10 @@
           <div class="sbItem"><calcite-select id="countySelect"></calcite-select> </div>
           <div class="sbItemHeader">City</div>
           <div class="sbItem"><calcite-select id="citySelect"></calcite-select></div>
-          <div class="sbItemHeader">Center Type</div>
-          <div class="sbItem">coming soon...</div>
           <div class="sbItemHeader">Center Name</div>
           <div class="sbItem"><calcite-select id="centerSelect"></calcite-select></div>
+          <div class="sbItemHeader">Center Type</div>
+          <div class="sbItem"><calcite-combobox id="centerTypeSelect" placeholder="select center types" selection-display="single" selection-mode="multiple"></calcite-combobox></div>
           <div class="sbItemHeader">Housing Type</div>
           <div class="sbItem"><calcite-combobox id="subtypeSelect" placeholder="select housing types" selection-display="single" selection-mode="multiple"></calcite-combobox></div>
       </div>
