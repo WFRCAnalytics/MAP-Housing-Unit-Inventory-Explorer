@@ -18,8 +18,8 @@ const countyRenderer = {
                       type: "simple-fill",
                       color: null,
                       outline: {
-                        color: [0,0,0, .75],
-                        width: 1
+                        color: [222,45,38, 1],
+                        width: 2
                     }
                   }
 
@@ -61,8 +61,8 @@ const cityRenderer = {
                           type: "simple-fill",
                           color: null,
                           outline: {
-                            color: [0,0,255, .5],
-                            width: 1
+                            color: [222,45,38, 1],
+                            width: 2
                         }
                       }
     
@@ -103,8 +103,8 @@ const centerRenderer = {
                         type: "simple-fill",
                         color: null,
                         outline: {
-                        color: [128,0,0, .5],
-                        width: 1
+                        color: [222,45,38, 1],
+                        width: 3
                     }
                     }
 

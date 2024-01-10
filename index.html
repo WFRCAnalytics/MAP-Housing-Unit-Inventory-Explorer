@@ -76,6 +76,11 @@
         });
       }
 
+      function hideAndResetDefinition(feature){
+        feature.definition = null;
+        feature.visible = false;
+      }
+
 
       require(["esri/config",
                "esri/Map", 
@@ -87,6 +92,7 @@
                "esri/widgets/Expand",
                "esri/widgets/BasemapGallery",
                "esri/core/reactiveUtils",
+               "esri/core/promiseUtils",
                "esri/rest/support/Query"], (
         esriConfig,
         Map,
@@ -98,6 +104,7 @@
         Expand,
         BasemapGallery,
         reactiveUtils,
+        promiseUtils,
         Query
       ) => {
 
@@ -114,6 +121,7 @@
         const jsonCity = 'json/CITY.json';
         const jsonCenter = 'json/CENTER.json';
         const jsonType = 'json/TYPE.json';
+        const jsonCenterType = 'json/CENTER_TYPE.json';
         
         let activeLayer;
 
@@ -135,11 +143,18 @@
           populateComboBox('subtypeSelect', subtypeArray);
         });
 
+        // initialize housing type options
+        fetchLocalJsonArray(jsonCenterType)
+        .then(data => {
+          const centerTypeArray = data[0].CENTERTYPE;
+          populateComboBox('centerTypeSelect', centerTypeArray);
+        });
+
         const countiesLayer = new FeatureLayer({
                 outFields: ["CO_NAME"],
                 url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/Boundaries_gdb/FeatureServer/1",
                 renderer:countyRenderer,
-                // maxScale: 50000,
+                maxScale: 0,
                 visible: false
               });
               
@@ -147,7 +162,7 @@
                 outFields: ["NAME"],
                 url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/Boundaries_gdb/FeatureServer/0",
                 renderer:cityRenderer,
-                // maxScale: 20000,
+                maxScale: 0,
                 // minScale: 100000,
                 visible: false
         
@@ -157,7 +172,7 @@
                 outFields: ["AreaName"],
                 url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/Boundaries_gdb/FeatureServer/2",
                 renderer:centerRenderer,
-                // maxScale: 2000,
+                maxScale: 0,
                 // minScale: 50000,
                 visible: false
               });
@@ -183,7 +198,7 @@
         const defaultZoom = 10
         const map = new Map({
           basemap: "satellite",
-          layers: [centersLayer, citiesLayer, countiesLayer, PointsLayer, ParcelsLayer],
+          layers: [PointsLayer, ParcelsLayer, centersLayer, citiesLayer, countiesLayer],
         });
 
         const view = new MapView({
@@ -192,6 +207,9 @@
           zoom: defaultZoom,
           center: [-111.98, 40.94]
         });
+
+        // // move the zoom icon
+        // view.ui.move("zoom", "bottom-left");
 
         if (newURL.searchParams.toString() === '') {
           activeLayer = PointsLayer;
@@ -206,12 +224,18 @@
               var cityParam = searchParams.get("cty");
               var centerParam = searchParams.get("ctr");
               var subtypeParam = searchParams.get("type");
+              var centerTypeParam = searchParams.get("cen");
+              
 
               var lrParam = searchParams.get("lr");
               var frParam = searchParams.get("fr");
               var brtParam = searchParams.get("brt");
               var fwyeParam = searchParams.get("fwye");
+              var pkParam = searchParams.get("pk");
+              var trlParam = searchParams.get("trl");
               var logOpParam = searchParams.get("op");
+              var yrbParam = searchParams.get("yrb");
+              var yreParam = searchParams.get("yre");
 
               var xParam = parseInt(searchParams.get("x"));
               var yParam = parseInt(searchParams.get("y"));
@@ -334,8 +358,12 @@
                   reactiveUtils.watch(
                     () => timeSlider.timeExtent,
                     (timeExtent) => {
-                      console.log(timeExtent.start.getFullYear());
-                      console.log(timeExtent.end.getFullYear())
+                      yStart = timeExtent.start.getFullYear();
+                      yEnd = timeExtent.end.getFullYear()
+                      yearQuery = `APX_BLT_YR >= '${yStart}' AND APX_BLT_YR <= '${yEnd}'`
+                      generateFullQuery()
+                      console.log(fullQuery)
+                      // activeLayer.definitionExpression = fullQuery;
                     }
                   );
 
@@ -350,6 +378,7 @@
         const citySelect = document.getElementById("citySelect");
         const centerSelect = document.getElementById("centerSelect");
         const subtypeSelect = document.getElementById("subtypeSelect");
+        const centerTypeSelect = document.getElementById("centerTypeSelect");
         const resetButton = document.getElementById("resetButton");
         
         // define default queries
@@ -357,12 +386,17 @@
         const defaultCityQuery = "(CITY IS NULL OR CITY IS NOT NULL)";
         const defaultCenterQuery = "(CENTER IS NULL OR CENTER IS NOT NULL)";
         const defaultSubtypeQuery = "(SUBTYPE IS NULL OR SUBTYPE IS NOT NULL)";
+        const defaultCenterTypeQuery = "(CENTERTYPE IS NULL OR CENTERTYPE IS NOT NULL)";
 
-        const defaultLRquery = "(DIST_LR IS NULL OR DIST_LR IS NOT NULL)";
-        const defaultFRquery = "(DIST_FR IS NULL OR DIST_FR IS NOT NULL)";
-        const defaultBRTquery = "(DIST_BRT IS NULL OR DIST_BRT IS NOT NULL)";
-        const defaultFWYEquery = "(DIST_FWYE IS NULL OR DIST_FWYE IS NOT NULL)";
+        const defaultLRquery = null;
+        const defaultFRquery = null;
+        const defaultBRTquery = null;
+        const defaultFWYEquery = null;
+        const defaultPARKquery = null;
+        const defaultTRAILquery = null;
         const defaultLogicOperator =  "AND";
+
+        const defaultYearQuery = "(APX_BLT_YR IS NULL OR APX_BLT_YR IS NOT NULL)"
 
         // set initial selection for geography filters - could switch to a placeholder?
         let countySelectionCurrent = "-No Selection-";
@@ -373,12 +407,16 @@
         let cityQuery = defaultCityQuery;
         let centerQuery = defaultCenterQuery;
         let subtypeQuery = defaultSubtypeQuery;
+        let centerTypeQuery = defaultCenterTypeQuery;
 
         let LRquery = null;
         let FRquery = null;
         let BRTquery = null;
         let FWYEquery = null;
+        let PARKquery = null;
+        let TRAILquery = null;
         let logicOperator =  defaultLogicOperator;
+        let yearQuery = defaultYearQuery;
 
         let fullQuery = null;
 
@@ -388,8 +426,8 @@
 
         function generateFullQuery() {
        
-          const queryComponents = [countyQuery, cityQuery, centerQuery, subtypeQuery];
-          const distArray = [LRquery, FRquery, BRTquery, FWYEquery].filter(item => item !== null);
+          const queryComponents = [countyQuery, cityQuery, centerQuery, subtypeQuery, centerTypeQuery];
+          const distArray = [LRquery, FRquery, BRTquery, FWYEquery, PARKquery, TRAILquery].filter(item => item !== null);
 
           const hasDistValues = distArray.length > 0;
 
@@ -409,12 +447,23 @@
           [PointsLayer, ParcelsLayer].forEach((layer) => {
           
             // clear the definition expression
-            layer.definitionExpression = null;
+            // layer.definitionExpression = null;
+            view.whenLayerView(layer).then((layerView) => {
+                layerView.filter = null;
+              });
           });
+
+          hideAndResetDefinition(countiesLayer)
+          hideAndResetDefinition(citiesLayer)
+          hideAndResetDefinition(centersLayer)
 
           countyActive = false
           cityActive = false
           centerActive = false
+
+          countySelectionCurrent = "None";
+          citySelectionCurrent = "None";
+          centerSelectionCurrent = "None";
 
           fetchLocalJsonArray(jsonBase)
             .then(data => {
@@ -432,22 +481,33 @@
             cityQuery = defaultCityQuery;
             centerQuery = defaultCenterQuery;
             subtypeQuery = defaultSubtypeQuery;
-            subtypeQuery = defaultSubtypeQuery;
+            centerTypeQuery = defaultCenterTypeQuery;
             LRquery = null;
             FRquery = null;
             BRTquery = null;
             FWYEquery = null;
+            PARKquery = null;
+            TRAILquery = null;
             logicOperator =  defaultLogicOperator;
+            yearQuery = defaultYearQuery;
             
             subtypeSelect.value = null;
+            centerTypeSelect.value = null;
             inputLR.value = null;
             inputFR.value = null;
             inputBRT.value = null;
             inputFWYE.value = null;
+            inputPARK.value = null;
+            inputTRAIL.value = null;
             logicOperator = "And"; 
             generateFullQuery()
             andButton.style.backgroundColor = "#00619B";
             orButton.style.backgroundColor = "#797979";
+            
+            // reset time slider
+            timeSlider.timeExtent.start = new Date(1850, 0, 1);
+            timeSlider.timeExtent.end = new Date(2022, 0, 1);
+        
 
           newURL.searchParams.delete('cny');
           newURL.searchParams.delete('cty');
@@ -457,6 +517,8 @@
           newURL.searchParams.delete('fr');
           newURL.searchParams.delete('brt');
           newURL.searchParams.delete('fwye');
+          newURL.searchParams.delete('pk');
+          newURL.searchParams.delete('trl');
           andButton.click()
           window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
         });
@@ -468,7 +530,11 @@
             generateFullQuery()
             newURL.searchParams.set("op", logicOperator)
             window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
-            layer.definitionExpression = fullQuery;
+            // layer.definitionExpression = fullQuery;
+            view.whenLayerView(layer).then((layerView) => {
+                layerView.filter = {where: fullQuery};
+              });
+            
             andButton.style.backgroundColor = "#00619B";
             orButton.style.backgroundColor = "#797979";
           });
@@ -481,7 +547,10 @@
             newURL.searchParams.set("op", logicOperator)
             window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
             generateFullQuery()
-            layer.definitionExpression = fullQuery;
+            // layer.definitionExpression = fullQuery;
+            view.whenLayerView(layer).then((layerView) => {
+                layerView.filter = {where: fullQuery};
+              });
             orButton.style.backgroundColor = "#00619B";
             andButton.style.backgroundColor = "#797979";
           });
@@ -490,6 +559,7 @@
         // COUNTY - filter and zoom features, update select options
         countySelect.addEventListener("calciteSelectChange", () => {
           [PointsLayer, ParcelsLayer].forEach((layer) => { // fix this to include parcels and points in main app
+
 
             selectionText = event.target.value;
 
@@ -514,8 +584,11 @@
             // update the main query
             generateFullQuery()
             console.log(fullQuery)
-            layer.definitionExpression = fullQuery;
-            
+            // layer.definitionExpression = fullQuery;
+            view.whenLayerView(layer).then((layerView) => {
+              layerView.filter = {where: fullQuery};
+            });
+
             // update the select options
             fetchLocalJsonArray(jsonCounty)
             .then(data => {
@@ -537,6 +610,12 @@
           // housingLayer.queryExtent().then((results) => {
           //   view.goTo(results.extent);
           // });
+          
+          // show county outline
+          hideAndResetDefinition(citiesLayer)
+          hideAndResetDefinition(centersLayer)
+          countiesLayer.definitionExpression = `CO_NAME = '${selectionText}'`;
+          countiesLayer.visible = true;
 
           // zoom to the boundary layer (faster but zooms farther out)
           const query = new Query();
@@ -570,7 +649,11 @@
             // update the main query
             generateFullQuery()
             console.log(fullQuery)
-            layer.definitionExpression = fullQuery;
+            // layer.definitionExpression = fullQuery;
+
+            view.whenLayerView(layer).then((layerView) => {
+              layerView.filter = {where: fullQuery};
+            });
             
             // update the select options
             fetchLocalJsonArray(jsonCity)
@@ -596,7 +679,13 @@
               setCalciteSelectValue(centerSelect, centerSelectionCurrent)
             });
           });
-          
+
+            // show city outline
+            hideAndResetDefinition(countiesLayer)
+            hideAndResetDefinition(centersLayer)            
+            citiesLayer.definitionExpression = `NAME = '${selectionText}'`;
+            citiesLayer.visible = true;
+
             // zoom to the boundary layer instead
             const query = new Query();
             query.where = `NAME = '${selectionText}'`;
@@ -632,7 +721,11 @@
             // update the main query
             generateFullQuery()
             console.log(fullQuery)
-            layer.definitionExpression = fullQuery;
+            // layer.definitionExpression = fullQuery;
+
+            view.whenLayerView(layer).then((layerView) => {
+              layerView.filter = {where: fullQuery};
+            });
             
             // update the select options
             fetchLocalJsonArray(jsonCenter)
@@ -660,6 +753,12 @@
             });
           });
           
+          // show center outline
+          hideAndResetDefinition(countiesLayer)
+          hideAndResetDefinition(citiesLayer)
+          centersLayer.definitionExpression = `AreaName = '${selectionText}'`;
+          centersLayer.visible = true;
+
           // zoom to the boundary layer instead
           const query = new Query();
           query.where = `AreaName = '${selectionText}'`;
@@ -701,10 +800,60 @@
             // update the main query
             generateFullQuery()
             console.log(fullQuery)
-            layer.definitionExpression = fullQuery;
+            // layer.definitionExpression = fullQuery;
+            view.whenLayerView(layer).then((layerView) => {
+              layerView.filter = {where: fullQuery};
+            });
+
           });
-          queryStatisticsForYearChart();
-          queryStatisticsForTypeChart();
+          view.whenLayerView(activeLayer).then((layerView) => {
+              queryStatisticsForYearChart(layerView);
+              queryStatisticsForTypeChart(layerView);
+            });
+        });
+
+        // CENTERTYPE Select
+        centerTypeSelect.addEventListener("calciteComboboxChange", (event) => {
+          [PointsLayer, ParcelsLayer].forEach((layer) => { // fix this to include parcels and points in main app
+
+            selection = event.target.value;
+            console.log(selection);
+
+            if (Array.isArray(selection) == false){
+              if(selection === null | selection === " " | selection === ""){
+
+                newURL.searchParams.delete('cen');
+              window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
+                centerTypeQuery = defaultCenterTypeQuery
+              }else{
+                // update URL params
+                
+                newURL.searchParams.set("cen", selection)
+                window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
+
+                centerTypeQuery = `CENTERTYPE IN ('${selection}')`
+              }
+            }else{
+              // const joinedString = selection.join('-');
+              newURL.searchParams.set("cen", selection)
+                window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
+              selection = selection.map(value => `'${value}'`);
+              centerTypeQuery = `CENTERTYPE IN (${selection})`
+            }
+            
+            // update the main query
+            generateFullQuery()
+            console.log(fullQuery)
+            // layer.definitionExpression = fullQuery;
+            view.whenLayerView(layer).then((layerView) => {
+              layerView.filter = {where: fullQuery};
+            });
+
+          });
+          view.whenLayerView(activeLayer).then((layerView) => {
+              queryStatisticsForYearChart(layerView);
+              queryStatisticsForTypeChart(layerView);
+            });
         });
 
         //initialize light rail dist filter
@@ -734,7 +883,14 @@
             console.log(fullQuery);
 
             [PointsLayer, ParcelsLayer].forEach((layer) => { 
-              layer.definitionExpression = fullQuery;
+              // layer.definitionExpression = fullQuery;
+              view.whenLayerView(layer).then((layerView) => {
+                layerView.filter = {where: fullQuery};
+              });
+            });
+            view.whenLayerView(activeLayer).then((layerView) => {
+              queryStatisticsForYearChart(layerView);
+              queryStatisticsForTypeChart(layerView);
             });
           });
 
@@ -765,7 +921,14 @@
             console.log(fullQuery);
 
             [PointsLayer, ParcelsLayer].forEach((layer) => { 
-              layer.definitionExpression = fullQuery;
+              // layer.definitionExpression = fullQuery;
+              view.whenLayerView(layer).then((layerView) => {
+                layerView.filter = {where: fullQuery};
+              });
+            });
+            view.whenLayerView(activeLayer).then((layerView) => {
+              queryStatisticsForYearChart(layerView);
+              queryStatisticsForTypeChart(layerView);
             });
           });
 
@@ -794,7 +957,14 @@
             console.log(fullQuery);
 
             [PointsLayer, ParcelsLayer].forEach((layer) => { 
-              layer.definitionExpression = fullQuery;
+              // layer.definitionExpression = fullQuery;
+              view.whenLayerView(layer).then((layerView) => {
+                layerView.filter = {where: fullQuery};
+              });
+            });
+            view.whenLayerView(activeLayer).then((layerView) => {
+              queryStatisticsForYearChart(layerView);
+              queryStatisticsForTypeChart(layerView);
             });
           });
 
@@ -824,8 +994,89 @@
             console.log(fullQuery);
 
             [PointsLayer, ParcelsLayer].forEach((layer) => { 
-              layer.definitionExpression = fullQuery;
+              // layer.definitionExpression = fullQuery;
+              view.whenLayerView(layer).then((layerView) => {
+                layerView.filter = {where: fullQuery};
+              });
             });
+            view.whenLayerView(activeLayer).then((layerView) => {
+              queryStatisticsForYearChart(layerView);
+              queryStatisticsForTypeChart(layerView);
+            });
+          });
+
+        //initialize PARK dist filter
+        const inputPARK  = document.getElementById("inputPARK");
+        inputPARK.value = null;
+        inputPARK.addEventListener("calciteInputChange", function(){
+
+            userInput = inputPARK.value;
+            console.log(userInput)
+
+            if (userInput === null | userInput === " " | userInput === ""){
+              newURL.searchParams.delete('pk');
+              window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
+              
+              PARKquery = defaultPARKquery;
+            } else {
+              // update URL params
+              newURL.searchParams.set("pk", userInput)
+              window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
+              PARKquery = `DIST_PARK <= '${userInput}'`;
+            }
+            
+            // update the main query
+            generateFullQuery()
+            console.log(fullQuery);
+
+            [PointsLayer, ParcelsLayer].forEach((layer) => { 
+              // layer.definitionExpression = fullQuery;
+              view.whenLayerView(layer).then((layerView) => {
+                layerView.filter = {where: fullQuery};
+              });
+            });
+            view.whenLayerView(activeLayer).then((layerView) => {
+              queryStatisticsForYearChart(layerView);
+              queryStatisticsForTypeChart(layerView);
+            });
+          });
+
+        //initialize PARK dist filter
+        const inputTRAIL  = document.getElementById("inputTRAIL");
+        inputTRAIL.value = null;
+        inputTRAIL.addEventListener("calciteInputChange", function(){
+
+            userInput = inputTRAIL.value;
+            console.log(userInput)
+
+            if (userInput === null | userInput === " " | userInput === ""){
+              newURL.searchParams.delete('trl');
+              window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
+              
+              TRAILquery = defaultTRAILquery;
+            } else {
+              // update URL params
+              newURL.searchParams.set("trl", userInput)
+              window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
+              TRAILquery = `DIST_TRAIL <= '${userInput}'`;
+            }
+            
+            // update the main query
+            generateFullQuery()
+            console.log(fullQuery);
+
+            [PointsLayer, ParcelsLayer].forEach((layer) => { 
+              // layer.definitionExpression = fullQuery;
+              view.whenLayerView(layer).then((layerView) => {
+                layerView.filter = {where: fullQuery};
+              });
+            });
+            
+            view.whenLayerView(activeLayer).then((layerView) => {
+              queryStatisticsForYearChart(layerView);
+              queryStatisticsForTypeChart(layerView);
+            });
+            
           });
 
         //==============================================
@@ -869,10 +1120,10 @@
       const yearCanvas = document.getElementById("year-chart");
       const typeCanvas = document.getElementById("type-chart");
 
-      function queryStatisticsForYearChart() {
+      const queryStatisticsForYearChart = promiseUtils.debounce(function (layerview) {
 
-          yearChart.options.title.text = "Built Decade (Loading...)"
-          yearChart.update();
+          // yearChart.options.title.text = "Built Decade (Loading...)"
+          // yearChart.update();
     
           // create query definitions for stacked bar chart data
           const decades = ["1840", "1850", "1860", "1870", "1880", "1890", "1900", "1910", "1920", "1930", "1940", "1950", "1960", "1970", "1980", "1990", "2000", "2010", "2020"];
@@ -891,11 +1142,14 @@
           }
 
           // query for stacked bar chart data
-          const yearChartQuery = activeLayer.createQuery();
+          const yearChartQuery = layerview.createQuery();
+          yearChartQuery.where = fullQuery
           yearChartQuery.geometry = view.extent;
           yearChartQuery.outStatistics = yearChartDefinitions;
 
-          return activeLayer.queryFeatures(yearChartQuery).then((result) => {
+          
+
+          return layerview.queryFeatures(yearChartQuery).then((result) => {
             const yearChartQueryResult = result.features[0].attributes;
             // console.log(yearChartQueryResult)
 
@@ -979,12 +1233,12 @@
           
           }, console.error);
 
-        }
+        });
 
-        function queryStatisticsForTypeChart() {
+        queryStatisticsForTypeChart = promiseUtils.debounce(function (layerView) {
           
-          typeChart.options.title.text = "Housing Type (Loading...)"
-          typeChart.update();
+          // typeChart.options.title.text = "Housing Type (Loading...)"
+          // typeChart.update();
 
           const statDefinitions = [
             {
@@ -1130,10 +1384,11 @@
           ];
            
           // query data for the pie chart
-          const query = activeLayer.createQuery();
+          const query = layerView.createQuery();
+          query.where = fullQuery
           query.geometry = view.extent;
           query.outStatistics = statDefinitions;
-          return activeLayer.queryFeatures(query).then((result) => {
+          return layerView.queryFeatures(query).then((result) => {
             const allStats = result.features[0].attributes;
             document.getElementById("countDiv").innerHTML = allStats.total;
           
@@ -1151,7 +1406,7 @@
             ]);
 
           }, console.error);
-        }
+        });
 
         // Updates the given chart with new data
         function updateChart(chart, dataValues) {
@@ -1267,8 +1522,19 @@
 
         // when the extent is changed update the charts
         reactiveUtils.when(() => view.stationary === true, () => {
-          queryStatisticsForYearChart();
-          queryStatisticsForTypeChart();
+          
+          view.whenLayerView(activeLayer).then((layerView) => {
+            reactiveUtils
+              .whenOnce(() => !layerView.updating)
+              .then(() => {
+                // Query layer view statistics as the user clicks
+                // or drags the pointer across the view.
+		            queryStatisticsForYearChart(layerView)
+                queryStatisticsForTypeChart(layerView);
+              });
+          });
+
+          
         });
 
         // // Another method of updating the charts, when data is done updating
@@ -1380,6 +1646,18 @@
                 }
               };
 
+              // centertype url params
+              if ((centerTypeParam != 'None') && centerTypeParam){
+                if (centerTypeParam.includes(',')) {
+                  centerTypeParam = centerTypeParam.split(',');
+                  centerTypeSelect.value = centerTypeParam;
+                  centerTypeQuery = `CENTERTYPE IN (${centerTypeParam})`
+                } else{
+                  centerTypeSelect.value = centerTypeParam;
+                  centerTypeQuery = `CENTERTYPE IN ('${centerTypeParam}')`
+                }
+              };
+
               // light rail url params
               if ((lrParam != 'None') && lrParam){
                 inputLR.value = lrParam;
@@ -1401,6 +1679,16 @@
                 FWYEquery = `DIST_FWYE <= '${fwyeParam}'`
               };
 
+              if ((pkParam != 'None') && pkParam){
+                inputPARK.value = pkParam;
+                PARKquery = `DIST_PARK <= '${pkParam}'`
+              };
+
+              if ((trlParam != 'None') && trlParam){
+                inputTRAIL.value = trlParam;
+                trlquery = `DIST_TRAIL <= '${trlParam}'`
+              };
+
               if ((logOpParam != 'None') && logOpParam){
                 if (logOpParam === "And"){
                   andButton.click()
@@ -1413,8 +1701,11 @@
 
               generateFullQuery();
               [PointsLayer, ParcelsLayer].forEach((layer) => { 
-                layer.definitionExpression = fullQuery;
+                // layer.definitionExpression = fullQuery;
+                view.whenLayerView(layer).then((layerView) => {
+                layerView.filter = {where: fullQuery};
               });
+            });
               
 
               let pt = new Point({
@@ -1487,105 +1778,57 @@
     <div id="viewDiv"></div>
     <div id="timeSlider"></div>
 
-    <div id="sidebarDiv" class="grid-container">
-      <div class="grid-item">
-        <div class="child1">
-          <b>County</b>
-        </div>
-        <div class="child2">
-          <calcite-select id="countySelect"></calcite-select>
-        </div>
+    <div id="sidebarDiv">    
+      <div class="sbContainer1">
+          <div id="sbHeader" class="sbItem">Selection Filters</div>
+          <div class="sbItem"></div>
+          <div class="sbItemHeader">County</div>
+          <div class="sbItem"><calcite-select id="countySelect"></calcite-select> </div>
+          <div class="sbItemHeader">City</div>
+          <div class="sbItem"><calcite-select id="citySelect"></calcite-select></div>
+          <div class="sbItemHeader">Center Name</div>
+          <div class="sbItem"><calcite-select id="centerSelect"></calcite-select></div>
+          <div class="sbItemHeader">Center Type</div>
+          <div class="sbItem"><calcite-combobox id="centerTypeSelect" placeholder="select center types" selection-display="single" selection-mode="multiple"></calcite-combobox></div>
+          <div class="sbItemHeader">Housing Type</div>
+          <div class="sbItem"><calcite-combobox id="subtypeSelect" placeholder="select housing types" selection-display="single" selection-mode="multiple"></calcite-combobox></div>
       </div>
-    
-      <div class="grid-item">
-        <div class="child1">
-          <b>From TRAX (mi)</b>
-        </div>
-        <div class="child2">
-          <calcite-input id="inputLR" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance"></calcite-input>
-        </div>
+      <br style="line-height: 6px" >
+      <div class="sbContainer2">
+          <div id="sbHeader" class="sbItem">Buffer Filters</div>
+          <div class="sbItem">
+              <div  class="logicDiv">
+                <div class="child4">
+                  use:
+                </div>
+                <div class="child4">
+                  <input id="andButton" type="button" value="Match All" class="esri-button" style="background-color: #00619B;"/>
+                </div>
+                <div class="child4">
+                  <input id="orButton" type="button" value="Match Any" class="esri-button" style="background-color: #797979;"/>
+                </div>
+              </div>
+          </div>
+          <div class="sbItemHeader">TRAX/S-Line</div>
+          <div class="sbItem"><calcite-input id="inputLR" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance (mi)"></calcite-input></div>
+          <div class="sbItemHeader">FrontRunner</div>
+          <div class="sbItem"><calcite-input id="inputFR" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance (mi)"></calcite-input></div>
+          <div class="sbItemHeader">BRT</div>
+          <div class="sbItem"><calcite-input id="inputBRT" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance (mi)"></calcite-input></div>
+          <div class="sbItemHeader">Freeway Exit</div>
+          <div class="sbItem"><calcite-input id="inputFWYE" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance (mi)"></calcite-input></div>
+          <div class="sbItemHeader">Parks</div>
+          <div class="sbItem"><calcite-input id="inputPARK" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance (mi)"></calcite-input></div>
+          <div class="sbItemHeader">Trails/TH</div>
+          <div class="sbItem"><calcite-input id="inputTRAIL" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance (mi)"></calcite-input></div>
       </div>
-    
-      <div class="grid-item">
-        <div class="child1">
-          <b>City</b>
-        </div>
-        <div class="child2">
-          <calcite-select id="citySelect"></calcite-select>
-        </div>
-      </div>
-    
-      <div class="grid-item">
-        <label>
-          <div class="child1">
-            <b>From FrontRunner (mi)</b>
-          </div>
-          <div class="child2">
-            <calcite-input id="inputFR" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance"></calcite-input>
-          </div>
-        </label>
-      </div>
-    
-      <div class="grid-item">
-        <div class="child1">
-          <b>Center</b>
-        </div>
-        <div class="child2">
-          <calcite-select id="centerSelect"></calcite-select>
-        </div>
-      </div>
-    
-      <div class="grid-item">
-        <label>
-          <div class="child1">
-            <b>From BRT (mi)</b>
-          </div>
-          <div class="child2">
-            <calcite-input id="inputBRT" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance"></calcite-input>
-          </div>
-        </label>
-      </div>
-    
-      <div class="grid-item">
-        <label>
-          <div class="child1">
-            <b>Housing Type</b>
-          </div>
-          <div class="child2">
-            <calcite-combobox id="subtypeSelect" placeholder="select housing types" selection-display="single" selection-mode="multiple"></calcite-combobox>
-          </div>
-        </label>
-      </div>
-    
-      <div class="grid-item">
-        <label>
-          <div class="child1">
-            <b>From FWY Exit (mi)</b>
-          </div>
-          <div class="child2">
-            <calcite-input id="inputFWYE" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance"></calcite-input>
-          </div>
-        </label>
-      </div>
-
-      <div class="grid-item2">
-          <div class="child3">
-            <input id="resetButton" type="button" value="Clear Filters" class="esri-button" style="background-color: #00619B;"/>
-          </div>
-      </div>
-
-      <div class="grid-item2">
-        <div  class="grid-container2">
-          <div class="child4">
-            <input id="andButton" type="button" value="And" class="esri-button" style="background-color: #00619B;"/>
-          </div>
-
-          <div class="child4">
-            <input id="orButton" type="button" value="Or" class="esri-button" style="background-color: #797979;"/>
-          </div>
-        </div>
+      <br style="line-height: 6px" >
+      <div id="resetDiv">
+        <input id="resetButton" type="button" value="Clear All Filters" class="esri-button" style="width:60%;background-color: #00619B;"/>
       </div>
     </div>
+
+    
 
     <div id="infoDiv" class="esri-widget" >
       <h4 class="esri-widget__heading esri-editor__title" style="text-align:center">About this Application:</h4>
