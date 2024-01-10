@@ -447,7 +447,10 @@
           [PointsLayer, ParcelsLayer].forEach((layer) => {
           
             // clear the definition expression
-            layer.definitionExpression = null;
+            // layer.definitionExpression = null;
+            view.whenLayerView(layer).then((layerView) => {
+                layerView.filter = null;
+              });
           });
 
           hideAndResetDefinition(countiesLayer)
@@ -527,7 +530,11 @@
             generateFullQuery()
             newURL.searchParams.set("op", logicOperator)
             window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
-            layer.definitionExpression = fullQuery;
+            // layer.definitionExpression = fullQuery;
+            view.whenLayerView(layer).then((layerView) => {
+                layerView.filter = {where: fullQuery};
+              });
+            
             andButton.style.backgroundColor = "#00619B";
             orButton.style.backgroundColor = "#797979";
           });
@@ -540,7 +547,10 @@
             newURL.searchParams.set("op", logicOperator)
             window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, 'Updated!', newURL);
             generateFullQuery()
-            layer.definitionExpression = fullQuery;
+            // layer.definitionExpression = fullQuery;
+            view.whenLayerView(layer).then((layerView) => {
+                layerView.filter = {where: fullQuery};
+              });
             orButton.style.backgroundColor = "#00619B";
             andButton.style.backgroundColor = "#797979";
           });
@@ -549,6 +559,7 @@
         // COUNTY - filter and zoom features, update select options
         countySelect.addEventListener("calciteSelectChange", () => {
           [PointsLayer, ParcelsLayer].forEach((layer) => { // fix this to include parcels and points in main app
+
 
             selectionText = event.target.value;
 
@@ -573,8 +584,11 @@
             // update the main query
             generateFullQuery()
             console.log(fullQuery)
-            layer.definitionExpression = fullQuery;
-            
+            // layer.definitionExpression = fullQuery;
+            view.whenLayerView(layer).then((layerView) => {
+              layerView.filter = {where: fullQuery};
+            });
+
             // update the select options
             fetchLocalJsonArray(jsonCounty)
             .then(data => {
@@ -635,7 +649,11 @@
             // update the main query
             generateFullQuery()
             console.log(fullQuery)
-            layer.definitionExpression = fullQuery;
+            // layer.definitionExpression = fullQuery;
+
+            view.whenLayerView(layer).then((layerView) => {
+              layerView.filter = {where: fullQuery};
+            });
             
             // update the select options
             fetchLocalJsonArray(jsonCity)
@@ -703,7 +721,11 @@
             // update the main query
             generateFullQuery()
             console.log(fullQuery)
-            layer.definitionExpression = fullQuery;
+            // layer.definitionExpression = fullQuery;
+
+            view.whenLayerView(layer).then((layerView) => {
+              layerView.filter = {where: fullQuery};
+            });
             
             // update the select options
             fetchLocalJsonArray(jsonCenter)
@@ -778,13 +800,19 @@
             // update the main query
             generateFullQuery()
             console.log(fullQuery)
-            layer.definitionExpression = fullQuery;
+            // layer.definitionExpression = fullQuery;
+            view.whenLayerView(layer).then((layerView) => {
+              layerView.filter = {where: fullQuery};
+            });
+
           });
-          queryStatisticsForYearChart();
-          queryStatisticsForTypeChart();
+          view.whenLayerView(activeLayer).then((layerView) => {
+              queryStatisticsForYearChart(layerView);
+              queryStatisticsForTypeChart(layerView);
+            });
         });
 
-        // SUBTYPE Select
+        // CENTERTYPE Select
         centerTypeSelect.addEventListener("calciteComboboxChange", (event) => {
           [PointsLayer, ParcelsLayer].forEach((layer) => { // fix this to include parcels and points in main app
 
@@ -816,10 +844,16 @@
             // update the main query
             generateFullQuery()
             console.log(fullQuery)
-            layer.definitionExpression = fullQuery;
+            // layer.definitionExpression = fullQuery;
+            view.whenLayerView(layer).then((layerView) => {
+              layerView.filter = {where: fullQuery};
+            });
+
           });
-          queryStatisticsForYearChart();
-          queryStatisticsForTypeChart();
+          view.whenLayerView(activeLayer).then((layerView) => {
+              queryStatisticsForYearChart(layerView);
+              queryStatisticsForTypeChart(layerView);
+            });
         });
 
         //initialize light rail dist filter
@@ -849,10 +883,15 @@
             console.log(fullQuery);
 
             [PointsLayer, ParcelsLayer].forEach((layer) => { 
-              layer.definitionExpression = fullQuery;
+              // layer.definitionExpression = fullQuery;
+              view.whenLayerView(layer).then((layerView) => {
+                layerView.filter = {where: fullQuery};
+              });
             });
-            queryStatisticsForYearChart();
-            queryStatisticsForTypeChart();
+            view.whenLayerView(activeLayer).then((layerView) => {
+              queryStatisticsForYearChart(layerView);
+              queryStatisticsForTypeChart(layerView);
+            });
           });
 
 
@@ -882,10 +921,15 @@
             console.log(fullQuery);
 
             [PointsLayer, ParcelsLayer].forEach((layer) => { 
-              layer.definitionExpression = fullQuery;
+              // layer.definitionExpression = fullQuery;
+              view.whenLayerView(layer).then((layerView) => {
+                layerView.filter = {where: fullQuery};
+              });
             });
-            queryStatisticsForYearChart();
-            queryStatisticsForTypeChart();
+            view.whenLayerView(activeLayer).then((layerView) => {
+              queryStatisticsForYearChart(layerView);
+              queryStatisticsForTypeChart(layerView);
+            });
           });
 
         //initialize BRT dist filter
@@ -913,10 +957,15 @@
             console.log(fullQuery);
 
             [PointsLayer, ParcelsLayer].forEach((layer) => { 
-              layer.definitionExpression = fullQuery;
+              // layer.definitionExpression = fullQuery;
+              view.whenLayerView(layer).then((layerView) => {
+                layerView.filter = {where: fullQuery};
+              });
             });
-            queryStatisticsForYearChart();
-            queryStatisticsForTypeChart();
+            view.whenLayerView(activeLayer).then((layerView) => {
+              queryStatisticsForYearChart(layerView);
+              queryStatisticsForTypeChart(layerView);
+            });
           });
 
         //initialize FWYE dist filter
@@ -945,10 +994,15 @@
             console.log(fullQuery);
 
             [PointsLayer, ParcelsLayer].forEach((layer) => { 
-              layer.definitionExpression = fullQuery;
+              // layer.definitionExpression = fullQuery;
+              view.whenLayerView(layer).then((layerView) => {
+                layerView.filter = {where: fullQuery};
+              });
             });
-            queryStatisticsForYearChart();
-            queryStatisticsForTypeChart();
+            view.whenLayerView(activeLayer).then((layerView) => {
+              queryStatisticsForYearChart(layerView);
+              queryStatisticsForTypeChart(layerView);
+            });
           });
 
         //initialize PARK dist filter
@@ -976,10 +1030,15 @@
             console.log(fullQuery);
 
             [PointsLayer, ParcelsLayer].forEach((layer) => { 
-              layer.definitionExpression = fullQuery;
+              // layer.definitionExpression = fullQuery;
+              view.whenLayerView(layer).then((layerView) => {
+                layerView.filter = {where: fullQuery};
+              });
             });
-            queryStatisticsForYearChart();
-            queryStatisticsForTypeChart();
+            view.whenLayerView(activeLayer).then((layerView) => {
+              queryStatisticsForYearChart(layerView);
+              queryStatisticsForTypeChart(layerView);
+            });
           });
 
         //initialize PARK dist filter
@@ -1007,10 +1066,17 @@
             console.log(fullQuery);
 
             [PointsLayer, ParcelsLayer].forEach((layer) => { 
-              layer.definitionExpression = fullQuery;
+              // layer.definitionExpression = fullQuery;
+              view.whenLayerView(layer).then((layerView) => {
+                layerView.filter = {where: fullQuery};
+              });
             });
-            queryStatisticsForYearChart();
-            queryStatisticsForTypeChart();
+            
+            view.whenLayerView(activeLayer).then((layerView) => {
+              queryStatisticsForYearChart(layerView);
+              queryStatisticsForTypeChart(layerView);
+            });
+            
           });
 
         //==============================================
@@ -1054,7 +1120,7 @@
       const yearCanvas = document.getElementById("year-chart");
       const typeCanvas = document.getElementById("type-chart");
 
-      queryStatisticsForYearChart = promiseUtils.debounce(function () {
+      const queryStatisticsForYearChart = promiseUtils.debounce(function (layerview) {
 
           // yearChart.options.title.text = "Built Decade (Loading...)"
           // yearChart.update();
@@ -1076,11 +1142,14 @@
           }
 
           // query for stacked bar chart data
-          const yearChartQuery = activeLayer.createQuery();
+          const yearChartQuery = layerview.createQuery();
+          yearChartQuery.where = fullQuery
           yearChartQuery.geometry = view.extent;
           yearChartQuery.outStatistics = yearChartDefinitions;
 
-          return activeLayer.queryFeatures(yearChartQuery).then((result) => {
+          
+
+          return layerview.queryFeatures(yearChartQuery).then((result) => {
             const yearChartQueryResult = result.features[0].attributes;
             // console.log(yearChartQueryResult)
 
@@ -1166,7 +1235,7 @@
 
         });
 
-        queryStatisticsForTypeChart = promiseUtils.debounce(function () {
+        queryStatisticsForTypeChart = promiseUtils.debounce(function (layerView) {
           
           // typeChart.options.title.text = "Housing Type (Loading...)"
           // typeChart.update();
@@ -1315,10 +1384,11 @@
           ];
            
           // query data for the pie chart
-          const query = activeLayer.createQuery();
+          const query = layerView.createQuery();
+          query.where = fullQuery
           query.geometry = view.extent;
           query.outStatistics = statDefinitions;
-          return activeLayer.queryFeatures(query).then((result) => {
+          return layerView.queryFeatures(query).then((result) => {
             const allStats = result.features[0].attributes;
             document.getElementById("countDiv").innerHTML = allStats.total;
           
@@ -1452,8 +1522,19 @@
 
         // when the extent is changed update the charts
         reactiveUtils.when(() => view.stationary === true, () => {
-          queryStatisticsForYearChart();
-          queryStatisticsForTypeChart();
+          
+          view.whenLayerView(activeLayer).then((layerView) => {
+            reactiveUtils
+              .whenOnce(() => !layerView.updating)
+              .then(() => {
+                // Query layer view statistics as the user clicks
+                // or drags the pointer across the view.
+		            queryStatisticsForYearChart(layerView)
+                queryStatisticsForTypeChart(layerView);
+              });
+          });
+
+          
         });
 
         // // Another method of updating the charts, when data is done updating
@@ -1620,8 +1701,11 @@
 
               generateFullQuery();
               [PointsLayer, ParcelsLayer].forEach((layer) => { 
-                layer.definitionExpression = fullQuery;
+                // layer.definitionExpression = fullQuery;
+                view.whenLayerView(layer).then((layerView) => {
+                layerView.filter = {where: fullQuery};
               });
+            });
               
 
               let pt = new Point({
@@ -1726,17 +1810,17 @@
               </div>
           </div>
           <div class="sbItemHeader">TRAX/S-Line</div>
-          <div class="sbItem"><calcite-input id="inputLR" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance"></calcite-input></div>
+          <div class="sbItem"><calcite-input id="inputLR" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance (mi)"></calcite-input></div>
           <div class="sbItemHeader">FrontRunner</div>
-          <div class="sbItem"><calcite-input id="inputFR" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance"></calcite-input></div>
+          <div class="sbItem"><calcite-input id="inputFR" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance (mi)"></calcite-input></div>
           <div class="sbItemHeader">BRT</div>
-          <div class="sbItem"><calcite-input id="inputBRT" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance"></calcite-input></div>
+          <div class="sbItem"><calcite-input id="inputBRT" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance (mi)"></calcite-input></div>
           <div class="sbItemHeader">Freeway Exit</div>
-          <div class="sbItem"><calcite-input id="inputFWYE" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance"></calcite-input></div>
+          <div class="sbItem"><calcite-input id="inputFWYE" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance (mi)"></calcite-input></div>
           <div class="sbItemHeader">Parks</div>
-          <div class="sbItem"><calcite-input id="inputPARK" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance"></calcite-input></div>
+          <div class="sbItem"><calcite-input id="inputPARK" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance (mi)"></calcite-input></div>
           <div class="sbItemHeader">Trails/TH</div>
-          <div class="sbItem"><calcite-input id="inputTRAIL" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance"></calcite-input></div>
+          <div class="sbItem"><calcite-input id="inputTRAIL" type="number" step=".5" min="0" clearable="true" placeholder="enter a distance (mi)"></calcite-input></div>
       </div>
       <br style="line-height: 6px" >
       <div id="resetDiv">
