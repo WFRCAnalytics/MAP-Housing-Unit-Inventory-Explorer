@@ -385,6 +385,8 @@
         const subtypeSelect = document.getElementById("subtypeSelect");
         const centerTypeSelect = document.getElementById("centerTypeSelect");
         const resetButton = document.getElementById("resetButton");
+        const statsModeToggle = document.getElementById("statsModeToggle");
+
         
         // define default queries
         const defaultCountyQuery = "(COUNTY IS NULL OR COUNTY IS NOT NULL)";
@@ -404,9 +406,9 @@
         const defaultYearQuery = "(APX_BLT_YR IS NULL OR APX_BLT_YR IS NOT NULL)"
 
         // set initial selection for geography filters - could switch to a placeholder?
-        let countySelectionCurrent = "-No Selection-";
-        let citySelectionCurrent = "-No Selection-";
-        let centerSelectionCurrent = "-No Selection-";
+        let countySelectionCurrent = null;
+        let citySelectionCurrent = null;
+        let centerSelectionCurrent = null;
 
         let countyQuery = defaultCountyQuery;
         let cityQuery = defaultCityQuery;
@@ -428,6 +430,8 @@
         let countyActive = false;
         let cityActive = false;
         let centerActive = false;
+
+        let chartMode = "ALL";
 
         // dynamically create the active query depending on which filters are active
         function generateFullQuery() {
@@ -469,6 +473,10 @@
           countySelectionCurrent = "None";
           citySelectionCurrent = "None";
           centerSelectionCurrent = "None";
+          
+          countySelect.disabled = false;
+          citySelect.disabled = false;
+          centerSelect.disabled = false;
 
           fetchLocalJsonArray(jsonBase).then(data => {
               const countyArray = data[0].COUNTY;
@@ -555,6 +563,21 @@
             orButton.style.backgroundColor = "#00619B";
             andButton.style.backgroundColor = "#797979";
           });
+        });
+
+        // setup actions for chart toggle
+        statsModeToggle.addEventListener("click", () => {
+          
+          if (statsModeToggle.checked === true){
+            chartMode = "GEOG";
+            document.getElementById("countHeader").innerHTML = "Units in View:";
+            updateChartsUsingActiveLayerView()
+          } else{
+              chartMode = "ALL";
+              document.getElementById("countHeader").innerHTML = "Total Units:";
+              updateChartsUsingActiveLayerView()
+          }
+          console.log(chartMode);
         });
 
         // COUNTY - filter and zoom features, update select options
@@ -1049,7 +1072,11 @@
 
       const yearCanvas = document.getElementById("year-chart");
       const typeCanvas = document.getElementById("type-chart");
-
+      
+      
+      //---------------------------------------
+      // query the data the for the year chart
+      //---------------------------------------
       const queryStatisticsForYearChart = promiseUtils.debounce( async function (layerview) {
 
           yearChart.options.title.text = "Built Decade (Loading...)"
@@ -1071,17 +1098,28 @@
             }
           }
           // console.log(yearChartDefinitions)
+          
           // query for stacked bar chart data
-          const yearChartQuery = layerview.createQuery();
-          yearChartQuery.where = fullQuery
-          yearChartQuery.geometry = view.extent;
-          yearChartQuery.outStatistics = yearChartDefinitions;
+          let yearChartQuery
+          if (chartMode === 'ALL') { 
+            yearChartQuery = activeLayer.createQuery();
+            yearChartQuery.where = fullQuery
+            yearChartQuery.outStatistics = yearChartDefinitions;
+            yearChartQuery = activeLayer.queryFeatures(yearChartQuery)
+          } else if (chartMode === 'GEOG') { 
+            yearChartQuery = layerview.createQuery();
+            yearChartQuery.where = fullQuery
+            yearChartQuery.geometry = view.extent;
+            yearChartQuery.outStatistics = yearChartDefinitions;
+            yearChartQuery = layerview.queryFeatures(yearChartQuery)
+          };
 
-          return layerview.queryFeatures(yearChartQuery).then((result) => {
+
+
+          return yearChartQuery.then((result) => {
             const yearChartQueryResult = result.features[0].attributes;
             // console.log(yearChartQueryResult)
 
-            
             const decadeTypeCountArray = [];
             for (const property in yearChartQueryResult) {
               if (yearChartQueryResult.hasOwnProperty(property)) {
@@ -1162,7 +1200,10 @@
           }, console.error);
 
         });
-
+        
+        //---------------------------------------
+        // query the data the for the type chart
+        //---------------------------------------
         queryStatisticsForTypeChart = promiseUtils.debounce(function (layerView) {
           
           typeChart.options.title.text = "Housing Type (Loading...)"
@@ -1312,11 +1353,21 @@
           ];
            
           // query data for the pie chart
-          const query = layerView.createQuery();
-          query.where = fullQuery
-          query.geometry = view.extent;
-          query.outStatistics = statDefinitions;
-          return layerView.queryFeatures(query).then((result) => {
+          let query
+          if (chartMode === 'ALL') { 
+            query = activeLayer.createQuery();
+            query.where = fullQuery
+            query.outStatistics = statDefinitions;
+            query = activeLayer.queryFeatures(query)
+          } if (chartMode === 'GEOG') { 
+            query = layerView.createQuery();
+            query.where = fullQuery
+            query.geometry = view.extent;
+            query.outStatistics = statDefinitions;
+            query = layerView.queryFeatures(query)
+          };
+
+          return query.then((result) => {
             const allStats = result.features[0].attributes;
             document.getElementById("countDiv").innerHTML = allStats.total;
           
@@ -1504,121 +1555,125 @@
         //===============================
         view.when(() => {
           // if provide URL has searchParams update the map
-          if (urlParamsToggle === true){
-            if (newURL.searchParams.toString() !== '') {
-              
-   
-              if ((countyParam != 'None') && countyParam){
-                countySelect.value = countyParam;
-                countyQuery = `COUNTY = '${countyParam}'`
-                // console.log(countyParam);
-              };
+          if (newURL.searchParams.toString() !== '') {
+            
+  
+            if ((countyParam != 'None') && countyParam){
+              countySelect.value = countyParam;
+              countyQuery = `COUNTY = '${countyParam}'`
+              // console.log(countyParam);
+            };
 
-              if ((cityParam != 'None') && cityParam){
-                citySelect.value = cityParam;
-                cityQuery = `CITY = '${cityParam}'`
-              };
+            if ((cityParam != 'None') && cityParam){
+              citySelect.value = cityParam;
+              cityQuery = `CITY = '${cityParam}'`
+            };
 
-              // center url params
-              if ((centerParam != 'None') && centerParam){
-                centerSelect.value = centerParam;
-                centerQuery = `CENTER = '${centerParam}'`
-              };
-              
-              // subtype url params
-              if ((subtypeParam != 'None') && subtypeParam){
-                if (subtypeParam.includes(',')) {
-                  subtypeParam = subtypeParam.split(',');
-                  subtypeSelect.value = subtypeParam;
-                subtypeQuery = `SUBTYPE IN (${subtypeParam})`
-                } else{
-                  subtypeSelect.value = subtypeParam;
-                  subtypeQuery = `SUBTYPE IN ('${subtypeParam}')`
-                }
-              };
-
-              // centertype url params
-              if ((centerTypeParam != 'None') && centerTypeParam){
-                if (centerTypeParam.includes(',')) {
-                  centerTypeParam = centerTypeParam.split(',');
-                  centerTypeSelect.value = centerTypeParam;
-                  centerTypeQuery = `CENTERTYPE IN (${centerTypeParam})`
-                } else{
-                  centerTypeSelect.value = centerTypeParam;
-                  centerTypeQuery = `CENTERTYPE IN ('${centerTypeParam}')`
-                }
-              };
-
-              // light rail url params
-              if ((lrParam != 'None') && lrParam){
-                inputLR.value = lrParam;
-                LRquery = `DIST_LR <= '${lrParam}'`
-              };
-
-              if ((frParam != 'None') && frParam){
-                inputFR.value = frParam;
-                FRquery = `DIST_FR <= '${frParam}'`
-              };
-
-              if ((brtParam != 'None') && brtParam){
-                inputBRT.value = brtParam;
-                BRTquery = `DIST_BRT <= '${brtParam}'`
-              };
-
-              if ((fwyeParam != 'None') && fwyeParam){
-                inputFWYE.value = fwyeParam;
-                FWYEquery = `DIST_FWYE <= '${fwyeParam}'`
-              };
-
-              if ((pkParam != 'None') && pkParam){
-                inputPARK.value = pkParam;
-                PARKquery = `DIST_PARK <= '${pkParam}'`
-              };
-
-              if ((trlParam != 'None') && trlParam){
-                inputTRAIL.value = trlParam;
-                trlquery = `DIST_TRAIL <= '${trlParam}'`
-              };
-
-              if ((logOpParam != 'None') && logOpParam){
-                if (logOpParam === "And"){
-                  andButton.click()
-                }
-                if (logOpParam === "Or"){
-                  orButton.click()
-                }
-                logicOperator = logOpParam;
-              };
-
-              generateFullQuery();
-              [PointsLayer, ParcelsLayer].forEach((layer) => { 
-                view.whenLayerView(layer).then((layerView) => {
-                layerView.filter = {where: fullQuery};
-              });
-            });
-              
-
-              let pt = new Point({
-                x: xParam,
-                y: yParam,
-                spatialReference: {
-                  wkid: 3857
-                }
-              });
-
-              // override center and zoom
-              view.center = pt;
-              view.zoom = zoomParam;
-
-              if (geomParam === 'pcl'){
-                ParcelsLayer.visible = true;
-                PointsLayer.visible = false;
-              } if (geomParam === 'pt'){
-                ParcelsLayer.visible = false;
-                PointsLayer.visible = true;
+            // center url params
+            if ((centerParam != 'None') && centerParam){
+              centerSelect.value = centerParam;
+              centerQuery = `CENTER = '${centerParam}'`
+            };
+            
+            // subtype url params
+            if ((subtypeParam != 'None') && subtypeParam){
+              if (subtypeParam.includes(',')) {
+                subtypeParam = subtypeParam.split(',');
+                subtypeSelect.value = subtypeParam;
+              subtypeQuery = `SUBTYPE IN (${subtypeParam})`
+              } else{
+                subtypeSelect.value = subtypeParam;
+                subtypeQuery = `SUBTYPE IN ('${subtypeParam}')`
               }
+            };
+
+            // centertype url params
+            if ((centerTypeParam != 'None') && centerTypeParam){
+              if (centerTypeParam.includes(',')) {
+                centerTypeParam = centerTypeParam.split(',');
+                centerTypeSelect.value = centerTypeParam;
+                centerTypeQuery = `CENTERTYPE IN (${centerTypeParam})`
+              } else{
+                centerTypeSelect.value = centerTypeParam;
+                centerTypeQuery = `CENTERTYPE IN ('${centerTypeParam}')`
+              }
+            };
+
+            // light rail url params
+            if ((lrParam != 'None') && lrParam){
+              inputLR.value = lrParam;
+              LRquery = `DIST_LR <= '${lrParam}'`
+            };
+
+            if ((frParam != 'None') && frParam){
+              inputFR.value = frParam;
+              FRquery = `DIST_FR <= '${frParam}'`
+            };
+
+            if ((brtParam != 'None') && brtParam){
+              inputBRT.value = brtParam;
+              BRTquery = `DIST_BRT <= '${brtParam}'`
+            };
+
+            if ((fwyeParam != 'None') && fwyeParam){
+              inputFWYE.value = fwyeParam;
+              FWYEquery = `DIST_FWYE <= '${fwyeParam}'`
+            };
+
+            if ((pkParam != 'None') && pkParam){
+              inputPARK.value = pkParam;
+              PARKquery = `DIST_PARK <= '${pkParam}'`
+            };
+
+            if ((trlParam != 'None') && trlParam){
+              inputTRAIL.value = trlParam;
+              trlquery = `DIST_TRAIL <= '${trlParam}'`
+            };
+
+            if ((logOpParam != 'None') && logOpParam){
+              if (logOpParam === "And"){
+                andButton.click()
+              }
+              if (logOpParam === "Or"){
+                orButton.click()
+              }
+              logicOperator = logOpParam;
+            };
+
+            if (countyParam || cityParam || centerParam){
+              countySelect.disabled = true;
+              citySelect.disabled = true;
+              centerSelect.disabled = true;
             }
-          } 
+
+            generateFullQuery();
+            [PointsLayer, ParcelsLayer].forEach((layer) => { 
+              view.whenLayerView(layer).then((layerView) => {
+              layerView.filter = {where: fullQuery};
+            });
+          });
+            
+
+            let pt = new Point({
+              x: xParam,
+              y: yParam,
+              spatialReference: {
+                wkid: 3857
+              }
+            });
+
+            // override center and zoom
+            view.center = pt;
+            view.zoom = zoomParam;
+
+            if (geomParam === 'pcl'){
+              ParcelsLayer.visible = true;
+              PointsLayer.visible = false;
+            } if (geomParam === 'pt'){
+              ParcelsLayer.visible = false;
+              PointsLayer.visible = true;
+            }
+          }
         });
         
         // Create URL params by watching when the extent is changed
@@ -1715,8 +1770,6 @@
       </div>
     </div>
 
-    
-
     <div id="infoDiv" class="esri-widget" >
       <h4 class="esri-widget__heading esri-editor__title" style="text-align:center">About this Application:</h4>
       <div class="esri-widget">
@@ -1733,9 +1786,14 @@
     </div>
 
     <div id="resultDiv" class="esri-widget">
-      
-      <div>
-        Total Units in View:
+      <div class="sectionChartToggle" >
+        <calcite-checkbox id="statsModeToggle"></calcite-checkbox>
+        <div>Dynamically update charts according to the <b>geographic extent</b> of the map. </div>
+      </div>
+
+      <br>
+      <div style="display: grid; grid-template-columns: .35fr 1fr;">
+        <div id="countHeader">Total Units:</div>
         <div class="count" id="countDiv">0</div>
       </div>
 
@@ -1751,9 +1809,7 @@
       </div>
       
       <div class="section" >
-        <p>These charts dynamically update according to the <b>visible</b> features in the map. Hover over an element in the chart to view its description.</p>
-        
-
+        <p> Hover over an element in the chart to view its description.</p>
       </div>
     </div>
 

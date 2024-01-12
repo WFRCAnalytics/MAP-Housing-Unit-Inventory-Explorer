@@ -71,20 +71,10 @@ height: 300px;
 /* margin-top: 2000px; */
 }
 
-
-#sidebarDivOld {
-width: 32vw;
-padding: 10px;
-height: 65vh;
-/* overflow-y: auto; */
-border: 2px solid #ccc;
-background-color: #353535;
-}
-
 #resultDiv {
     display:flex;
     flex-direction: column;
-    height:80vh;
+    height:82vh;
     width: 40vh;
     font-size: 14px;
     padding: 10px;
@@ -100,6 +90,15 @@ flex: 1;
 /* border: 1px solid #ccc; */
 /* box-sizing: border-box; */
 }
+
+.sectionChartToggle {
+  display: grid;
+  grid-template-columns: .07fr 1fr;
+  
+  /* grid-gap: .5vh; */
+}
+
+
 
 
 .count {
@@ -132,8 +131,8 @@ grid-gap: .5vh;
   text-align: center;
   width: 100%;
   display: flex;
-      justify-content: center;
-      align-items: center;
+  justify-content: center;
+  align-items: center;
 }
 
 #sidebarDiv {
