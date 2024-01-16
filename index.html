@@ -640,6 +640,11 @@
           countiesLayer.queryExtent(query).then(function(results){
             view.goTo(results.extent);
           });
+
+          if (chartMode === 'ALL') {
+            updateChartsUsingActiveLayerView()
+          };
+
         });
 
         // CITY - filter and zoom features, update select options
@@ -705,6 +710,10 @@
             citiesLayer.queryExtent(query).then(function(results){
               view.goTo(results.extent);
             });
+
+            if (chartMode === 'ALL') {
+              updateChartsUsingActiveLayerView()
+            };
 
         });
 
@@ -775,6 +784,10 @@
           centersLayer.queryExtent(query).then(function(results){
             view.goTo(results.extent);
           });
+
+          if (chartMode === 'ALL') {
+            updateChartsUsingActiveLayerView()
+          };
 
         });
 
@@ -1499,10 +1512,17 @@
         createYearChart();
         createTypeChart();
 
+        // draw the charts once
+        if (chartMode === 'ALL') {
+            updateChartsUsingActiveLayerView()
+        };
+
         // when the view is stationary after a move, update the charts
-        // aitys till the current layerview stops drawing
+        // waits till the current layerview stops drawing
         reactiveUtils.when(() => view.stationary === true, () => {
-          updateChartsUsingActiveLayerView()
+          if (chartMode === 'GEOG') {
+            updateChartsUsingActiveLayerView()
+          };
         });
 
         // create an expand object for the charts
