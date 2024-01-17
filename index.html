@@ -189,11 +189,14 @@
         
         const PointsLayer = new FeatureLayer({
             url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/hui_for_web_gdb/FeatureServer/1",
-            renderer:pointRenderer,
+            renderer:ptRendererType,
+            // renderer:ptRendererBuiltDecade,
             outFields: ["*"],
             visible: true,
           });
 
+        // store the main data layers in an array for loops later
+        const DataLayers = [PointsLayer, ParcelsLayer];
 
         // Create the Map and View objects
         const defaultZoom = 14
@@ -208,7 +211,6 @@
           zoom: defaultZoom,
           center: [-111.90, 40.76]
         });
-
 
         // updates the charts using the layerview of whichever layer is active
         function updateChartsUsingActiveLayerView(){
@@ -362,22 +364,18 @@
                     });
                   
                   view.ui.add(timeSliderExpand, "bottom-left");
-           
+                  
                   // watch the time slider for changes
-                  reactiveUtils.watch(
-                    () => timeSlider.timeExtent,
-                    (timeExtent) => {
-                      yStart = timeExtent.start.getFullYear();
-                      yEnd = timeExtent.end.getFullYear();
-                      updateChartsUsingActiveLayerView()
-                    }
-                  );
+                  document.getElementById("timeSlider").addEventListener("pointerup",(event) => {
+                    // console.log("start", timeSlider.timeExtent.start.getFullYear());
+                    // console.log("end", timeSlider.timeExtent.end.getFullYear());
+                    yStart = timeSlider.timeExtent.start.getFullYear();
+                    yEnd = timeSlider.timeExtent.end.getFullYear();
+                    updateChartsUsingActiveLayerView()
+                  });
 
-                  // Option 2: add the time slider (non-expandable) to the view, manual allows for div placement
-                  // view.ui.add(timeSlider, "manual");
         });
 
-        
         // store ui objects as variables
         const countySelect = document.getElementById("countySelect");
         const citySelect = document.getElementById("citySelect");
@@ -386,7 +384,10 @@
         const centerTypeSelect = document.getElementById("centerTypeSelect");
         const resetButton = document.getElementById("resetButton");
         const statsModeToggle = document.getElementById("statsModeToggle");
-
+        const typeButton = document.getElementById("typeButton");
+        const bltDecButton = document.getElementById("bltDecButton");
+        const densityButton = document.getElementById("densityButton");
+        const valueButton = document.getElementById("valueButton");
         
         // define default queries
         const defaultCountyQuery = "(COUNTY IS NULL OR COUNTY IS NOT NULL)";
@@ -454,7 +455,7 @@
 
         // setup actions for the reset button
         resetButton.addEventListener("click", () => {
-          [PointsLayer, ParcelsLayer].forEach((layer) => {
+          DataLayers.forEach((layer) => {
           
             // clear the filter
             view.whenLayerView(layer).then((layerView) => {
@@ -536,7 +537,7 @@
 
         // setup actions for the AND button
         andButton.addEventListener("click", () => {
-          [PointsLayer, ParcelsLayer].forEach((layer) => {  
+          DataLayers.forEach((layer) => {  
             logicOperator = "And"; 
             generateFullQuery()
             newURL.searchParams.set("op", logicOperator)
@@ -552,7 +553,7 @@
 
         // setup actions for the OR button
         orButton.addEventListener("click", () => {
-          [PointsLayer, ParcelsLayer].forEach((layer) => {  
+          DataLayers.forEach((layer) => {  
             logicOperator = "Or";
             newURL.searchParams.set("op", logicOperator)
             window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, '', newURL);
@@ -580,9 +581,45 @@
           console.log(chartMode);
         });
 
+        // setup actions for the type button
+        typeButton.addEventListener("click", () => {
+          typeButton.style.backgroundColor = "#00619B";
+          bltDecButton.style.backgroundColor = "#797979";
+          densityButton.style.backgroundColor = "#797979";
+          valueButton.style.backgroundColor = "#797979";
+          PointsLayer.renderer = ptRendererType; 
+        });
+
+        // setup actions for the Built Decade button
+        bltDecButton.addEventListener("click", () => {
+          typeButton.style.backgroundColor = "#797979";
+          bltDecButton.style.backgroundColor = "#00619B";
+          densityButton.style.backgroundColor = "#797979";
+          valueButton.style.backgroundColor = "#797979";
+          PointsLayer.renderer = ptRendererBuiltDecade; 
+        });
+
+        // setup actions for the Density button
+        densityButton.addEventListener("click", () => {
+          typeButton.style.backgroundColor = "#797979";
+          bltDecButton.style.backgroundColor = "#797979";
+          densityButton.style.backgroundColor = "#00619B";
+          valueButton.style.backgroundColor = "#797979";
+          PointsLayer.renderer = ptRendererDensity; 
+        });
+
+        // setup actions for the Value button
+        valueButton.addEventListener("click", () => {
+          typeButton.style.backgroundColor = "#797979";
+          bltDecButton.style.backgroundColor = "#797979";
+          densityButton.style.backgroundColor = "#797979";
+          valueButton.style.backgroundColor = "#00619B";
+          PointsLayer.renderer = ptRendererValue; 
+        });
+
         // COUNTY - filter and zoom features, update select options
         countySelect.addEventListener("calciteSelectChange", () => {
-          [PointsLayer, ParcelsLayer].forEach((layer) => {
+          DataLayers.forEach((layer) => {
 
             // get the selection text
             selectionText = event.target.value;
@@ -649,7 +686,7 @@
 
         // CITY - filter and zoom features, update select options
         citySelect.addEventListener("calciteSelectChange", () => {
-          [PointsLayer, ParcelsLayer].forEach((layer) => { // fix this to include parcels and points in main app
+          DataLayers.forEach((layer) => { // fix this to include parcels and points in main app
 
             selectionText = event.target.value;
             citySelectionCurrent = selectionText;
@@ -719,7 +756,7 @@
 
         // CENTER - filter and zoom features, update select options
         centerSelect.addEventListener("calciteSelectChange", () => {
-          [PointsLayer, ParcelsLayer].forEach((layer) => { // fix this to include parcels and points in main app
+          DataLayers.forEach((layer) => { // fix this to include parcels and points in main app
 
             selectionText = event.target.value;
             centerSelectionCurrent = selectionText;
@@ -793,7 +830,7 @@
 
         // SUBTYPE Select
         subtypeSelect.addEventListener("calciteComboboxChange", (event) => {
-          [PointsLayer, ParcelsLayer].forEach((layer) => { // fix this to include parcels and points in main app
+          DataLayers.forEach((layer) => { // fix this to include parcels and points in main app
 
             selection = event.target.value;
 
@@ -829,7 +866,7 @@
 
         // CENTERTYPE Select
         centerTypeSelect.addEventListener("calciteComboboxChange", (event) => {
-          [PointsLayer, ParcelsLayer].forEach((layer) => { // fix this to include parcels and points in main app
+          DataLayers.forEach((layer) => { // fix this to include parcels and points in main app
 
             selection = event.target.value;
 
@@ -886,11 +923,12 @@
             // update the main query
             generateFullQuery()
 
-            [PointsLayer, ParcelsLayer].forEach((layer) => { 
+            DataLayers.forEach(layer => { 
               view.whenLayerView(layer).then((layerView) => {
                 layerView.filter = {where: fullQuery};
               });
             });
+  
             updateChartsUsingActiveLayerView()
           });
 
@@ -914,8 +952,8 @@
             
             // update the main query
             generateFullQuery()
-
-            [PointsLayer, ParcelsLayer].forEach((layer) => { 
+            
+            DataLayers.forEach(layer => { 
               view.whenLayerView(layer).then((layerView) => {
                 layerView.filter = {where: fullQuery};
               });
@@ -943,7 +981,7 @@
             // update the main query
             generateFullQuery()
 
-            [PointsLayer, ParcelsLayer].forEach((layer) => { 
+            DataLayers.forEach((layer) => { 
               view.whenLayerView(layer).then((layerView) => {
                 layerView.filter = {where: fullQuery};
               });
@@ -972,7 +1010,7 @@
             // update the main query
             generateFullQuery()
 
-            [PointsLayer, ParcelsLayer].forEach((layer) => { 
+            DataLayers.forEach(layer => { 
               view.whenLayerView(layer).then((layerView) => {
                 layerView.filter = {where: fullQuery};
               });
@@ -1002,7 +1040,7 @@
             // update the main query
             generateFullQuery()
 
-            [PointsLayer, ParcelsLayer].forEach((layer) => { 
+            DataLayers.forEach(layer => { 
               view.whenLayerView(layer).then((layerView) => {
                 layerView.filter = {where: fullQuery};
               });
@@ -1027,12 +1065,12 @@
               newURL.searchParams.set("trl", userInput)
               window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, '', newURL);
               TRAILquery = `DIST_TRAIL <= '${userInput}'`;
-            }
+            };
             
             // update the main query
-            generateFullQuery()
+            generateFullQuery();
 
-            [PointsLayer, ParcelsLayer].forEach((layer) => { 
+            DataLayers.forEach(layer => { 
               view.whenLayerView(layer).then((layerView) => {
                 layerView.filter = {where: fullQuery};
               });
@@ -1072,9 +1110,20 @@
           view: view,
           content: sidebarDiv,
           expanded: true,
-          // group: "top-left"
+          group: "top-left"
         });
         view.ui.add(sidebarExpand, { position: "top-left"});
+
+        const symbologyDiv = document.getElementById("symbology");
+        const symbologyExpand = new Expand({
+          expandIcon: "media-layer",
+          expandTooltip: "Symbology",
+          view: view,
+          content: symbologyDiv,
+          expanded: false,
+          group: "top-left"
+        });
+        view.ui.add(symbologyExpand, { position: "top-left"});
 
       //=========================
       // chart stuff
@@ -1667,11 +1716,11 @@
             }
 
             generateFullQuery();
-            [PointsLayer, ParcelsLayer].forEach((layer) => { 
+            DataLayers.forEach(layer => { 
               view.whenLayerView(layer).then((layerView) => {
-              layerView.filter = {where: fullQuery};
+                layerView.filter = {where: fullQuery};
+              });
             });
-          });
             
 
             let pt = new Point({
@@ -1831,6 +1880,20 @@
       <div class="section" >
         <p> Hover over an element in the chart to view its description.</p>
       </div>
+    </div>
+
+    <div id="symbology" class="esri-widget">
+      <div style="text-align: center;">
+      Click any button to change the layer symbology:
+      </div>
+      <br>
+      <input class="esri-button style-button" value="Housing Type" id="typeButton" value="" type="button" style="background-color: #00619B;"/>
+        
+      <input class="esri-button style-button" value="Built Decade" id="bltDecButton" type="button" style="background-color: #797979;"/>
+  
+      <input class="esri-button style-button" value="Land Use Density" id="densityButton" type="button" style="background-color: #797979;"/>
+        
+      <input class="esri-button style-button" value="Unit Valuation" id="valueButton" type="button" style="background-color: #797979;"/>
     </div>
 
 

@@ -49,9 +49,11 @@ width: 100%;
     font-weight: 500;
 } */
 
-#topbar {
-    background: #fff;
+#symbology {
+    /* background: #fff; */
+    height: 30vh;
     padding: 10px;
+    border: 2px solid #ccc;
   }
 
 #infoDiv {
@@ -109,7 +111,7 @@ font-weight: bold;
 display: inline-block;
 }
 
-#resetButton, #andButton, #orButton{
+#resetButton, #andButton, #orButton, #typeButton, #bltDecButton,#densityButton,#valueButton{
 color:white;
 }
 
@@ -143,6 +145,14 @@ grid-gap: .5vh;
   border: 2px solid #ccc;
   background-color: #353535;
   color: #ffffff
+}
+
+#symbology {
+  padding: 10px;
+  width: 190px;
+}
+.style-button{
+  margin: 3px;
 }
 
 .sbContainer1 {
