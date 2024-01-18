@@ -181,7 +181,7 @@
         const ParcelsLayer = new FeatureLayer({
             outFields: ["*"],
             url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/hui_for_web_gdb/FeatureServer/0",
-            renderer:parcelRenderer,
+            renderer:pclRendererType,
             maxScale: 0,
             visible: false,
             popupTemplate:parcelPopupTemplate
@@ -588,6 +588,7 @@
           densityButton.style.backgroundColor = "#797979";
           valueButton.style.backgroundColor = "#797979";
           PointsLayer.renderer = ptRendererType; 
+          ParcelsLayer.renderer = pclRendererType; 
         });
 
         // setup actions for the Built Decade button
@@ -596,7 +597,8 @@
           bltDecButton.style.backgroundColor = "#00619B";
           densityButton.style.backgroundColor = "#797979";
           valueButton.style.backgroundColor = "#797979";
-          PointsLayer.renderer = ptRendererBuiltDecade; 
+          PointsLayer.renderer = ptRendererBuiltDecade;
+          ParcelsLayer.renderer = pclRendererBuiltDecade;  
         });
 
         // setup actions for the Density button
@@ -605,7 +607,8 @@
           bltDecButton.style.backgroundColor = "#797979";
           densityButton.style.backgroundColor = "#00619B";
           valueButton.style.backgroundColor = "#797979";
-          PointsLayer.renderer = ptRendererDensity; 
+          PointsLayer.renderer = ptRendererDensity;
+          ParcelsLayer.renderer = pclRendererDensity;  
         });
 
         // setup actions for the Value button
@@ -614,7 +617,8 @@
           bltDecButton.style.backgroundColor = "#797979";
           densityButton.style.backgroundColor = "#797979";
           valueButton.style.backgroundColor = "#00619B";
-          PointsLayer.renderer = ptRendererValue; 
+          PointsLayer.renderer = ptRendererValue;
+          ParcelsLayer.renderer = pclRendererValue;
         });
 
         // COUNTY - filter and zoom features, update select options
