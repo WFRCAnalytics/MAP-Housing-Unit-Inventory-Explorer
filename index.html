@@ -170,7 +170,7 @@
               });
 
         const centersLayer = new FeatureLayer({
-                outFields: ["AreaName"],
+                outFields: ["AreaName", "AreaType"],
                 url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/Boundaries_gdb/FeatureServer/2",
                 renderer:centerRenderer,
                 maxScale: 0,
@@ -199,7 +199,7 @@
         const DataLayers = [PointsLayer, ParcelsLayer];
 
         // Create the Map and View objects
-        const defaultZoom = 14
+        const defaultZoom = 13
         const map = new Map({
           basemap: "satellite",
           layers: [PointsLayer, ParcelsLayer, centersLayer, citiesLayer, countiesLayer],
@@ -209,15 +209,31 @@
           container: "viewDiv",
           map: map,
           zoom: defaultZoom,
-          center: [-111.90, 40.76]
+          center: [-111.91, 40.80]
         });
 
         // updates the charts using the layerview of whichever layer is active
         function updateChartsUsingActiveLayerView(){
           view.whenLayerView(activeLayer).then((layerView) => {
             reactiveUtils.whenOnce(() => !layerView.updating).then(() => {
-                queryStatisticsForTypeChart(layerView);
-		            queryStatisticsForYearChart(layerView);       
+              switch(chartMode){  
+                case "TYPE":
+                  queryStatisticsForTypePieChart(layerView);
+                  queryStatisticsForTypeBarChart(layerView);
+                  break;
+                case "DECADE":
+                  queryStatisticsForDecadePieChart(layerView)
+                  queryStatisticsForDecadeBarChart(layerView)
+                  break;
+                case "DENSITY":
+                  queryStatisticsForDensityPieChart(layerView)
+                  queryStatisticsForDensityBarChart(layerView)
+                  break;
+                case "VALUE":
+                  queryStatisticsForValuePieChart(layerView)
+                  queryStatisticsForValueBarChart(layerView)
+                  break;
+              }       
             });
           }); 
         };
@@ -253,6 +269,7 @@
               var xParam = parseInt(searchParams.get("x"));
               var yParam = parseInt(searchParams.get("y"));
               var zoomParam = parseInt(searchParams.get("zoom"));
+              var yearParam = searchParams.get("yr");
 
               if (geomParam === 'pcl'){
                 activeLayer = ParcelsLayer;
@@ -261,7 +278,7 @@
               }
         }
 
-        // view.ui.move("zoom", "top-right");
+        
 
         // create the base map gallery expand object
         const basemapGallery = new BasemapGallery({
@@ -352,11 +369,12 @@
                         }
                       }
                     });
+            
                   
 
                   // Option 1: time slider expand
                   const timeSliderExpand = new Expand({
-                      expandIcon: "calendar",
+                      expandIcon: "date-time",
                       expandTooltip: "TimeSlider",
                       view,
                       content: timeSlider.container,
@@ -367,10 +385,13 @@
                   
                   // watch the time slider for changes
                   document.getElementById("timeSlider").addEventListener("pointerup",(event) => {
-                    // console.log("start", timeSlider.timeExtent.start.getFullYear());
-                    // console.log("end", timeSlider.timeExtent.end.getFullYear());
                     yStart = timeSlider.timeExtent.start.getFullYear();
                     yEnd = timeSlider.timeExtent.end.getFullYear();
+
+                    newURL.searchParams.set("yr", yStart + "_" + yEnd);
+                    window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, '', newURL);
+                    yearQuery = `(APX_BLT_YR >= ${yStart} AND APX_BLT_YR <= ${yEnd})`;
+                    generateFullQuery()
                     updateChartsUsingActiveLayerView()
                   });
 
@@ -432,12 +453,13 @@
         let cityActive = false;
         let centerActive = false;
 
-        let chartMode = "ALL";
+        let queryMode = "ALL"; // ALL or GEOG
+        let chartMode = "TYPE"; // TYPE, DECADE, DENSITY, VALUE
 
         // dynamically create the active query depending on which filters are active
         function generateFullQuery() {
        
-          const queryComponents = [countyQuery, cityQuery, centerQuery, subtypeQuery, centerTypeQuery];
+          const queryComponents = [countyQuery, cityQuery, centerQuery, subtypeQuery, centerTypeQuery, yearQuery];
           const distArray = [LRquery, FRquery, BRTquery, FWYEquery, PARKquery, TRAILquery].filter(item => item !== null);
 
           const hasDistValues = distArray.length > 0;
@@ -570,15 +592,15 @@
         statsModeToggle.addEventListener("click", () => {
           
           if (statsModeToggle.checked === true){
-            chartMode = "GEOG";
+            queryMode = "GEOG";
             document.getElementById("countHeader").innerHTML = "Units in View:";
             updateChartsUsingActiveLayerView()
           } else{
-              chartMode = "ALL";
+              queryMode = "ALL";
               document.getElementById("countHeader").innerHTML = "Total Units:";
               updateChartsUsingActiveLayerView()
           }
-          console.log(chartMode);
+          console.log(queryMode);
         });
 
         // setup actions for the type button
@@ -588,7 +610,11 @@
           densityButton.style.backgroundColor = "#797979";
           valueButton.style.backgroundColor = "#797979";
           PointsLayer.renderer = ptRendererType; 
-          ParcelsLayer.renderer = pclRendererType; 
+          ParcelsLayer.renderer = pclRendererType;
+          chartMode = "TYPE";
+          createYearChart()
+          createTypeChart() 
+          updateChartsUsingActiveLayerView()
         });
 
         // setup actions for the Built Decade button
@@ -598,7 +624,11 @@
           densityButton.style.backgroundColor = "#797979";
           valueButton.style.backgroundColor = "#797979";
           PointsLayer.renderer = ptRendererBuiltDecade;
-          ParcelsLayer.renderer = pclRendererBuiltDecade;  
+          ParcelsLayer.renderer = pclRendererBuiltDecade;
+          chartMode = "DECADE";
+          createYearChart()
+          createTypeChart() 
+          updateChartsUsingActiveLayerView()
         });
 
         // setup actions for the Density button
@@ -608,7 +638,11 @@
           densityButton.style.backgroundColor = "#00619B";
           valueButton.style.backgroundColor = "#797979";
           PointsLayer.renderer = ptRendererDensity;
-          ParcelsLayer.renderer = pclRendererDensity;  
+          ParcelsLayer.renderer = pclRendererDensity;
+          chartMode = "DENSITY";
+          createYearChart()
+          createTypeChart() 
+          updateChartsUsingActiveLayerView()
         });
 
         // setup actions for the Value button
@@ -619,6 +653,10 @@
           valueButton.style.backgroundColor = "#00619B";
           PointsLayer.renderer = ptRendererValue;
           ParcelsLayer.renderer = pclRendererValue;
+          chartMode = "VALUE";
+          createYearChart()
+          createTypeChart() 
+          updateChartsUsingActiveLayerView()
         });
 
         // COUNTY - filter and zoom features, update select options
@@ -682,7 +720,7 @@
             view.goTo(results.extent);
           });
 
-          if (chartMode === 'ALL') {
+          if (queryMode === 'ALL') {
             updateChartsUsingActiveLayerView()
           };
 
@@ -752,7 +790,7 @@
               view.goTo(results.extent);
             });
 
-            if (chartMode === 'ALL') {
+            if (queryMode === 'ALL') {
               updateChartsUsingActiveLayerView()
             };
 
@@ -826,7 +864,7 @@
             view.goTo(results.extent);
           });
 
-          if (chartMode === 'ALL') {
+          if (queryMode === 'ALL') {
             updateChartsUsingActiveLayerView()
           };
 
@@ -894,6 +932,7 @@
               selection = selection.map(value => `'${value}'`);
               centerTypeQuery = `CENTERTYPE IN (${selection})`
             }
+
             
             // update the main query
             generateFullQuery()
@@ -902,6 +941,18 @@
             });
 
           });
+
+          // show center outline
+          hideAndResetDefinition(countiesLayer)
+          hideAndResetDefinition(citiesLayer)
+
+          if (Array.isArray(selection) == false){
+            centersLayer.definitionExpression = `AreaType IN ('${selection}')`;
+          }else{
+            centersLayer.definitionExpression = `AreaType IN (${selection})`;
+          }
+          centersLayer.visible = true;
+
           updateChartsUsingActiveLayerView()
         });
 
@@ -1120,7 +1171,7 @@
 
         const symbologyDiv = document.getElementById("symbology");
         const symbologyExpand = new Expand({
-          expandIcon: "media-layer",
+          expandIcon: "legend",
           expandTooltip: "Symbology",
           view: view,
           content: symbologyDiv,
@@ -1133,20 +1184,21 @@
       // chart stuff
       //=========================
 
-      let yearChart = null;
-      let typeChart = null;
+      let chartTop = null;
+      let chartBottom = null;
 
       const yearCanvas = document.getElementById("year-chart");
       const typeCanvas = document.getElementById("type-chart");
       
       
       //---------------------------------------
-      // query the data the for the year chart
+      // query the data the for the Type Bar chart
       //---------------------------------------
-      const queryStatisticsForYearChart = promiseUtils.debounce( async function (layerview) {
 
-          yearChart.options.title.text = "Built Decade (Loading...)"
-          yearChart.update();
+      const queryStatisticsForTypeBarChart = promiseUtils.debounce( async function (layerview) {
+
+          chartTop.options.title.text = "Housing Type (Loading...)"
+          chartTop.update();
     
           // create query definitions for stacked bar chart data
           const decades = ["1840", "1850", "1860", "1870", "1880", "1890", "1900", "1910", "1920", "1930", "1940", "1950", "1960", "1970", "1980", "1990", "2000", "2010", "2020"];
@@ -1167,20 +1219,18 @@
           
           // query for stacked bar chart data
           let yearChartQuery
-          if (chartMode === 'ALL') { 
+          if (queryMode === 'ALL') { 
             yearChartQuery = activeLayer.createQuery();
             yearChartQuery.where = fullQuery
             yearChartQuery.outStatistics = yearChartDefinitions;
             yearChartQuery = activeLayer.queryFeatures(yearChartQuery)
-          } else if (chartMode === 'GEOG') { 
+          } else if (queryMode === 'GEOG') { 
             yearChartQuery = layerview.createQuery();
             yearChartQuery.where = fullQuery
             yearChartQuery.geometry = view.extent;
             yearChartQuery.outStatistics = yearChartDefinitions;
             yearChartQuery = layerview.queryFeatures(yearChartQuery)
           };
-
-
 
           return yearChartQuery.then((result) => {
             const yearChartQueryResult = result.features[0].attributes;
@@ -1259,25 +1309,60 @@
 
               // console.log(updatedDataArray);
               
-              // yearChart.update();
+              // chartTop.update();
 
-              updateStackedChart(yearChart, uniqueDecades,updatedDataArray)
+              updateStackedChart(chartTop, uniqueDecades,updatedDataArray, "Housing Type")
           
           }, console.error);
 
         });
+
+        // //---------------------------------------
+        // // query the data for the total units
+        // //---------------------------------------
+
+        // queryStatisticsForTotal = promiseUtils.debounce(function (layerView) {
+        //   document.getElementById("countDiv").innerHTML = "Loading...";
+        //   const statDefinitions = [
+        //     {
+        //       onStatisticField: "(CASE WHEN COUNTY IS NULL) OR (CASE WHEN COUNTY IS NOT NULL) THEN UNIT_COUNT ELSE 0 END",
+        //       outStatisticFieldName: "total",
+        //       statisticType: "sum"
+        //     }
+        //   ];
+
+        //   // query data for the pie chart
+        //   let query
+        //   if (queryMode === 'ALL') { 
+        //     query = activeLayer.createQuery();
+        //     query.where = fullQuery
+        //     query.outStatistics = statDefinitions;
+        //     query = activeLayer.queryFeatures(query)
+        //   } if (queryMode === 'GEOG') { 
+        //     query = layerView.createQuery();
+        //     query.where = fullQuery
+        //     query.geometry = view.extent;
+        //     query.outStatistics = statDefinitions;
+        //     query = layerView.queryFeatures(query)
+        //   };
+        //   return query.then((result) => {
+        //     const allStats = result.features[0].attributes;
+        //     document.getElementById("countDiv").innerHTML = allStats.total;
+        //   }, console.error);
+        // });
         
         //---------------------------------------
-        // query the data the for the type chart
+        // query the data the for the Type Pie chart
         //---------------------------------------
-        queryStatisticsForTypeChart = promiseUtils.debounce(function (layerView) {
+
+        queryStatisticsForTypePieChart = promiseUtils.debounce(function (layerView) {
           
-          typeChart.options.title.text = "Housing Type (Loading...)"
-          typeChart.update();
+          chartBottom.options.title.text = "Housing Type (Loading...)"
+          chartBottom.update();
 
           const statDefinitions = [
             {
-              onStatisticField: "CASE WHEN SUBTYPE IS NOT NULL THEN UNIT_COUNT ELSE 0 END",
+              onStatisticField: "CASE WHEN (COUNTY IS NULL) OR (COUNTY IS NOT NULL) THEN UNIT_COUNT ELSE 0 END",
               outStatisticFieldName: "total",
               statisticType: "sum"
             },
@@ -1321,64 +1406,52 @@
               outStatisticFieldName: "apartment",
               statisticType: "sum"
             },
+          ];
+           
+          // query data for the pie chart
+          let query
+          if (queryMode === 'ALL') { 
+            query = activeLayer.createQuery();
+            query.where = fullQuery
+            query.outStatistics = statDefinitions;
+            query = activeLayer.queryFeatures(query)
+          } if (queryMode === 'GEOG') { 
+            query = layerView.createQuery();
+            query.where = fullQuery
+            query.geometry = view.extent;
+            query.outStatistics = statDefinitions;
+            query = layerView.queryFeatures(query)
+          };
+
+          return query.then((result) => {
+            const allStats = result.features[0].attributes;
+            document.getElementById("countDiv").innerHTML = allStats.total;
+            delete allStats['total'];
+            colors = ["#FAECA7", "#FC921F", "#E60049", "#BD7EBE", 
+                                    "#28C830", "#9E559C", '#1E8553', '#149ECE']
+
+            updatePieChart2(chartBottom, Object.keys(allStats), Object.values(allStats), "Housing Type", colors)
+          }, console.error);
+        });
+
+      //----------------------------------------------
+      // query the data the for the Decade Bar chart
+      //----------------------------------------------
+
+      const queryStatisticsForDecadeBarChart = promiseUtils.debounce( async function (layerview) {
+
+          chartTop.options.title.text = "Built Decade (Loading...)"
+          chartTop.update();
+    
+          const decadeChartDefinitions = [
             {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1840') THEN UNIT_COUNT ELSE 0 END",
-              outStatisticFieldName: "year_1840",
+              onStatisticField: "CASE WHEN (BLT_DECADE IN ('1840','1850','1860','1870', '1880','1890')) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_1840-1890",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1850') THEN UNIT_COUNT ELSE 0 END",
-              outStatisticFieldName: "year_1850",
-              statisticType: "sum"
-            },
-            {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1860') THEN UNIT_COUNT ELSE 0 END",
-              outStatisticFieldName: "year_1860",
-              statisticType: "sum"
-            },
-            {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1870') THEN UNIT_COUNT ELSE 0 END",
-              outStatisticFieldName: "year_1870",
-              statisticType: "sum"
-            },
-            {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1880') THEN UNIT_COUNT ELSE 0 END",
-              outStatisticFieldName: "year_1880",
-              statisticType: "sum"
-            },
-            {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1890') THEN UNIT_COUNT ELSE 0 END",
-              outStatisticFieldName: "year_1890",
-              statisticType: "sum"
-            },
-            {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1900') THEN UNIT_COUNT ELSE 0 END",
-              outStatisticFieldName: "year_1900",
-              statisticType: "sum"
-            },
-            {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1910') THEN UNIT_COUNT ELSE 0 END",
-              outStatisticFieldName: "year_1910",
-              statisticType: "sum"
-            },
-            {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1920') THEN UNIT_COUNT ELSE 0 END",
-              outStatisticFieldName: "year_1920",
-              statisticType: "sum"
-            },
-            {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1930') THEN UNIT_COUNT ELSE 0 END",
-              outStatisticFieldName: "year_1930",
-              statisticType: "sum"
-            },
-            {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1940') THEN UNIT_COUNT ELSE 0 END",
-              outStatisticFieldName: "year_1940",
-              statisticType: "sum"
-            },
-            {
-              onStatisticField: "CASE WHEN (BLT_DECADE = '1950') THEN UNIT_COUNT ELSE 0 END",
-              outStatisticFieldName: "year_1950",
+              onStatisticField: "CASE WHEN (BLT_DECADE IN ('1900','1910','1920','1930','1940','1950')) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_1900-1950",
               statisticType: "sum"
             },
             {
@@ -1417,61 +1490,693 @@
               statisticType: "sum"
             } 
           ];
-           
-          // query data for the pie chart
-          let query
-          if (chartMode === 'ALL') { 
-            query = activeLayer.createQuery();
-            query.where = fullQuery
-            query.outStatistics = statDefinitions;
-            query = activeLayer.queryFeatures(query)
-          } if (chartMode === 'GEOG') { 
-            query = layerView.createQuery();
-            query.where = fullQuery
-            query.geometry = view.extent;
-            query.outStatistics = statDefinitions;
-            query = layerView.queryFeatures(query)
+          // console.log(statDefinitions)
+          
+          // query for stacked bar chart data
+          let yearChartQuery;
+          if (queryMode === 'ALL') { 
+            yearChartQuery = activeLayer.createQuery();
+            yearChartQuery.where = fullQuery
+            yearChartQuery.outStatistics = decadeChartDefinitions;
+            yearChartQuery = activeLayer.queryFeatures(yearChartQuery)
+          } else if (queryMode === 'GEOG') { 
+            yearChartQuery = layerview.createQuery();
+            yearChartQuery.where = fullQuery
+            yearChartQuery.geometry = view.extent;
+            yearChartQuery.outStatistics = decadeChartDefinitions;
+            yearChartQuery = layerview.queryFeatures(yearChartQuery)
           };
 
-          return query.then((result) => {
-            const allStats = result.features[0].attributes;
-            document.getElementById("countDiv").innerHTML = allStats.total;
-          
+
+          return yearChartQuery.then((result) => {
+            const yearChartQueryResult = result.features[0].attributes;
+            // console.log(yearChartQueryResult)
+
+            // Filter out objects with a sum of 0 and get an array of unique decades
+            const filteredObject = Object.fromEntries(Object.entries(yearChartQueryResult).filter(([key, value]) => value !== 0));
+            // console.log(filteredObject);
+            const valuesArray = Object.values(filteredObject);
+
+            const uniqueDecades = Object.keys(filteredObject).map(key => key.split('_')[1]);
+            // console.log(uniqueDecades);
+
+            // Update the backgroundColor attribute using the typeColorMap
+            const typeColorMap = {
+              "1840-1890": '#0D0887',
+              "1900-1950": '#4D02A2',
+              "1960": '#7E03A8',
+              "1970": '#AA2396',
+              "1980": '#CC4779',
+              "1990": '#E66C5D',
+              "2000": '#F99541',
+              "2010": '#FEC428',
+              "2020": '#FFFFBE'
+            };
+
+            const filteredColors = uniqueDecades.map(key => typeColorMap[key]);
+            // console.log(filteredColors);
             
-
-            updateChart(typeChart, [
-              allStats.single_family,
-              allStats.duplex,
-              allStats.single_family_adu,
-              allStats.condo,
-              allStats.townhome,
-              allStats.mobile_home_park,
-              allStats.mixed_th_single_family,
-              allStats.apartment
-            ]);
-
+            updateBarChart(chartTop, uniqueDecades, valuesArray, "Built Decade", filteredColors)
+          
           }, console.error);
+
         });
 
+      //----------------------------------------------
+      // query the data the for the Decade Pie chart
+      //----------------------------------------------
+
+      const queryStatisticsForDecadePieChart = promiseUtils.debounce( async function (layerview) {
+        
+        document.getElementById("countDiv").innerHTML = "Loading...";
+        chartBottom.options.title.text = "Built Decade (Loading...)"
+        chartBottom.update();
+    
+          const decadeChartDefinitions = [
+            {
+              onStatisticField: "CASE WHEN (COUNTY IS NULL) OR (COUNTY IS NOT NULL) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "total",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE IN ('1840','1850','1860','1870', '1880','1890')) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_1840-1890",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE IN ('1900','1910','1920','1930','1940','1950')) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_1900-1950",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1960') THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_1960",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1970') THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_1970",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1980') THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_1980",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE = '1990') THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_1990",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE = '2000') THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_2000",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE = '2010') THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_2010",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (BLT_DECADE = '2020') THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "year_2020",
+              statisticType: "sum"
+            } 
+          ];
+          // console.log(statDefinitions)
+          
+          // query for stacked bar chart data
+          let yearChartQuery;
+          if (queryMode === 'ALL') { 
+            yearChartQuery = activeLayer.createQuery();
+            yearChartQuery.where = fullQuery
+            yearChartQuery.outStatistics = decadeChartDefinitions;
+            yearChartQuery = activeLayer.queryFeatures(yearChartQuery)
+          } else if (queryMode === 'GEOG') { 
+            yearChartQuery = layerview.createQuery();
+            yearChartQuery.where = fullQuery
+            yearChartQuery.geometry = view.extent;
+            yearChartQuery.outStatistics = decadeChartDefinitions;
+            yearChartQuery = layerview.queryFeatures(yearChartQuery)
+          };
+
+          return yearChartQuery.then((result) => {
+            const yearChartQueryResult = result.features[0].attributes;
+            document.getElementById("countDiv").innerHTML = yearChartQueryResult.total;
+            delete yearChartQueryResult['total'];
+
+            // Filter out objects with a sum of 0 and get an array of unique decades
+            const filteredObject = Object.fromEntries(Object.entries(yearChartQueryResult).filter(([key, value]) => value !== 0));
+            // console.log(filteredObject);
+            const valuesArray = Object.values(filteredObject);
+
+            const uniqueDecades = Object.keys(filteredObject).map(key => key.split('_')[1]);
+            // console.log(uniqueDecades);
+
+            // Update the backgroundColor attribute using the typeColorMap
+            const typeColorMap = {
+              "1840-1890": '#0D0887',
+              "1900-1950": '#4D02A2',
+              "1960": '#7E03A8',
+              "1970": '#AA2396',
+              "1980": '#CC4779',
+              "1990": '#E66C5D',
+              "2000": '#F99541',
+              "2010": '#FEC428',
+              "2020": '#FFFFBE'
+            };
+
+            const filteredColors = uniqueDecades.map(key => typeColorMap[key]);
+            // console.log(filteredColors);
+
+            // updatePieChart(chartBottom, [
+            //   allStats.single_family,
+            //   allStats.duplex,
+            //   allStats.single_family_adu,
+            //   allStats.condo,
+            //   allStats.townhome,
+            //   allStats.mobile_home_park,
+            //   allStats.mixed_th_single_family,
+            //   allStats.apartment
+            // ]);
+            
+            updatePieChart2(chartBottom,uniqueDecades, valuesArray, "Built Decade", filteredColors)
+          
+          }, console.error);
+
+        });
+      
+      //----------------------------------------------
+      // query the data the for the Density Bar chart
+      //----------------------------------------------
+
+      const queryStatisticsForDensityBarChart = promiseUtils.debounce( async function (layerview) {
+
+          chartTop.options.title.text = "Residential Density (Loading...)"
+          chartTop.update();
+    
+          const decadeChartDefinitions = [
+            {
+              onStatisticField: "CASE WHEN (DUA < 1) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class1",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN ((DUA >= 1) AND (DUA < 2)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class2",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN ((DUA >= 2) AND (DUA < 3)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class3",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN ((DUA >= 3) AND (DUA < 5)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class4",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN ((DUA >= 5) AND (DUA < 7)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class5",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN ((DUA >= 7) AND (DUA < 10)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class6",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN ((DUA >= 10) AND (DUA < 20)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class7",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN ((DUA >= 20) AND (DUA < 50)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class8",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN ((DUA >= 50) AND (DUA < 100)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class9",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (DUA >= 100) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class10",
+              statisticType: "sum"
+            } 
+          ];
+
+          
+          // query for stacked bar chart data
+          let yearChartQuery;
+          if (queryMode === 'ALL') { 
+            yearChartQuery = activeLayer.createQuery();
+            yearChartQuery.where = fullQuery
+            yearChartQuery.outStatistics = decadeChartDefinitions;
+            yearChartQuery = activeLayer.queryFeatures(yearChartQuery)
+          } else if (queryMode === 'GEOG') { 
+            yearChartQuery = layerview.createQuery();
+            yearChartQuery.where = fullQuery
+            yearChartQuery.geometry = view.extent;
+            yearChartQuery.outStatistics = decadeChartDefinitions;
+            yearChartQuery = layerview.queryFeatures(yearChartQuery)
+          };
+
+          return yearChartQuery.then((result) => {
+            const yearChartQueryResult = result.features[0].attributes;
+         
+            // Filter out objects with a sum of 0 and get an array of unique decades
+            const filteredObject = Object.fromEntries(Object.entries(yearChartQueryResult).filter(([key, value]) => value !== 0));
+            const valuesArray = Object.values(filteredObject);
+            const uniqueKeys = Object.keys(filteredObject)
+
+            // Update the backgroundColor attribute using the typeColorMap
+            const colorMap = {
+              "class1": '#FFFFD9',
+              "class2": '#EFF9B5',
+              "class3": '#CFECB3',
+              "class4": '#97D6B9',
+              "class5": '#5DC0C0',
+              "class6": '#31A6C2',
+              "class7": '#1F80B8',
+              "class8": '#2355A4',
+              "class9": '#22318D',
+              "class10": '#081D58'
+            };
+
+            const labelMap = {
+              "class1": '< 1 units / acre',
+              "class2": '1 - 2 units / acre',
+              "class3": '2 - 3 units / acre',
+              "class4": '3 - 5 units / acre',
+              "class5": '5 - 7 units / acre',
+              "class6": '7 - 10 units / acre',
+              "class7": '10 - 20 units / acre',
+              "class8": '20 - 50 units / acre',
+              "class9": '50 - 100 units / acre',
+              "class10": '> 100 units / acre'
+            };
+
+            const filteredColors = uniqueKeys.map(key => colorMap[key]);
+            const filteredLabels = uniqueKeys.map(key => labelMap[key]);
+            updateBarChart(chartTop, filteredLabels, valuesArray, "Residential Density", filteredColors)
+          
+          }, console.error);
+
+        });
+
+      //----------------------------------------------
+      // query the data the for the Density Pie chart
+      //----------------------------------------------
+
+      const queryStatisticsForDensityPieChart = promiseUtils.debounce( async function (layerview) {
+
+        document.getElementById("countDiv").innerHTML = "Loading...";
+        chartBottom.options.title.text = "Residential Density (Loading...)"
+        chartBottom.update();
+    
+        const decadeChartDefinitions = [
+            {
+              onStatisticField: "CASE WHEN (COUNTY IS NULL) OR (COUNTY IS NOT NULL) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "total",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (DUA < 1) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class1",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN ((DUA >= 1) AND (DUA < 2)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class2",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN ((DUA >= 2) AND (DUA < 3)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class3",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN ((DUA >= 3) AND (DUA < 5)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class4",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN ((DUA >= 5) AND (DUA < 7)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class5",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN ((DUA >= 7) AND (DUA < 10)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class6",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN ((DUA >= 10) AND (DUA < 20)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class7",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN ((DUA >= 20) AND (DUA < 50)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class8",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN ((DUA >= 50) AND (DUA < 100)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class9",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (DUA >= 100) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class10",
+              statisticType: "sum"
+            } 
+          ];
+
+          // query for stacked bar chart data
+          let yearChartQuery;
+          if (queryMode === 'ALL') { 
+            yearChartQuery = activeLayer.createQuery();
+            yearChartQuery.where = fullQuery
+            yearChartQuery.outStatistics = decadeChartDefinitions;
+            yearChartQuery = activeLayer.queryFeatures(yearChartQuery)
+          } else if (queryMode === 'GEOG') { 
+            yearChartQuery = layerview.createQuery();
+            yearChartQuery.where = fullQuery
+            yearChartQuery.geometry = view.extent;
+            yearChartQuery.outStatistics = decadeChartDefinitions;
+            yearChartQuery = layerview.queryFeatures(yearChartQuery)
+          };
+
+          return yearChartQuery.then((result) => {
+            const yearChartQueryResult = result.features[0].attributes;
+            document.getElementById("countDiv").innerHTML = yearChartQueryResult.total;
+            delete yearChartQueryResult['total'];
+            // Filter out objects with a sum of 0 and get an array of unique decades
+            const filteredObject = Object.fromEntries(Object.entries(yearChartQueryResult).filter(([key, value]) => value !== 0));
+            const valuesArray = Object.values(filteredObject);
+            const uniqueKeys = Object.keys(filteredObject)
+
+            // Update the backgroundColor attribute using the typeColorMap
+            const colorMap = {
+              "class1": '#FFFFD9',
+              "class2": '#EFF9B5',
+              "class3": '#CFECB3',
+              "class4": '#97D6B9',
+              "class5": '#5DC0C0',
+              "class6": '#31A6C2',
+              "class7": '#1F80B8',
+              "class8": '#2355A4',
+              "class9": '#22318D',
+              "class10": '#081D58'
+            };
+
+            const labelMap = {
+              "class1": '< 1 units / acre',
+              "class2": '1 - 2 units / acre',
+              "class3": '2 - 3 units / acre',
+              "class4": '3 - 5 units / acre',
+              "class5": '5 - 7 units / acre',
+              "class6": '7 - 10 units / acre',
+              "class7": '10 - 20 units / acre',
+              "class8": '20 - 50 units / acre',
+              "class9": '50 - 100 units / acre',
+              "class10": '> 100 units / acre'
+            };
+
+            const filteredColors = uniqueKeys.map(key => colorMap[key]);
+            const filteredLabels = uniqueKeys.map(key => labelMap[key]);
+            updatePieChart2(chartBottom, filteredLabels, valuesArray, "Residential Density", filteredColors)
+          }, console.error);
+
+        });
+
+      //----------------------------------------------
+      // query the data the for the Value Bar chart
+      //----------------------------------------------
+
+      const queryStatisticsForValueBarChart = promiseUtils.debounce( async function (layerview) {
+
+          chartTop.options.title.text = "Value per Acre (Loading...)"
+          chartTop.update();
+    
+          const decadeChartDefinitions = [
+            {
+              onStatisticField: "CASE WHEN ((TOT_VALUE / ACRES ) < 1200000) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class1",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (((TOT_VALUE / ACRES ) >= 1200000) AND ((TOT_VALUE / ACRES ) < 1600000)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class2",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (((TOT_VALUE / ACRES ) >= 1600000) AND ((TOT_VALUE / ACRES ) < 1900000)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class3",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (((TOT_VALUE / ACRES ) >= 1900000) AND ((TOT_VALUE / ACRES ) < 2100000)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class4",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (((TOT_VALUE / ACRES ) >= 2100000) AND ((TOT_VALUE / ACRES ) < 2400000)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class5",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (((TOT_VALUE / ACRES ) >= 2400000) AND ((TOT_VALUE / ACRES ) < 2800000)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class6",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (((TOT_VALUE / ACRES ) >= 2800000) AND ((TOT_VALUE / ACRES ) < 3500000)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class7",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN ((TOT_VALUE / ACRES ) >= 3500000) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class8",
+              statisticType: "sum"
+            } 
+          ];
+
+          
+          // query for stacked bar chart data
+          let yearChartQuery;
+          if (queryMode === 'ALL') { 
+            yearChartQuery = activeLayer.createQuery();
+            yearChartQuery.where = fullQuery
+            yearChartQuery.outStatistics = decadeChartDefinitions;
+            yearChartQuery = activeLayer.queryFeatures(yearChartQuery)
+          } else if (queryMode === 'GEOG') { 
+            yearChartQuery = layerview.createQuery();
+            yearChartQuery.where = fullQuery
+            yearChartQuery.geometry = view.extent;
+            yearChartQuery.outStatistics = decadeChartDefinitions;
+            yearChartQuery = layerview.queryFeatures(yearChartQuery)
+          };
+
+          return yearChartQuery.then((result) => {
+            const yearChartQueryResult = result.features[0].attributes;
+         
+            // Filter out objects with a sum of 0 and get an array of unique decades
+            const filteredObject = Object.fromEntries(Object.entries(yearChartQueryResult).filter(([key, value]) => value !== 0));
+            const valuesArray = Object.values(filteredObject);
+            const uniqueKeys = Object.keys(filteredObject)
+
+            // Update the backgroundColor attribute using the typeColorMap
+            const colorMap = {
+              "class1": '#F0261C',
+              "class2": '#F77833',
+              "class3": '#F8AF4E',
+              "class4": '#F6E36B',
+              "class5": '#DEEE89',
+              "class6": '#FFE300',
+              "class7": '#86BAD9',
+              "class8": '#3DA1D1'
+            };
+
+            const labelMap = {
+              "class1": '< 1.2 M$',
+              "class2": '1.2 - 1.6 M$',
+              "class3": '1.6 - 1.9 M$',
+              "class4": '1.9 - 2.1 M$',
+              "class5": '2.1 - 2.4 M$',
+              "class6": '2.4 - 2.8 M$',
+              "class7": '2.8 - 3.5 M$',
+              "class8": '> 3.5 M$'
+            };
+
+            const filteredColors = uniqueKeys.map(key => colorMap[key]);
+            const filteredLabels = uniqueKeys.map(key => labelMap[key]);
+            updateBarChart(chartTop, filteredLabels, valuesArray, "Valuation per Acre", filteredColors)
+          
+          }, console.error);
+
+        });
+
+      //----------------------------------------------
+      // query the data the for the Value Pie chart
+      //----------------------------------------------
+
+      const queryStatisticsForValuePieChart = promiseUtils.debounce( async function (layerview) {
+
+        document.getElementById("countDiv").innerHTML = "Loading...";
+        chartBottom.options.title.text = "Valuation per Acre (Loading...)"
+        chartBottom.update();
+    
+        const decadeChartDefinitions = [
+            {
+              onStatisticField: "CASE WHEN (COUNTY IS NULL) OR (COUNTY IS NOT NULL) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "total",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN ((TOT_VALUE / ACRES ) < 1200000) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class1",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (((TOT_VALUE / ACRES ) >= 1200000) AND ((TOT_VALUE / ACRES ) < 1600000)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class2",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (((TOT_VALUE / ACRES ) >= 1600000) AND ((TOT_VALUE / ACRES ) < 1900000)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class3",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (((TOT_VALUE / ACRES ) >= 1900000) AND ((TOT_VALUE / ACRES ) < 2100000)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class4",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (((TOT_VALUE / ACRES ) >= 2100000) AND ((TOT_VALUE / ACRES ) < 2400000)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class5",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (((TOT_VALUE / ACRES ) >= 2400000) AND ((TOT_VALUE / ACRES ) < 2800000)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class6",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN (((TOT_VALUE / ACRES ) >= 2800000) AND ((TOT_VALUE / ACRES ) < 3500000)) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class7",
+              statisticType: "sum"
+            },
+            {
+              onStatisticField: "CASE WHEN ((TOT_VALUE / ACRES ) >= 3500000) THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "class8",
+              statisticType: "sum"
+            } 
+          ];
+
+          // query for stacked bar chart data
+          let yearChartQuery;
+          if (queryMode === 'ALL') { 
+            yearChartQuery = activeLayer.createQuery();
+            yearChartQuery.where = fullQuery
+            yearChartQuery.outStatistics = decadeChartDefinitions;
+            yearChartQuery = activeLayer.queryFeatures(yearChartQuery)
+          } else if (queryMode === 'GEOG') { 
+            yearChartQuery = layerview.createQuery();
+            yearChartQuery.where = fullQuery
+            yearChartQuery.geometry = view.extent;
+            yearChartQuery.outStatistics = decadeChartDefinitions;
+            yearChartQuery = layerview.queryFeatures(yearChartQuery)
+          };
+
+          return yearChartQuery.then((result) => {
+            const yearChartQueryResult = result.features[0].attributes;
+            document.getElementById("countDiv").innerHTML = yearChartQueryResult.total;
+            delete yearChartQueryResult['total'];
+            // Filter out objects with a sum of 0 and get an array of unique decades
+            const filteredObject = Object.fromEntries(Object.entries(yearChartQueryResult).filter(([key, value]) => value !== 0));
+            const valuesArray = Object.values(filteredObject);
+            const uniqueKeys = Object.keys(filteredObject)
+
+            // Update the backgroundColor attribute using the typeColorMap
+            const colorMap = {
+              "class1": '#F0261C',
+              "class2": '#F77833',
+              "class3": '#F8AF4E',
+              "class4": '#F6E36B',
+              "class5": '#DEEE89',
+              "class6": '#FFE300',
+              "class7": '#86BAD9',
+              "class8": '#3DA1D1'
+            };
+
+            const labelMap = {
+              "class1": '< 1.2 M$',
+              "class2": '1.2 - 1.6 M$',
+              "class3": '1.6 - 1.9 M$',
+              "class4": '1.9 - 2.1 M$',
+              "class5": '2.1 - 2.4 M$',
+              "class6": '2.4 - 2.8 M$',
+              "class7": '2.8 - 3.5 M$',
+              "class8": '> 3.5 M$'
+            };
+
+            const filteredColors = uniqueKeys.map(key => colorMap[key]);
+            const filteredLabels = uniqueKeys.map(key => labelMap[key]);
+            updatePieChart2(chartBottom, filteredLabels, valuesArray, "Valuation per Acre", filteredColors)
+          }, console.error);
+
+        });
+      
+
+        // // Updates the given chart with new data
+        // function updatePieChart(chart, dataValues) {
+        //   chart.data.datasets[0].data = dataValues;
+        //   chartBottom.options.title.text = "Housing Type"
+        //   chart.update();
+        // }
+
         // Updates the given chart with new data
-        function updateChart(chart, dataValues) {
+        function updatePieChart2(chart,labels, dataValues,text, colors) {
+          chart.data.labels = labels;
           chart.data.datasets[0].data = dataValues;
-          typeChart.options.title.text = "Housing Type"
+          chart.options.title.text = text;
+          chart.data.datasets[0].backgroundColor = colors;
           chart.update();
         }
 
         // Updates the given chart with new data
-        function updateStackedChart(chart, labels, dataValues) {
+        function updateBarChart(chart,labels, dataValues, text, colors) {
+          chart.data.labels = labels;
+          chart.data.datasets[0].data = dataValues;
+          chart.data.datasets[0].backgroundColor = colors;
+          chart.options.title.text = text;
+          chart.update();
+        }
+
+        // Updates the given chart with new data
+        function updateStackedChart(chart, labels, dataValues, text) {
           chart.data.labels = labels;
           chart.data.datasets = dataValues;
-          chart.options.title.text = "Built Decade"
+          chart.options.title.text = text;
           chart.update();
         }
 
         // instantiate the year stacked chart
         function createYearChart() {
+          
+          // Destroy the existing chart instance if it exists
+          if (chartTop) {
+            chartTop.destroy(); 
+          }
+
           // const yearCanvas = document.getElementById("year-chart");
-          yearChart = new Chart(yearCanvas.getContext("2d"), {
+          chartTop = new Chart(yearCanvas.getContext("2d"), {
             type: "bar",
             data: {
               labels: [],
@@ -1490,7 +2195,7 @@
               },
               title: {
                 display: true,
-                text: "Built Decade",
+                // text: "Built Decade",
                 fontColor:"#FFFFFF",
                 fontSize:13
               },
@@ -1525,7 +2230,13 @@
         // instantiate the type pie chart
         function createTypeChart() {
           // const typeCanvas = document.getElementById("type-chart");
-          typeChart = new Chart(typeCanvas.getContext("2d"), {
+          
+          // Destroy the existing chart instance if it exists
+          if (chartBottom) {
+            chartBottom.destroy(); 
+          }
+
+          chartBottom = new Chart(typeCanvas.getContext("2d"), {
             type: "doughnut",
             data: {
               labels: ["single_family", "duplex", "single_family_adu", "condo", 
@@ -1551,7 +2262,7 @@
                },
               title: {
                 display: true,
-                text: "Housing Type",
+                // text: "Housing Type",
                 fontColor:"#FFFFFF",
                 fontSize:13
               }
@@ -1566,14 +2277,14 @@
         createTypeChart();
 
         // draw the charts once
-        if (chartMode === 'ALL') {
+        if (queryMode === 'ALL') {
             updateChartsUsingActiveLayerView()
         };
 
         // when the view is stationary after a move, update the charts
         // waits till the current layerview stops drawing
         reactiveUtils.when(() => view.stationary === true, () => {
-          if (chartMode === 'GEOG') {
+          if (queryMode === 'GEOG') {
             updateChartsUsingActiveLayerView()
           };
         });
@@ -1594,6 +2305,7 @@
                 // when the resources in the MapView have loaded.
                 const legend = new Legend({
                   view: view,
+                  container:document.getElementById("symbology"),
                   layerInfos: [
                     {
                       layer: PointsLayer,
@@ -1606,23 +2318,23 @@
                   ]
                 });
 
-                const legendExpand = new Expand({
-                expandIcon: "legend",
-                expandTooltip: "Legend",
-                view: view,
-                content: legend,
-                group: "top-right"
-                });
+                // const legendExpand = new Expand({
+                // expandIcon: "legend",
+                // expandTooltip: "Legend",
+                // view: view,
+                // content: legend,
+                // group: "top-right"
+                // });
 
-                // Add widget to the bottom right corner of the view
-                view.ui.add(legendExpand, "top-right");
+                // // Add widget to the bottom right corner of the view
+                // view.ui.add(legendExpand, "top-right");
               });
         
-        view.ui.add(infoDivExpand, "top-right");
+        // view.ui.add(infoDivExpand, "top-right");
         view.ui.add(chartExpand, { position: "top-right"});
         view.ui.add(bgExpand, "top-right");
-
-
+        // view.ui.move("zoom", "top-right");
+        
         //===============================
         // urlParams Functionality
         //===============================
@@ -1630,6 +2342,8 @@
           // if provide URL has searchParams update the map
           if (newURL.searchParams.toString() !== '') {
             
+            
+
   
             if ((countyParam != 'None') && countyParam){
               countySelect.value = countyParam;
@@ -1739,6 +2453,14 @@
             view.center = pt;
             view.zoom = zoomParam;
 
+            if ((yearParam != 'None') && yearParam){
+              const yeerStart = yearParam.split('_')[0];
+              const yeerEnd = yearParam.split('_')[1];
+              timeSlider.timeExtent.start = new Date(yeerStart,0,1);
+              timeSlider.timeExtent.end = new Date(yeerEnd,0,1);
+              yearQuery = `(APX_BLT_YR >= ${yeerStart} AND APX_BLT_YR <= ${yeerEnd})`;
+            };
+
             if (geomParam === 'pcl'){
               ParcelsLayer.visible = true;
               PointsLayer.visible = false;
@@ -1782,14 +2504,27 @@
 
   <body>
     <div id="info" >
-      <div id="title" style="flex:1.4;" >Housing Inventory Explorer (Jan 2022)</div>
-      
-      <div id="title" style="flex:1;">
+      <div id="header" style="flex:1;">
         <a href="https://wfrc.org/">
           <img src="images/logo.png"  height="45px" width="auto">
         </a>
       </div>
+
+      <div d="header" style="flex:1.6;">
+        <div id="title1">WFRC-Area Housing Inventory Explorer</div>
+        <div id="title2">(January 2022)</div>
+      </div>
+
+      <div id="header2" style="flex:.2;" >
+        
+        <a href="https://docs.google.com/document/d/1dmgoN0SSVyjYOIDhS_r3c9cc5MlXL709iMiZwK8l1XA/edit" class="my-link">
+          About this map
+        </a>
+      </div>
+      
+      
     </div>
+    
     <div id="viewDiv"></div>
     <div id="timeSlider"></div>
 
@@ -1843,19 +2578,6 @@
       </div>
     </div>
 
-    <div id="infoDiv" class="esri-widget" >
-      <h4 class="esri-widget__heading esri-editor__title" style="text-align:center">About this Application:</h4>
-      <div class="esri-widget">
-        <p>This map highlights the basic types and quantities of existing housing in Davis, Salt Lake and Weber counties.</p>
-        <p> WFRC uses the County Assessor <a href="https://gis.utah.gov/data/cadastre/parcels/"> tax parcel GIS data</a> gathered annually by UGRC as a key input to its land use models and forecasts.</p>
-        <p>The Housing Unit Inventory shown in this webmap is derived from January 1, 2022 residential data from the Assessor’s tax parcels, adding in unit count estimates for rental properties and grouping housing units together that share adjoining ‘common areas’ (e.g. condos and HOAs).</p>
-        <p>For more information about this dataset, consult our <a href="https://docs.google.com/document/d/1W-ZdTamoB-rMPg91OTFyEO3OlI5LE0Vq7meF3oKFgVM/edit">metadata</a> or contact <a href="mailto:analytics@wfrc.org"> analytics@wfrc.org</a>.</p>
-        <br>
-        <h4 class="esri-widget__heading esri-editor__title" style="text-align:center">How to use:</h4>
-        <p>Each panel can be toggled on or off. The Chart panel updates on the fly using whatever data is visible on the map. The Basemap can be switched to a variety of options and a legend can also be toggled. When zoomed in close enough, you can click a feature on the map to show its attributes. </p>
-        <p>The Filters panel (top-left) allows you filter the data by geographic extent (Counties, Cities, or Wasatch Choice Centers). It also allows you to filter the units by their proximity to transit stations and/or freeway exits. You can use the And/Or button to change the query logic for these categories. Finally, you can filter the data by year, using the hidden time slider in the bottom-left. </p>
-        
-      </div>
     </div>
 
     <div id="resultDiv" class="esri-widget">
@@ -1886,18 +2608,20 @@
       </div>
     </div>
 
-    <div id="symbology" class="esri-widget">
-      <div style="text-align: center;">
-      Click any button to change the layer symbology:
+    <div id="symbology" >
+      <div style="text-align: left;">
+      Click any button to change the <b>layer symbology</b> accordingly:
       </div>
-      <br>
+      <br style="line-height: 5px" >
       <input class="esri-button style-button" value="Housing Type" id="typeButton" value="" type="button" style="background-color: #00619B;"/>
         
       <input class="esri-button style-button" value="Built Decade" id="bltDecButton" type="button" style="background-color: #797979;"/>
   
-      <input class="esri-button style-button" value="Land Use Density" id="densityButton" type="button" style="background-color: #797979;"/>
+      <input class="esri-button style-button" value="Residential Density" id="densityButton" type="button" style="background-color: #797979;"/>
         
-      <input class="esri-button style-button" value="Unit Valuation" id="valueButton" type="button" style="background-color: #797979;"/>
+      <input class="esri-button style-button" value="Valuation per Acre" id="valueButton" type="button" style="background-color: #797979;"/>
+      
+      
     </div>
 
 

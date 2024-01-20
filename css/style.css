@@ -22,7 +22,7 @@ width: 100%;
     /* top: 10px; */
     left: 0;
     right: 0;
-    text-align: right;
+    text-align: left;
     height: 45;
     /* padding: 10px 15px 5px 15px; */
     /* margin-left: auto; */
@@ -35,13 +35,50 @@ width: 100%;
    
   }
 
-  #title {
+  #header {
     /* display: inline-block; */
     width: 100%;
     vertical-align: middle;
+    display: flex;
+    align-items: center;
     font-size: 16pt;
     font-weight: 500;
     color:white;
+  }
+
+  #header2 {
+    /* display: inline-block; */
+    width: 100%;
+    vertical-align: middle;
+    display: flex;
+    align-items: center;
+    font-size: 12pt;
+    font-weight: 400;
+    /* color:white; */
+  }
+
+  #title1 {
+    float: left;
+    margin-right: 10px;
+    font-size: 16pt;
+    font-weight: 500;
+    color:white;
+    display: flex;
+    align-items: center;
+    vertical-align: middle;
+    height: 100%;
+  }
+
+  #title2 {
+    float: left;
+    font-size: 12pt;
+    font-weight: 400;
+    color:white;
+    display: flex;
+    align-items: center;
+    vertical-align: middle;
+    height: 100%;
+    
   }
 
 /* #titleText {
@@ -49,12 +86,8 @@ width: 100%;
     font-weight: 500;
 } */
 
-#symbology {
-    /* background: #fff; */
-    height: 30vh;
-    padding: 10px;
-    border: 2px solid #ccc;
-  }
+
+
 
 #infoDiv {
 padding: 10px;
@@ -64,14 +97,28 @@ font-size: 14px;
 overflow-y: auto;
 overflow-x: hidden;
 border: 2px solid #ccc;
+background: rgba(53, 53, 53, 1);
 }
 
 #instructionsDiv{
 width: 240px;
 padding: 10px;
 height: 300px;
-/* margin-top: 2000px; */
 }
+
+#symbology {
+  height: 67vh;
+  padding-top: 50px;
+  width: 15vw;
+  padding: 10px;
+  border: 2px solid #ccc;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: rgba(53, 53, 53, 1);
+  display:flex;
+  flex-direction: column;
+}
+
 
 #resultDiv {
     display:flex;
@@ -98,6 +145,19 @@ flex: 1;
   grid-template-columns: .07fr 1fr;
   
   /* grid-gap: .5vh; */
+}
+
+.my-link {
+  color: white; /* Set the default color */
+  /* text-decoration: none; Optional: Remove the underline */
+}
+
+.my-link:hover {
+  color: red; /* Change color on hover */
+}
+
+.my-link:visited {
+  color: white; /* Set the color for visited links */
 }
 
 
@@ -147,12 +207,9 @@ grid-gap: .5vh;
   color: #ffffff
 }
 
-#symbology {
-  padding: 10px;
-  width: 190px;
-}
+
 .style-button{
-  margin: 3px;
+  margin: 2px;
 }
 
 .sbContainer1 {
