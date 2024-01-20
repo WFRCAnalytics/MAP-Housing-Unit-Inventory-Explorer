@@ -353,11 +353,11 @@
                         const normal = new Intl.DateTimeFormat("en-us", options);
                         switch (type) {
                           case "min":
-                            element.setAttribute("style", "color: #00619B;font-size: 14px;");
+                            element.setAttribute("style", "color: #0091e6;font-size: 16px;");
                             element.innerText = normal.format(value);
                             break;
                           case "max":
-                            element.setAttribute("style", "color: #00619B;font-size: 14px;");
+                            element.setAttribute("style", "color: #0091e6;font-size: 16px;");
                             element.innerText = normal.format(value);
                             break;
                           case "extent":
@@ -704,8 +704,10 @@
               
             } if(selectionText === "None"){
                 fetchLocalJsonArray(jsonBase).then(data => {
+                      const countyArray = data[0].COUNTY;
                       const cityArray = data[0].CITY;
                       const centerArray = data[0].CENTER;
+                      populateSelectBox('countySelect', countyArray);
                       populateSelectBox('citySelect', cityArray);
                       populateSelectBox('centerSelect', centerArray);
                     }); 
