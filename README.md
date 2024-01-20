@@ -11,7 +11,7 @@ Version 2 of the Housing Inventory Explorer web map (developed using the ESRI Ma
 
 The Housing Inventory Explorer has a number of powerful tools to filter the housing inventory dataset and change how it is displayed/colored on the map. The filter and display controls are located on the sides of the map – the graphic below describes the maps buttons (circled in red) that are used to access various map tool.  
 
-![alt text](image/graphic.jpg)
+![alt text](images/graphic.jpg)
 
 The Housing Unit Explorer uses the most current regionwide data available. WFRC is coordinating with other entities, including MAG (for Utah County), in hopes of adding Utah County's urban areas.
 
