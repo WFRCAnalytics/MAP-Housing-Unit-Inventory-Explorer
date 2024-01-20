@@ -736,7 +736,7 @@ const ptRendererValue = {
   type:"class-breaks",
   // field: "TOT_VALUE",
   legendOptions: {
-    title: "Unit Valuation"
+    title: "Assessed Value"
   },
   valueExpression: "( $feature.TOT_VALUE / $feature.ACRES )",
   classBreakInfos: [
@@ -860,7 +860,7 @@ const pclRendererValue = {
   type:"class-breaks",
   // field: "TOT_VALUE",
   legendOptions: {
-    title: "Unit Valuation"
+    title: "Assessed Value"
   },
   valueExpression: "( $feature.TOT_VALUE / $feature.ACRES )",
   classBreakInfos: [

@@ -690,6 +690,8 @@
             // update the select options
             fetchLocalJsonArray(jsonCounty)
             .then(data => {
+
+              if(selectionText !== "None"){
               const dataFiltered = data.find(item => item.NAME === selectionText);
               const countyArray = dataFiltered.COUNTY;
               const cityArray = dataFiltered.CITY;
@@ -698,7 +700,18 @@
               if ((cityActive !== true) && (centerActive !== true)){
                 populateSelectBox('citySelect', cityArray);
                 populateSelectBox('centerSelect', centerArray);   
-              }           
+              }  
+              
+            } if(selectionText === "None"){
+                fetchLocalJsonArray(jsonBase).then(data => {
+                      const cityArray = data[0].CITY;
+                      const centerArray = data[0].CENTER;
+                      populateSelectBox('citySelect', cityArray);
+                      populateSelectBox('centerSelect', centerArray);
+                    }); 
+            
+              }
+
               setCalciteSelectValue(countySelect, countySelectionCurrent)
               setCalciteSelectValue(citySelect, citySelectionCurrent)
               setCalciteSelectValue(centerSelect, centerSelectionCurrent)
@@ -714,12 +727,13 @@
           countiesLayer.visible = true;
 
           // zoom to the boundary layer (faster but zooms farther out)
-          const query = new Query();
-          query.where = `CO_NAME = '${selectionText}'`;
-          countiesLayer.queryExtent(query).then(function(results){
-            view.goTo(results.extent);
-          });
-
+          if(selectionText !== "None"){
+            const query = new Query();
+            query.where = `CO_NAME = '${selectionText}'`;
+            countiesLayer.queryExtent(query).then(function(results){
+              view.goTo(results.extent);
+            });
+          };
           if (queryMode === 'ALL') {
             updateChartsUsingActiveLayerView()
           };
@@ -752,23 +766,42 @@
               layerView.filter = {where: fullQuery};
             });
             
+            
             // update the select options
             fetchLocalJsonArray(jsonCity)
             .then(data => {
-              const dataFiltered = data.find(item => item.NAME === selectionText);
-              const countyArray = dataFiltered.COUNTY;
-              const cityArray = dataFiltered.CITY;
-              const centerArray = dataFiltered.CENTER;
+              
+              if(selectionText !== "None"){
+                const dataFiltered = data.find(item => item.NAME === selectionText);
+                const countyArray = dataFiltered.COUNTY;
+                const cityArray = dataFiltered.CITY;
+                const centerArray = dataFiltered.CENTER;
 
-             
-              if ((countyActive !== true) && (centerActive !== true)){
-                populateSelectBox('countySelect', countyArray);
-                populateSelectBox('centerSelect', centerArray);              
-              } if ((countyActive === true)){
+                if ((countyActive !== true) && (centerActive !== true)){
                   populateSelectBox('countySelect', countyArray);
-                  populateSelectBox('centerSelect', centerArray);
-              } if ((centerActive === true)){
-                  populateSelectBox('centerSelect', centerArray);
+                  populateSelectBox('centerSelect', centerArray);              
+                } if ((countyActive === true)){
+                    populateSelectBox('countySelect', countyArray);
+                    populateSelectBox('centerSelect', centerArray);
+                } if ((centerActive === true)){
+                    populateSelectBox('centerSelect', centerArray);
+                };
+              } if(selectionText === "None"){
+                
+                if (countyActive === true){
+                  fetchLocalJsonArray(jsonCounty)
+                  .then(data => {
+                    const dataFiltered = data.find(item => item.NAME === countySelectionCurrent);
+                    const centerArray = dataFiltered.CENTER;
+                    populateSelectBox('centerSelect', centerArray);
+                    })
+                }if (countyActive !== true){
+                  fetchLocalJsonArray(jsonBase).then(data => {
+                    const centerArray = data[0].CENTER;
+                    populateSelectBox('centerSelect', centerArray);
+                  });
+                }
+
               }
 
               setCalciteSelectValue(countySelect, countySelectionCurrent)
@@ -784,12 +817,13 @@
             citiesLayer.visible = true;
 
             // zoom to the boundary layer instead
-            const query = new Query();
-            query.where = `NAME = '${selectionText}'`;
-            citiesLayer.queryExtent(query).then(function(results){
-              view.goTo(results.extent);
-            });
-
+            if(selectionText !== "None"){
+              const query = new Query();
+              query.where = `NAME = '${selectionText}'`;
+              citiesLayer.queryExtent(query).then(function(results){
+                view.goTo(results.extent);
+              });
+            };
             if (queryMode === 'ALL') {
               updateChartsUsingActiveLayerView()
             };
@@ -2517,7 +2551,7 @@
 
       <div id="header2" style="flex:.2;" >
         
-        <a href="https://docs.google.com/document/d/1dmgoN0SSVyjYOIDhS_r3c9cc5MlXL709iMiZwK8l1XA/edit" class="my-link">
+        <a href="https://docs.google.com/document/d/1dmgoN0SSVyjYOIDhS_r3c9cc5MlXL709iMiZwK8l1XA/edit" class="my-link" target="_blank">
           About this map
         </a>
       </div>
