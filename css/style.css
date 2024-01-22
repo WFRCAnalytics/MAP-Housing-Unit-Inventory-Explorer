@@ -34,6 +34,7 @@ width: 100%;
     border: 2px solid #ccc;
    
   }
+ 
 
   #header {
     /* display: inline-block; */
@@ -247,3 +248,10 @@ text-align: center;
   line-height: 2;
   /* font-size: .9vw; */
   }
+
+div.esri-time-slider__animation,
+div.esri-time-slider__previous,
+div.esri-time-slider__next {
+	display: none;
+}
+
