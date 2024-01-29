@@ -1233,7 +1233,7 @@
 
       const queryStatisticsForTypeBarChart = promiseUtils.debounce( async function (layerview) {
 
-          chartTop.options.title.text = "Housing Type (Loading...)"
+          chartTop.options.title.text = "Housing Types - By Decade (Loading...)"
           chartTop.update();
     
           // create query definitions for stacked bar chart data
@@ -1347,7 +1347,7 @@
               
               // chartTop.update();
 
-              updateStackedChart(chartTop, uniqueDecades,updatedDataArray, "Housing Type")
+              updateStackedChart(chartTop, uniqueDecades,updatedDataArray, "Housing Types - By Decade")
           
           }, console.error);
 
@@ -1393,7 +1393,7 @@
 
         queryStatisticsForTypePieChart = promiseUtils.debounce(function (layerView) {
           
-          chartBottom.options.title.text = "Housing Type (Loading...)"
+          chartBottom.options.title.text = "Housing Types (Loading...)"
           chartBottom.update();
 
           const statDefinitions = [
@@ -1466,7 +1466,7 @@
             colors = ["#FAECA7", "#FC921F", "#E60049", "#BD7EBE", 
                                     "#28C830", "#9E559C", '#1E8553', '#149ECE']
 
-            updatePieChart2(chartBottom, Object.keys(allStats), Object.values(allStats), "Housing Type", colors)
+            updatePieChart2(chartBottom, Object.keys(allStats), Object.values(allStats), "Housing Types", colors)
           }, console.error);
         });
 
@@ -2548,7 +2548,7 @@
 
       <div d="header" style="flex:1.6;">
         <div id="title1">WFRC-Area Housing Inventory Explorer</div>
-        <div id="title2">(January 2022)</div>
+        <div id="title2">(data shown: January 2022)</div>
       </div>
 
       <div id="header2" style="flex:.2;" >
