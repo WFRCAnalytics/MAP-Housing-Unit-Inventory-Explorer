@@ -593,7 +593,7 @@ const pclRendererDensity = {
       label: "< 1 units / acre",
       symbol: {
         type: "simple-fill",
-        color: [255, 255, 217,transparency],
+        color: [255, 255, 217,parcelTransparency],
         size: dPixelSize,
         outline: {
           color: PtOutlineColor,
@@ -606,7 +606,7 @@ const pclRendererDensity = {
       maxValue: 2,
       symbol: {
         type: "simple-fill",
-        color: [239, 249, 181,transparency],
+        color: [239, 249, 181,parcelTransparency],
         size: dPixelSize,
         outline: {
           color: PtOutlineColor,
@@ -621,7 +621,7 @@ const pclRendererDensity = {
       maxValue: 3,
       symbol: {
         type: "simple-fill",
-        color: [207, 236, 179,transparency],
+        color: [207, 236, 179,parcelTransparency],
         size: dPixelSize,
         outline: {
           color: PtOutlineColor,
@@ -635,7 +635,7 @@ const pclRendererDensity = {
       maxValue: 5,
       symbol: {
         type: "simple-fill",
-        color: [151, 214, 185,transparency],
+        color: [151, 214, 185,parcelTransparency],
         size: dPixelSize,
         outline: {
           color: PtOutlineColor,
@@ -649,7 +649,7 @@ const pclRendererDensity = {
       maxValue: 7,
       symbol: {
         type: "simple-fill",
-        color: [93, 192, 192,transparency],
+        color: [93, 192, 192,parcelTransparency],
         size: dPixelSize,
         outline: {
           color: PtOutlineColor,
@@ -663,7 +663,7 @@ const pclRendererDensity = {
       maxValue: 10,
       symbol: {
         type: "simple-fill",
-        color: [49, 166, 194,transparency],
+        color: [49, 166, 194,parcelTransparency],
         size: dPixelSize,
         outline: {
           color: PtOutlineColor,
@@ -677,7 +677,7 @@ const pclRendererDensity = {
       maxValue: 20,
       symbol: {
         type: "simple-fill",
-        color: [31, 128, 184,transparency],
+        color: [31, 128, 184,parcelTransparency],
         size: dPixelSize,
         outline: {
           color: PtOutlineColor,
@@ -691,7 +691,7 @@ const pclRendererDensity = {
       maxValue: 50,
       symbol: {
         type: "simple-fill",
-        color: [35, 85, 164,transparency],
+        color: [35, 85, 164,parcelTransparency],
         size: dPixelSize,
         outline: {
           color: PtOutlineColor,
@@ -705,7 +705,7 @@ const pclRendererDensity = {
       maxValue: 100,
       symbol: {
         type: "simple-fill",
-        color: [34, 49, 141,transparency],
+        color: [34, 49, 141,parcelTransparency],
         size: dPixelSize,
         outline: {
           color: PtOutlineColor,
@@ -719,7 +719,7 @@ const pclRendererDensity = {
       maxValue: Infinity,
       symbol: {
         type: "simple-fill",
-        color: [8, 29, 88,transparency],
+        color: [8, 29, 88,parcelTransparency],
         size: dPixelSize,
         outline: {
           color: PtOutlineColor,
@@ -869,7 +869,7 @@ const pclRendererValue = {
       maxValue: 1200000,
       symbol: {
         type: "simple-fill",
-        color: [240, 38, 28,transparency],
+        color: [240, 38, 28,parcelTransparency],
         size: dPixelSize,
         outline: {
           color: PtOutlineColor,
@@ -883,7 +883,7 @@ const pclRendererValue = {
       maxValue: 1600000,
       symbol: {
         type: "simple-fill",
-        color: [247, 120, 51,transparency],
+        color: [247, 120, 51,parcelTransparency],
         size: dPixelSize,
         outline: {
           color: PtOutlineColor,
@@ -897,7 +897,7 @@ const pclRendererValue = {
       maxValue: 1900000,
       symbol: {
         type: "simple-fill",
-        color: [248, 175, 78,transparency],
+        color: [248, 175, 78,parcelTransparency],
         size: dPixelSize,
         outline: {
           color: PtOutlineColor,
@@ -911,7 +911,7 @@ const pclRendererValue = {
       maxValue: 2100000,
       symbol: {
         type: "simple-fill",
-        color: [246, 227, 107,transparency],
+        color: [246, 227, 107,parcelTransparency],
         size: dPixelSize,
         outline: {
           color: PtOutlineColor,
@@ -925,7 +925,7 @@ const pclRendererValue = {
       maxValue: 2400000,
       symbol: {
         type: "simple-fill",
-        color: [222, 238, 137,transparency],
+        color: [222, 238, 137,parcelTransparency],
         size: dPixelSize,
         outline: {
           color: PtOutlineColor,
@@ -939,7 +939,7 @@ const pclRendererValue = {
       maxValue: 2800000,
       symbol: {
         type: "simple-fill",
-        color: [255, 227, 0,transparency],
+        color: [255, 227, 0,parcelTransparency],
         size: dPixelSize,
         outline: {
           color: PtOutlineColor,
@@ -953,7 +953,7 @@ const pclRendererValue = {
       maxValue: 3500000,
       symbol: {
         type: "simple-fill",
-        color: [134, 186, 189,transparency],
+        color: [134, 186, 189,parcelTransparency],
         size: dPixelSize,
         outline: {
           color: PtOutlineColor,
@@ -967,7 +967,7 @@ const pclRendererValue = {
       maxValue: Infinity,
       symbol: {
         type: "simple-fill",
-        color: [61, 161, 209,transparency],
+        color: [61, 161, 209,parcelTransparency],
         size: dPixelSize,
         outline: {
           color: PtOutlineColor,
@@ -1154,7 +1154,7 @@ const pclRendererBuiltDecade = {
           label: "NA",
           symbol: {
             type: "simple-fill",
-            color: [0, 0, 0, transparency], // [R,G,B, Transparency]
+            color: [0, 0, 0, parcelTransparency], // [R,G,B, parcelTransparency]
             size: dPixelSize,
             outline: {
               color: PtOutlineColor,
@@ -1169,7 +1169,7 @@ const pclRendererBuiltDecade = {
         label: "1840-1890",
         symbol: {
             type: "simple-fill",
-            color: [13, 8, 135, transparency],
+            color: [13, 8, 135, parcelTransparency],
             size: dPixelSize,
             outline: {
               color: PtOutlineColor,
@@ -1184,7 +1184,7 @@ const pclRendererBuiltDecade = {
         label: "1900-1950",
         symbol: {
             type: "simple-fill",
-            color: [77, 2, 162, transparency],
+            color: [77, 2, 162, parcelTransparency],
             size: dPixelSize,
             outline: {
               color: PtOutlineColor,
@@ -1199,7 +1199,7 @@ const pclRendererBuiltDecade = {
         label: "1960",
         symbol: {
             type: "simple-fill",
-            color: [126, 3, 168, transparency],
+            color: [126, 3, 168, parcelTransparency],
             size: dPixelSize,
             outline: {
               color: PtOutlineColor,
@@ -1214,7 +1214,7 @@ const pclRendererBuiltDecade = {
         label: "1970",
         symbol: {
             type: "simple-fill",
-            color: [170, 35, 150, transparency],
+            color: [170, 35, 150, parcelTransparency],
             size: dPixelSize,
             outline: {
               color: PtOutlineColor,
@@ -1230,7 +1230,7 @@ const pclRendererBuiltDecade = {
         label: "1980",
         symbol: {
             type: "simple-fill",
-            color: [204, 71, 121, transparency],
+            color: [204, 71, 121, parcelTransparency],
             size: dPixelSize,
             outline: {
               color: PtOutlineColor,
@@ -1244,7 +1244,7 @@ const pclRendererBuiltDecade = {
         label:"1990",
         symbol: {
             type: "simple-fill",
-            color: [230, 108, 93, transparency],
+            color: [230, 108, 93, parcelTransparency],
             size: dPixelSize,
             outline: {
               color: PtOutlineColor,
@@ -1260,7 +1260,7 @@ const pclRendererBuiltDecade = {
         label: "2000",
         symbol: {
             type: "simple-fill",
-            color: [249, 149, 65, transparency],
+            color: [249, 149, 65, parcelTransparency],
             size: dPixelSize,
             outline: {
               color: PtOutlineColor,
@@ -1275,7 +1275,7 @@ const pclRendererBuiltDecade = {
         label: "2010",
         symbol: {
             type: "simple-fill",
-            color: [254, 196, 40, transparency],
+            color: [254, 196, 40, parcelTransparency],
             size: dPixelSize,
             outline: {
               color: PtOutlineColor,
@@ -1290,8 +1290,8 @@ const pclRendererBuiltDecade = {
         label: "2020",
         symbol: {
             type: "simple-fill",
-            // color: [241, 250, 34, transparency],
-            color: [255, 255, 190, transparency],
+            // color: [241, 250, 34, parcelTransparency],
+            color: [255, 255, 190, parcelTransparency],
             size: dPixelSize,
             outline: {
               color: PtOutlineColor,
