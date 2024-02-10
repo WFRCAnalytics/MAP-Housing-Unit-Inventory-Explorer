@@ -96,42 +96,100 @@ const centerRenderer = {
             legendOptions: {
                 title: "City"
             },
-            field: "Area",
+            field: "AreaType",
             uniqueValueInfos: [{
-                    value: "WFRC",
-                    label: "WFRC",
+                    value: "Metropolitan Center",
+                    label: "Metropolitan Center",
                     symbol: {
                         type: "simple-fill",
                         color: null,
                         outline: {
-                        color: [222,45,38, 1],
-                        width: 3
-                    }
+                          color: [241, 88, 7, 1],
+                          width: 3
+                        }
                     }
             },{
-                    value: "WFRC-Box Elder",
-                    label: "WFRC-Box Elder",
+                    value: "Urban Center",
+                    label: "Urban Center",
                     symbol: {
                         type: "simple-fill",
                         color: null,
                         outline: {
-                        color: [128,0,0, 1],
-                        width: 1
-                    }
+                          color: [231, 144, 42, 1],
+                          width: 3
+                        }
                     }
             },{
-                    value: "MAG",
-                    label: "MAG",
+                    value: "City Center",
+                    label: "City Center",
                     symbol: {
                         type: "simple-fill",
                         color: null,
                         outline: {
-                        color: [128,0,0, 1],
-                        width: 1
+                          color: [252, 182, 34, 1],
+                          width: 3
+                        }
                     }
+            },{
+                    value: "Neighborhood Center",
+                    label: "Neighborhood Center",
+                    symbol: {
+                        type: "simple-fill",
+                        color: null,
+                        outline: {
+                          color: [254, 219, 151, 1],
+                          width: 3
+                        }
                     }
-            }]  
+            },{
+                    value: "Special District",
+                    label: "Special District",
+                    symbol: {
+                        type: "simple-fill",
+                        color: null,
+                        outline: {
+                          color: [190,190,190, 1],
+                          width: 3
+                        }
+                    }
+            },{
+                    value: "Industrial District",
+                    label: "Industrial District",
+                    symbol: {
+                        type: "simple-fill",
+                        color: null,
+                        outline: {
+                          color: [193,160,203, 1],
+                          width: 3
+                        }
+                    }
+            },{
+                    value: "Employment District",
+                    label: "Employment District",
+                    symbol: {
+                        type: "simple-fill",
+                        color: null,
+                        outline: {
+                          color: [216, 161, 159, 1],
+                          width: 3
+                        }
+                    }
+            },{
+                    value: "Educational Center",
+                    label: "Educational Center",
+                    symbol: {
+                        type: "simple-fill",
+                        color: null,
+                        outline: {
+                          color: [27, 185, 209, 1],
+                          width: 3
+                        }
+                    }
+            }
+          ]  
     };
+
+    
 
 
   const ptRendererType = {
@@ -426,6 +484,29 @@ const parcelPopupTemplate = {
       ],
       expressionInfos: arcadeExpressionInfos
     }
+
+    const centerPopupTemplate = {
+      title: "Center: {AreaName}",
+      content: [{
+            type: "fields",
+            fieldInfos: [
+              {
+                fieldName: "AreaName",
+                label: "Center Name"
+              },
+              {
+                fieldName: "AreaType",
+                label: "Center Type"
+              },
+              {
+                fieldName: "Area",
+                label: "MPO"
+              },
+            ],
+          }
+        ],
+        // expressionInfos: arcadeExpressionInfos
+      }
 
 // renderer for DUA symbolization on points
 const ptRendererDensity = {

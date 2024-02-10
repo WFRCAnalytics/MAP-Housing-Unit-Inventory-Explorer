@@ -175,7 +175,8 @@
                 renderer:centerRenderer,
                 maxScale: 0,
                 // minScale: 50000,
-                visible: false
+                visible: false,
+                popupTemplate:centerPopupTemplate
               });
 
         const ParcelsLayer = new FeatureLayer({
@@ -190,7 +191,6 @@
         const PointsLayer = new FeatureLayer({
             url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/hui_for_web_gdb/FeatureServer/1",
             renderer:ptRendererType,
-            // renderer:ptRendererBuiltDecade,
             outFields: ["*"],
             visible: true,
           });
@@ -201,7 +201,7 @@
         // Create the Map and View objects
         const defaultZoom = 13
         const map = new Map({
-          basemap: "satellite",
+          basemap: "hybrid",
           layers: [PointsLayer, ParcelsLayer, centersLayer, citiesLayer, countiesLayer],
         });
 
