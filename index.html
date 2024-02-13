@@ -1238,7 +1238,7 @@
     
           // create query definitions for stacked bar chart data
           const decades = ["1840", "1850", "1860", "1870", "1880", "1890", "1900", "1910", "1920", "1930", "1940", "1950", "1960", "1970", "1980", "1990", "2000", "2010", "2020"];
-          const subtypes = ["single_family", "duplex", "single_family_adu", "condo", "townhome", "mobile_home_park", "mixed_th/single_family", "apartment"];
+          const subtypes = ["single_family", "duplex", "single_family_adu", "condo", "townhome", "mobile_home_park", "mixed th/single_family", "apartment"];
           const yearChartDefinitions = [];
           for (const decade of decades) {
             for (const subtype of subtypes) {
@@ -1334,7 +1334,7 @@
                 "condo": '#BD7EBE',
                 "townhome": '#28C830',
                 "mobile_home_park": '#9E559C',
-                "mixed_th/single_family": '#1E8553',
+                "mixed th/single_family": '#1E8553',
                 "apartment": '#149ECE'
               };
               
@@ -1418,13 +1418,13 @@
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN SUBTYPE = 'townhome' THEN UNIT_COUNT ELSE 0 END",
-              outStatisticFieldName: "townhome",
+              onStatisticField: "CASE WHEN SUBTYPE = 'condo' THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "condo",
               statisticType: "sum"
             },
             {
-              onStatisticField: "CASE WHEN SUBTYPE = 'condo' THEN UNIT_COUNT ELSE 0 END",
-              outStatisticFieldName: "condo",
+              onStatisticField: "CASE WHEN SUBTYPE = 'townhome' THEN UNIT_COUNT ELSE 0 END",
+              outStatisticFieldName: "townhome",
               statisticType: "sum"
             },
             {
