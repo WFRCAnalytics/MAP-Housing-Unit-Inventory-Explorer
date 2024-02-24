@@ -1194,16 +1194,22 @@
         });
 
 
-        const sidebarDiv = document.getElementById("sidebarDiv");
-        const sidebarExpand = new Expand({
+        const filtersPanel = document.getElementById("filtersPanel");
+        const filtersPanelExpand = new Expand({
           expandIcon: "sliders-horizontal",
           expandTooltip: "Filters",
           view: view,
-          content: sidebarDiv,
+          content: filtersPanel,
           expanded: true,
           group: "top-left"
         });
-        view.ui.add(sidebarExpand, { position: "top-left"});
+        view.ui.add(filtersPanelExpand, { position: "top-left"});
+
+        // collapse chart by default if screen size is small
+        let windowSizeSmall = 640;
+        if (window.innerWidth < windowSizeSmall){
+          filtersPanelExpand.expanded = false;
+        }
 
         const symbologyDiv = document.getElementById("symbology");
         const symbologyExpand = new Expand({
@@ -2326,15 +2332,19 @@
         });
 
         // create an expand object for the charts
-        const resultDiv = document.getElementById("resultDiv");
+        const chartPanel = document.getElementById("chartPanel");
         const chartExpand = new Expand({
           expandIcon: "graph-bar-side-by-side",
           expandTooltip: "Statistics",
           view: view,
-          content: resultDiv,
+          content: chartPanel,
           expanded: true,
           group: "top-right"
         });
+        
+        if (window.innerWidth < windowSizeSmall){
+          chartExpand.expanded = false;
+        ;}
 
         view.when(() => {
                 // get the first layer in the collection of operational layers in the WebMap
@@ -2564,7 +2574,7 @@
     <div id="viewDiv"></div>
     <div id="timeSlider"></div>
 
-    <div id="sidebarDiv">    
+    <div id="filtersPanel">    
       <div class="sbContainer1">
           <div id="sbHeader" class="sbItem">Selection Filters</div>
           <div class="sbItem"></div>
@@ -2616,7 +2626,7 @@
 
     </div>
 
-    <div id="resultDiv" class="esri-widget">
+    <div id="chartPanel" class="esri-widget">
       <div class="sectionChartToggle" >
         <calcite-checkbox id="statsModeToggle"></calcite-checkbox>
         <div>Dynamically update charts according to the <b>geographic extent</b> of the map. </div>
