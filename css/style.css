@@ -41,7 +41,7 @@ width: 100%;
     /* display: inline-block; */
     width: 100%;
     vertical-align: middle;
-    display: flex;
+    display:flex;
     align-items: center;
     font-size: 16pt;
     font-weight: 500;
@@ -54,7 +54,7 @@ width: 100%;
     vertical-align: middle;
     display: flex;
     align-items: center;
-    font-size: 12pt;
+    font-size: .45em;
     font-weight: 400;
     /* color:white; */
   }
@@ -62,7 +62,7 @@ width: 100%;
   #title1 {
     float: left;
     margin-right: 10px;
-    font-size: 16pt;
+    font-size: 1.2rem;
     font-weight: 500;
     color:white;
     display: flex;
@@ -73,7 +73,7 @@ width: 100%;
 
   #title2 {
     float: left;
-    font-size: 12pt;
+    font-size: .65em;
     font-weight: 400;
     color:white;
     display: flex;
@@ -259,10 +259,75 @@ div.esri-time-slider__next {
 @media all and (max-width:640px){
   
   #timeSlider {
-    position: relative;
-    width: 100px;
+    position: sticky;
+    /* width: 90px; */
     /* left: 5%; */
     /* right: 5%; */
     /* bottom: 0px; */
   }
+
+  #filtersPanel {
+    position: sticky;
+    width: 100%;
+    height: 88%;
+    /* left: 5%; */
+    /* right: 5%; */
+    /* bottom: 0px; */
+  }
+
+  #symbology {
+    position: sticky;
+    width: 100%;
+    height: 88%;
+    /* left: 5%; */
+    /* right: 5%; */
+    /* bottom: 0px; */
+  
+  }
+
+  #chartPanel {
+    position: sticky;
+    width: 95%;
+    height: 90%;
+    /* left: 5%; */
+    /* right: 5%; */
+    /* bottom: 0px; */
+  
+  }
+
+  #logo{
+    height:23px 
+  }
+
+  #title1 {
+    float: left;
+    margin-right: 10px;
+    font-size: .5em;
+    font-weight: 500;
+    color:white;
+    display: flex;
+    align-items: center;
+    vertical-align: middle;
+    height: 100%;
+    
+  }
+
+  #title2 {
+    float: left;
+    font-size: .45em;
+    font-weight: 400;
+    color:white;
+    display: flex;
+    align-items: center;
+    vertical-align: middle;
+    height: 100%;
+    
+  }
+
+  .my-link {
+    color: white; /* Set the default color */
+    /* text-decoration: none; Optional: Remove the underline */
+    display: none
+  }
+
 }

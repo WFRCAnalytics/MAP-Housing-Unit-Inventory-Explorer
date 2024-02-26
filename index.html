@@ -381,7 +381,12 @@
                       expanded: false
                     });
                   
-                  view.ui.add(timeSliderExpand, "bottom-left");
+                  // view.ui.add(timeSliderExpand, "bottom-left");
+                  if (window.innerWidth < windowSizeSmall){
+                    view.ui.add(timeSliderExpand, { position: "top-left"});
+                  ;}else{
+                    view.ui.add(timeSliderExpand, { position: "bottom-left"});
+                  }
                   
                   // watch the time slider for changes
                   document.getElementById("timeSlider").addEventListener("pointerup",(event) => {
@@ -1221,6 +1226,8 @@
           group: "top-left"
         });
         view.ui.add(symbologyExpand, { position: "top-left"});
+
+        
 
       //=========================
       // chart stuff
@@ -2374,11 +2381,33 @@
 
                 // // Add widget to the bottom right corner of the view
                 // view.ui.add(legendExpand, "top-right");
+
+                if (window.innerWidth < windowSizeSmall){
+                  legend.hideLayersNotInCurrentView = true;
+                  legend.style = {
+                                    type:'card',
+                                    layout:'auto'
+                                  };
+                ;}
+
               });
         
         // view.ui.add(infoDivExpand, "top-right");
-        view.ui.add(chartExpand, { position: "top-right"});
-        view.ui.add(bgExpand, "top-right");
+        // view.ui.add(chartExpand, { position: "top-right"});
+        if (window.innerWidth < windowSizeSmall){
+          view.ui.add(chartExpand, { position: "top-left"});
+        ;}else{
+          view.ui.add(chartExpand, { position: "top-right"});
+        }
+
+
+        if (window.innerWidth < windowSizeSmall){
+          view.ui.add(bgExpand, { position: "top-left"});
+        ;}else{
+          view.ui.add(bgExpand, { position: "top-right"});
+        }
+
+        // view.ui.add(bgExpand, "top-right");
         // view.ui.move("zoom", "top-right");
         
         //===============================
@@ -2552,11 +2581,11 @@
     <div id="info" >
       <div id="header" style="flex:1;">
         <a href="https://wfrc.org/">
-          <img src="images/logo.png"  height="45px" width="auto">
+          <img src="images/logo.png" id="logo"  height="45px" width="auto">
         </a>
       </div>
 
-      <div d="header" style="flex:1.6;">
+      <div id="header" style="flex:1.6;">
         <div id="title1">WFRC-Area Housing Inventory Explorer</div>
         <div id="title2">(data shown: January 2022)</div>
       </div>
