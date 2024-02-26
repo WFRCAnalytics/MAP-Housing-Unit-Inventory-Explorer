@@ -1,11 +1,18 @@
-html,
-body,
+
+
+html,body{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin: 0;
+}
 
 #viewDiv {
+
 padding: 0;
 margin: 0;
-height: 98.2%;
-width: 100%;
+flex: 1;
+
 }
 
 #timeSlider {
@@ -18,21 +25,16 @@ width: 100%;
 
 
 #info {
-    z-index: 99;
-    /* position: absolute; */
-    /* top: 10px; */
+
     left: 0;
     right: 0;
     text-align: left;
     height: 45;
-    /* padding: 10px 15px 5px 15px; */
-    /* margin-left: auto; */
-    /* margin-right: auto; */
-    /* width: 100%; */
     background: rgb(53, 53, 53, 1);
     font-size: 25pt;
     display:flex;
     border: 2px solid #ccc;
+   
    
   }
  
