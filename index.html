@@ -381,7 +381,12 @@
                       expanded: false
                     });
                   
-                  view.ui.add(timeSliderExpand, "bottom-left");
+                  // view.ui.add(timeSliderExpand, "bottom-left");
+                  if (window.innerWidth < windowSizeSmall){
+                    view.ui.add(timeSliderExpand, { position: "top-left"});
+                  ;}else{
+                    view.ui.add(timeSliderExpand, { position: "bottom-left"});
+                  }
                   
                   // watch the time slider for changes
                   document.getElementById("timeSlider").addEventListener("pointerup",(event) => {
@@ -1194,16 +1199,22 @@
         });
 
 
-        const sidebarDiv = document.getElementById("sidebarDiv");
-        const sidebarExpand = new Expand({
+        const filtersPanel = document.getElementById("filtersPanel");
+        const filtersPanelExpand = new Expand({
           expandIcon: "sliders-horizontal",
           expandTooltip: "Filters",
           view: view,
-          content: sidebarDiv,
+          content: filtersPanel,
           expanded: true,
           group: "top-left"
         });
-        view.ui.add(sidebarExpand, { position: "top-left"});
+        view.ui.add(filtersPanelExpand, { position: "top-left"});
+
+        // collapse chart by default if screen size is small
+        let windowSizeSmall = 640;
+        if (window.innerWidth < windowSizeSmall){
+          filtersPanelExpand.expanded = false;
+        }
 
         const symbologyDiv = document.getElementById("symbology");
         const symbologyExpand = new Expand({
@@ -1215,6 +1226,8 @@
           group: "top-left"
         });
         view.ui.add(symbologyExpand, { position: "top-left"});
+
+        
 
       //=========================
       // chart stuff
@@ -2326,15 +2339,19 @@
         });
 
         // create an expand object for the charts
-        const resultDiv = document.getElementById("resultDiv");
+        const chartPanel = document.getElementById("chartPanel");
         const chartExpand = new Expand({
           expandIcon: "graph-bar-side-by-side",
           expandTooltip: "Statistics",
           view: view,
-          content: resultDiv,
+          content: chartPanel,
           expanded: true,
           group: "top-right"
         });
+        
+        if (window.innerWidth < windowSizeSmall){
+          chartExpand.expanded = false;
+        ;}
 
         view.when(() => {
                 // get the first layer in the collection of operational layers in the WebMap
@@ -2364,11 +2381,33 @@
 
                 // // Add widget to the bottom right corner of the view
                 // view.ui.add(legendExpand, "top-right");
+
+                if (window.innerWidth < windowSizeSmall){
+                  legend.hideLayersNotInCurrentView = true;
+                  legend.style = {
+                                    type:'card',
+                                    layout:'auto'
+                                  };
+                ;}
+
               });
         
         // view.ui.add(infoDivExpand, "top-right");
-        view.ui.add(chartExpand, { position: "top-right"});
-        view.ui.add(bgExpand, "top-right");
+        // view.ui.add(chartExpand, { position: "top-right"});
+        if (window.innerWidth < windowSizeSmall){
+          view.ui.add(chartExpand, { position: "top-left"});
+        ;}else{
+          view.ui.add(chartExpand, { position: "top-right"});
+        }
+
+
+        if (window.innerWidth < windowSizeSmall){
+          view.ui.add(bgExpand, { position: "top-left"});
+        ;}else{
+          view.ui.add(bgExpand, { position: "top-right"});
+        }
+
+        // view.ui.add(bgExpand, "top-right");
         // view.ui.move("zoom", "top-right");
         
         //===============================
@@ -2542,11 +2581,11 @@
     <div id="info" >
       <div id="header" style="flex:1;">
         <a href="https://wfrc.org/">
-          <img src="images/logo.png"  height="45px" width="auto">
+          <img src="images/logo.png" id="logo"  height="45px" width="auto">
         </a>
       </div>
 
-      <div d="header" style="flex:1.6;">
+      <div id="header" style="flex:1.6;">
         <div id="title1">WFRC-Area Housing Inventory Explorer</div>
         <div id="title2">(data shown: January 2022)</div>
       </div>
@@ -2564,7 +2603,7 @@
     <div id="viewDiv"></div>
     <div id="timeSlider"></div>
 
-    <div id="sidebarDiv">    
+    <div id="filtersPanel">    
       <div class="sbContainer1">
           <div id="sbHeader" class="sbItem">Selection Filters</div>
           <div class="sbItem"></div>
@@ -2616,7 +2655,7 @@
 
     </div>
 
-    <div id="resultDiv" class="esri-widget">
+    <div id="chartPanel" class="esri-widget">
       <div class="sectionChartToggle" >
         <calcite-checkbox id="statsModeToggle"></calcite-checkbox>
         <div>Dynamically update charts according to the <b>geographic extent</b> of the map. </div>
