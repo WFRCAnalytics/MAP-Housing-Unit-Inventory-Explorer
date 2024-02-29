@@ -1,6 +1,5 @@
-
-
-html,body{
+html,
+body {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -8,106 +7,95 @@ html,body{
 }
 
 #viewDiv {
-
-padding: 0;
-margin: 0;
-flex: 1;
-
+  padding: 0;
+  margin: 0;
+  flex: 1;
 }
 
 #timeSlider {
-    position: absolute;
-    width: 70vw;
-    left: 5%;
-    right: 5%;
-    bottom: 0px;
+  position: absolute;
+  width: 70vw;
+  left: 5%;
+  right: 5%;
+  bottom: 0px;
 }
 
-
 #info {
+  left: 0;
+  right: 0;
+  text-align: left;
+  height: 45;
+  background: rgb(53, 53, 53, 1);
+  font-size: 25pt;
+  display: flex;
+  border: 2px solid #ccc;
+}
 
-    left: 0;
-    right: 0;
-    text-align: left;
-    height: 45;
-    background: rgb(53, 53, 53, 1);
-    font-size: 25pt;
-    display:flex;
-    border: 2px solid #ccc;
-   
-   
-  }
- 
+#header {
+  /* display: inline-block; */
+  width: 100%;
+  vertical-align: middle;
+  display: flex;
+  align-items: center;
+  font-size: 16pt;
+  font-weight: 500;
+  color: white;
+}
 
-  #header {
-    /* display: inline-block; */
-    width: 100%;
-    vertical-align: middle;
-    display:flex;
-    align-items: center;
-    font-size: 16pt;
-    font-weight: 500;
-    color:white;
-  }
+#header2 {
+  /* display: inline-block; */
+  width: 100%;
+  vertical-align: middle;
+  display: flex;
+  align-items: center;
+  font-size: 0.45em;
+  font-weight: 400;
+  /* color:white; */
+}
 
-  #header2 {
-    /* display: inline-block; */
-    width: 100%;
-    vertical-align: middle;
-    display: flex;
-    align-items: center;
-    font-size: .45em;
-    font-weight: 400;
-    /* color:white; */
-  }
+#title1 {
+  float: left;
+  margin-right: 10px;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: white;
+  display: flex;
+  align-items: center;
+  vertical-align: middle;
+  height: 100%;
+}
 
-  #title1 {
-    float: left;
-    margin-right: 10px;
-    font-size: 1.2rem;
-    font-weight: 500;
-    color:white;
-    display: flex;
-    align-items: center;
-    vertical-align: middle;
-    height: 100%;
-  }
-
-  #title2 {
-    float: left;
-    font-size: .65em;
-    font-weight: 400;
-    color:white;
-    display: flex;
-    align-items: center;
-    vertical-align: middle;
-    height: 100%;
-    
-  }
+#title2 {
+  float: left;
+  font-size: 0.65em;
+  font-weight: 400;
+  color: white;
+  display: flex;
+  align-items: center;
+  vertical-align: middle;
+  height: 100%;
+}
 
 /* #titleText {
     font-size: 16pt;
     font-weight: 500;
 } */
 
-
-
-
 #infoDiv {
-padding: 10px;
-width: 20vw;
-height: 85vh;
-font-size: 14px;
-overflow-y: auto;
-overflow-x: hidden;
-border: 2px solid #ccc;
-background: rgba(53, 53, 53, 1);
+  padding: 10px;
+  width: 20vw;
+  height: 85vh;
+  font-size: 14px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border: 2px solid #ccc;
+  background: rgba(53, 53, 53, 1);
 }
 
-#instructionsDiv{
-width: 240px;
-padding: 10px;
-height: 300px;
+#instructionsDiv {
+  width: 240px;
+  padding: 10px;
+  height: 300px;
 }
 
 #symbology {
@@ -119,35 +107,34 @@ height: 300px;
   overflow-y: auto;
   overflow-x: hidden;
   background: rgba(53, 53, 53, 1);
-  display:flex;
+  display: none;
   flex-direction: column;
 }
 
-
 #chartPanel {
-    display:flex;
-    flex-direction: column;
-    height:82vh;
-    width: 40vh;
-    font-size: 14px;
-    padding: 10px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    background: rgba(53, 53, 53, 1);
-    border: 2px solid #ccc;
-  }
+  display: none;
+  flex-direction: column;
+  height: 82vh;
+  width: 40vh;
+  font-size: 14px;
+  padding: 10px;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  background: rgba(53, 53, 53, 1);
+  border: 2px solid #ccc;
+}
 
 .section {
-flex: 1;
-/* position: relative; */
-/* border: 1px solid #ccc; */
-/* box-sizing: border-box; */
+  flex: 1;
+  /* position: relative; */
+  /* border: 1px solid #ccc; */
+  /* box-sizing: border-box; */
 }
 
 .sectionChartToggle {
   display: grid;
-  grid-template-columns: .07fr 1fr;
-  
+  grid-template-columns: 0.07fr 1fr;
+
   /* grid-gap: .5vh; */
 }
 
@@ -164,36 +151,36 @@ flex: 1;
   color: white; /* Set the color for visited links */
 }
 
-
-
-
 .count {
-/* flex: 1; */
-white-space: nowrap;
-font-size: 14px;
-font-weight: bold;
-display: inline-block;
+  /* flex: 1; */
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: bold;
+  display: inline-block;
 }
 
-#resetButton, #andButton, #orButton, #typeButton, #bltDecButton,#densityButton,#valueButton{
-color:white;
+#resetButton,
+#andButton,
+#orButton,
+#typeButton,
+#bltDecButton,
+#densityButton,
+#valueButton {
+  color: white;
 }
-
 
 .logicDiv {
-display: grid;
-grid-template-columns: .5fr 1fr 1fr;
-grid-gap: .5vh;
-
+  display: grid;
+  grid-template-columns: 0.5fr 1fr 1fr;
+  grid-gap: 0.5vh;
 }
 
-
-#sbHeader{
+#sbHeader {
   font-weight: bold;
   text-decoration: underline;
   font-size: 18px;
 }
-#resetDiv{
+#resetDiv {
   text-align: center;
   width: 100%;
   display: flex;
@@ -202,46 +189,46 @@ grid-gap: .5vh;
 }
 
 #filtersPanel {
+  display: none;
   width: 28vw;
   padding: 10px;
   height: 70vh;
   overflow-y: auto;
   border: 2px solid #ccc;
   background-color: #353535;
-  color: #ffffff
+  color: #ffffff;
 }
 
-
-.style-button{
+.style-button {
   margin: 2px;
 }
 
 .sbContainer1 {
-display: grid;
-grid-template-rows: repeat(6, 1fr);
-grid-template-columns: .75fr 2fr;
-/* gap: 10px; */
-column-gap: 10px;
-row-gap: 4px;
-padding: 9px;
-border: 1px solid #ccc;
+  display: grid;
+  grid-template-rows: repeat(6, 1fr);
+  grid-template-columns: 0.75fr 2fr;
+  /* gap: 10px; */
+  column-gap: 10px;
+  row-gap: 4px;
+  padding: 9px;
+  border: 1px solid #ccc;
 }
 
 .sbContainer2 {
-display: grid;
-grid-template-rows: repeat(7, 1fr);
-grid-template-columns: .75fr 2fr;
-/* gap: 10px; */
-column-gap: 10px;
-row-gap: 4px;
-padding: 9px;
-border: 1px solid #ccc;
+  display: grid;
+  grid-template-rows: repeat(7, 1fr);
+  grid-template-columns: 0.75fr 2fr;
+  /* gap: 10px; */
+  column-gap: 10px;
+  row-gap: 4px;
+  padding: 9px;
+  border: 1px solid #ccc;
 }
 
 .sbItem {
-/* border: 1px solid #cccccc60; */
-/* padding: 10px; */
-text-align: center;
+  /* border: 1px solid #cccccc60; */
+  /* padding: 10px; */
+  text-align: center;
 }
 
 .sbItemHeader {
@@ -250,16 +237,15 @@ text-align: center;
   text-align: right;
   line-height: 2;
   /* font-size: .9vw; */
-  }
+}
 
 div.esri-time-slider__animation,
 div.esri-time-slider__previous,
 div.esri-time-slider__next {
-	display: none;
+  display: none;
 }
 
-@media all and (max-width:640px){
-  
+@media all and (max-width: 640px) {
   #timeSlider {
     position: sticky;
     /* width: 90px; */
@@ -284,52 +270,48 @@ div.esri-time-slider__next {
     /* left: 5%; */
     /* right: 5%; */
     /* bottom: 0px; */
-  
   }
 
   #chartPanel {
     position: sticky;
+    overflow-y: auto;
     width: 95%;
     height: 90%;
     /* left: 5%; */
     /* right: 5%; */
     /* bottom: 0px; */
-  
   }
 
-  #logo{
-    height:23px 
+  #logo {
+    height: 23px;
   }
 
   #title1 {
     float: left;
     margin-right: 10px;
-    font-size: .5em;
+    font-size: 0.5em;
     font-weight: 500;
-    color:white;
+    color: white;
     display: flex;
     align-items: center;
     vertical-align: middle;
     height: 100%;
-    
   }
 
   #title2 {
     float: left;
-    font-size: .45em;
+    font-size: 0.45em;
     font-weight: 400;
-    color:white;
+    color: white;
     display: flex;
     align-items: center;
     vertical-align: middle;
     height: 100%;
-    
   }
 
   .my-link {
     color: white; /* Set the default color */
     /* text-decoration: none; Optional: Remove the underline */
-    display: none
+    display: none;
   }
-
 }
