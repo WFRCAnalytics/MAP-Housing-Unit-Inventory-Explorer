@@ -1383,18 +1383,8 @@
 
             // create query definitions for stacked bar chart data
             const decades = [
-              "1840",
-              "1850",
-              "1860",
-              "1870",
-              "1880",
-              "1890",
-              "1900",
-              "1910",
-              "1920",
-              "1930",
-              "1940",
-              "1950",
+              "1840-1890",
+              "1900-1950",
               "1960",
               "1970",
               "1980",
@@ -1403,6 +1393,27 @@
               "2010",
               "2020",
             ];
+            // const decades = [
+            //   "1840",
+            //   "1850",
+            //   "1860",
+            //   "1870",
+            //   "1880",
+            //   "1890",
+            //   "1900",
+            //   "1910",
+            //   "1920",
+            //   "1930",
+            //   "1940",
+            //   "1950",
+            //   "1960",
+            //   "1970",
+            //   "1980",
+            //   "1990",
+            //   "2000",
+            //   "2010",
+            //   "2020",
+            // ];
             const subtypes = [
               "single_family",
               "duplex",
@@ -1450,9 +1461,8 @@
               for (const property in yearChartQueryResult) {
                 if (yearChartQueryResult.hasOwnProperty(property)) {
                   const [year, ...typeParts] = property.split("_").slice(1);
-
                   decadeTypeCountArray.push({
-                    decade: +year,
+                    decade: year,
                     type: typeParts.join("_"),
                     count: yearChartQueryResult[property],
                   });
@@ -1688,13 +1698,15 @@
             const decadeChartDefinitions = [
               {
                 onStatisticField:
-                  "CASE WHEN (BLT_DECADE IN ('1840','1850','1860','1870', '1880','1890')) THEN UNIT_COUNT ELSE 0 END",
+                  // "CASE WHEN (BLT_DECADE IN ('1840','1850','1860','1870', '1880','1890')) THEN UNIT_COUNT ELSE 0 END",
+                  "CASE WHEN (BLT_DECADE IN ('1840-1890')) THEN UNIT_COUNT ELSE 0 END",
                 outStatisticFieldName: "year_1840-1890",
                 statisticType: "sum",
               },
               {
                 onStatisticField:
-                  "CASE WHEN (BLT_DECADE IN ('1900','1910','1920','1930','1940','1950')) THEN UNIT_COUNT ELSE 0 END",
+                  // "CASE WHEN (BLT_DECADE IN ('1900','1910','1920','1930','1940','1950')) THEN UNIT_COUNT ELSE 0 END",
+                  "CASE WHEN (BLT_DECADE IN ('1900-1950')) THEN UNIT_COUNT ELSE 0 END",
                 outStatisticFieldName: "year_1900-1950",
                 statisticType: "sum",
               },
@@ -2891,26 +2903,28 @@
   </head>
 
   <body>
-    <div id="info">
-      <div id="header" style="flex: 1">
+    <div id="headerDiv">
+      
+      <div id="logoDiv" class="headerItem">
         <a href="https://wfrc.org/">
-          <img src="images/logo.png" id="logo" height="45px" width="auto" />
+          <img src="images/logo.png" id="logo" />
         </a>
       </div>
 
-      <div id="header" style="flex: 1.6">
+      <div id="titleDiv" class="headerItem">
         <div id="title1">WFRC-Area Housing Inventory Explorer</div>
         <div id="title2">(data shown: January 2022)</div>
       </div>
 
-      <div id="header2" style="flex: 0.2">
-        <a
-          href="https://docs.google.com/document/d/1dmgoN0SSVyjYOIDhS_r3c9cc5MlXL709iMiZwK8l1XA/edit"
-          class="my-link"
-          target="_blank"
-        >
-          About this map
-        </a>
+      <div id="aboutDiv" class="headerItem">
+        <div id="iconDiv">
+          <calcite-icon icon="information-f" style="--calcite-ui-icon-color:white"/>
+        </div>
+        <div id="aboutTextDiv">
+          <a href="https://docs.google.com/document/d/1dmgoN0SSVyjYOIDhS_r3c9cc5MlXL709iMiZwK8l1XA/edit" class="my-link" target="_blank"> 
+            About this map
+          </a>
+        </div>
       </div>
     </div>
 

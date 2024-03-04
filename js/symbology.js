@@ -1092,177 +1092,124 @@ const ptRendererBuiltDecade = {
     title: "Built Decade",
   },
   field: "BLT_DECADE",
-  uniqueValueGroups: [
+  uniqueValueInfos: [
     {
-      classes: [
-        {
-          values: ["NA"],
-          label: "NA",
-          symbol: {
-            type: "simple-marker",
-            color: [0, 0, 0, transparency], // [R,G,B, Transparency]
-            size: dPixelSize,
-            outline: {
-              color: PtOutlineColor,
-              width: dOutlineWidth,
-            },
-          },
+      value: "1840-1890",
+      label: "1840-1890",
+      symbol: {
+        type: "simple-marker",
+        color: [13, 8, 135, transparency],
+        size: dPixelSize,
+        outline: {
+          color: PtOutlineColor,
+          width: dOutlineWidth,
         },
-      ],
+      },
     },
     {
-      classes: [
-        {
-          values: ["1840", "1850", "1860", "1870", "1880", "1890"],
-          label: "1840-1890",
-          symbol: {
-            type: "simple-marker",
-            color: [13, 8, 135, transparency],
-            size: dPixelSize,
-            outline: {
-              color: PtOutlineColor,
-              width: dOutlineWidth,
-            },
-          },
+      value: "1900-1950",
+      label: "1900-1950",
+      symbol: {
+        type: "simple-marker",
+        color: [77, 2, 162, transparency],
+        size: dPixelSize,
+        outline: {
+          color: PtOutlineColor,
+          width: dOutlineWidth,
         },
-      ],
+      },
     },
     {
-      classes: [
-        {
-          values: ["1900", "1910", "1920", "1930", "1940", "1950"],
-          label: "1900-1950",
-          symbol: {
-            type: "simple-marker",
-            color: [77, 2, 162, transparency],
-            size: dPixelSize,
-            outline: {
-              color: PtOutlineColor,
-              width: dOutlineWidth,
-            },
-          },
+      value: "1960",
+      label: "1960",
+      symbol: {
+        type: "simple-marker",
+        color: [126, 3, 168, transparency],
+        size: dPixelSize,
+        outline: {
+          color: PtOutlineColor,
+          width: dOutlineWidth,
         },
-      ],
+      },
     },
     {
-      classes: [
-        {
-          values: ["1960"],
-          label: "1960",
-          symbol: {
-            type: "simple-marker",
-            color: [126, 3, 168, transparency],
-            size: dPixelSize,
-            outline: {
-              color: PtOutlineColor,
-              width: dOutlineWidth,
-            },
-          },
+      value: "1970",
+      label: "1970",
+      symbol: {
+        type: "simple-marker",
+        color: [170, 35, 150, transparency],
+        size: dPixelSize,
+        outline: {
+          color: PtOutlineColor,
+          width: dOutlineWidth,
         },
-      ],
+      },
     },
     {
-      classes: [
-        {
-          values: ["1970"],
-          label: "1970",
-          symbol: {
-            type: "simple-marker",
-            color: [170, 35, 150, transparency],
-            size: dPixelSize,
-            outline: {
-              color: PtOutlineColor,
-              width: dOutlineWidth,
-            },
-          },
+      value: "1980",
+      label: "1980",
+      symbol: {
+        type: "simple-marker",
+        color: [204, 71, 121, transparency],
+        size: dPixelSize,
+        outline: {
+          color: PtOutlineColor,
+          width: dOutlineWidth,
         },
-      ],
+      },
     },
     {
-      classes: [
-        {
-          values: ["1980"],
-          label: "1980",
-          symbol: {
-            type: "simple-marker",
-            color: [204, 71, 121, transparency],
-            size: dPixelSize,
-            outline: {
-              color: PtOutlineColor,
-              width: dOutlineWidth,
-            },
-          },
+      value: "1990",
+      label: "1990",
+      symbol: {
+        type: "simple-marker",
+        color: [230, 108, 93, transparency],
+        size: dPixelSize,
+        outline: {
+          color: PtOutlineColor,
+          width: dOutlineWidth,
         },
-      ],
+      },
     },
     {
-      classes: [
-        {
-          values: ["1990"],
-          label: "1990",
-          symbol: {
-            type: "simple-marker",
-            color: [230, 108, 93, transparency],
-            size: dPixelSize,
-            outline: {
-              color: PtOutlineColor,
-              width: dOutlineWidth,
-            },
-          },
+      value: "2000",
+      label: "2000",
+      symbol: {
+        type: "simple-marker",
+        color: [249, 149, 65, transparency],
+        size: dPixelSize,
+        outline: {
+          color: PtOutlineColor,
+          width: dOutlineWidth,
         },
-      ],
+      },
     },
     {
-      classes: [
-        {
-          values: ["2000"],
-          label: "2000",
-          symbol: {
-            type: "simple-marker",
-            color: [249, 149, 65, transparency],
-            size: dPixelSize,
-            outline: {
-              color: PtOutlineColor,
-              width: dOutlineWidth,
-            },
-          },
+      value: "2010",
+      label: "2010",
+      symbol: {
+        type: "simple-marker",
+        color: [254, 196, 40, transparency],
+        size: dPixelSize,
+        outline: {
+          color: PtOutlineColor,
+          width: dOutlineWidth,
         },
-      ],
+      },
     },
-    {
-      classes: [
-        {
-          values: ["2010"],
-          label: "2010",
-          symbol: {
-            type: "simple-marker",
-            color: [254, 196, 40, transparency],
-            size: dPixelSize,
-            outline: {
-              color: PtOutlineColor,
-              width: dOutlineWidth,
-            },
-          },
+	{
+      value: "2020",
+      label: "2020",
+      symbol: {
+        type: "simple-marker",
+		// color: [241, 250, 34, transparency],
+        color: [255, 255, 190, transparency],
+        size: dPixelSize,
+        outline: {
+          color: PtOutlineColor,
+          width: dOutlineWidth,
         },
-      ],
-    },
-    {
-      classes: [
-        {
-          values: ["2020"],
-          label: "2020",
-          symbol: {
-            type: "simple-marker",
-            // color: [241, 250, 34, transparency],
-            color: [255, 255, 190, transparency],
-            size: dPixelSize,
-            outline: {
-              color: PtOutlineColor,
-              width: dOutlineWidth,
-            },
-          },
-        },
-      ],
+      },
     },
   ],
 };
@@ -1273,177 +1220,124 @@ const pclRendererBuiltDecade = {
     title: "Built Decade",
   },
   field: "BLT_DECADE",
-  uniqueValueGroups: [
+  uniqueValueInfos: [
     {
-      classes: [
-        {
-          values: ["NA"],
-          label: "NA",
-          symbol: {
-            type: "simple-fill",
-            color: [0, 0, 0, parcelTransparency], // [R,G,B, parcelTransparency]
-            size: dPixelSize,
-            outline: {
-              color: PtOutlineColor,
-              width: dOutlineWidth,
-            },
-          },
+      value: "1840-1890",
+      label: "1840-1890",
+      symbol: {
+        type: "simple-fill",
+        color: [13, 8, 135, parcelTransparency],
+        size: dPixelSize,
+        outline: {
+          color: PtOutlineColor,
+          width: dOutlineWidth,
         },
-      ],
+      },
     },
     {
-      classes: [
-        {
-          values: ["1840", "1850", "1860", "1870", "1880", "1890"],
-          label: "1840-1890",
-          symbol: {
-            type: "simple-fill",
-            color: [13, 8, 135, parcelTransparency],
-            size: dPixelSize,
-            outline: {
-              color: PtOutlineColor,
-              width: dOutlineWidth,
-            },
-          },
+      value: "1900-1950",
+      label: "1900-1950",
+      symbol: {
+        type: "simple-fill",
+        color: [77, 2, 162, parcelTransparency],
+        size: dPixelSize,
+        outline: {
+          color: PtOutlineColor,
+          width: dOutlineWidth,
         },
-      ],
+      },
     },
     {
-      classes: [
-        {
-          values: ["1900", "1910", "1920", "1930", "1940", "1950"],
-          label: "1900-1950",
-          symbol: {
-            type: "simple-fill",
-            color: [77, 2, 162, parcelTransparency],
-            size: dPixelSize,
-            outline: {
-              color: PtOutlineColor,
-              width: dOutlineWidth,
-            },
-          },
+      value: "1960",
+      label: "1960",
+      symbol: {
+        type: "simple-fill",
+        color: [126, 3, 168, parcelTransparency],
+        size: dPixelSize,
+        outline: {
+          color: PtOutlineColor,
+          width: dOutlineWidth,
         },
-      ],
+      },
     },
     {
-      classes: [
-        {
-          values: ["1960"],
-          label: "1960",
-          symbol: {
-            type: "simple-fill",
-            color: [126, 3, 168, parcelTransparency],
-            size: dPixelSize,
-            outline: {
-              color: PtOutlineColor,
-              width: dOutlineWidth,
-            },
-          },
+      value: "1970",
+      label: "1970",
+      symbol: {
+        type: "simple-fill",
+        color: [170, 35, 150, parcelTransparency],
+        size: dPixelSize,
+        outline: {
+          color: PtOutlineColor,
+          width: dOutlineWidth,
         },
-      ],
+      },
     },
     {
-      classes: [
-        {
-          values: ["1970"],
-          label: "1970",
-          symbol: {
-            type: "simple-fill",
-            color: [170, 35, 150, parcelTransparency],
-            size: dPixelSize,
-            outline: {
-              color: PtOutlineColor,
-              width: dOutlineWidth,
-            },
-          },
+      value: "1980",
+      label: "1980",
+      symbol: {
+        type: "simple-fill",
+        color: [204, 71, 121, parcelTransparency],
+        size: dPixelSize,
+        outline: {
+          color: PtOutlineColor,
+          width: dOutlineWidth,
         },
-      ],
+      },
     },
     {
-      classes: [
-        {
-          values: ["1980"],
-          label: "1980",
-          symbol: {
-            type: "simple-fill",
-            color: [204, 71, 121, parcelTransparency],
-            size: dPixelSize,
-            outline: {
-              color: PtOutlineColor,
-              width: dOutlineWidth,
-            },
-          },
+      value: "1990",
+      label: "1990",
+      symbol: {
+        type: "simple-fill",
+        color: [230, 108, 93, parcelTransparency],
+        size: dPixelSize,
+        outline: {
+          color: PtOutlineColor,
+          width: dOutlineWidth,
         },
-      ],
+      },
     },
     {
-      classes: [
-        {
-          values: ["1990"],
-          label: "1990",
-          symbol: {
-            type: "simple-fill",
-            color: [230, 108, 93, parcelTransparency],
-            size: dPixelSize,
-            outline: {
-              color: PtOutlineColor,
-              width: dOutlineWidth,
-            },
-          },
+      value: "2000",
+      label: "2000",
+      symbol: {
+        type: "simple-fill",
+        color: [249, 149, 65, parcelTransparency],
+        size: dPixelSize,
+        outline: {
+          color: PtOutlineColor,
+          width: dOutlineWidth,
         },
-      ],
+      },
     },
     {
-      classes: [
-        {
-          values: ["2000"],
-          label: "2000",
-          symbol: {
-            type: "simple-fill",
-            color: [249, 149, 65, parcelTransparency],
-            size: dPixelSize,
-            outline: {
-              color: PtOutlineColor,
-              width: dOutlineWidth,
-            },
-          },
+      value: "2010",
+      label: "2010",
+      symbol: {
+        type: "simple-fill",
+        color: [254, 196, 40, parcelTransparency],
+        size: dPixelSize,
+        outline: {
+          color: PtOutlineColor,
+          width: dOutlineWidth,
         },
-      ],
+      },
     },
-    {
-      classes: [
-        {
-          values: ["2010"],
-          label: "2010",
-          symbol: {
-            type: "simple-fill",
-            color: [254, 196, 40, parcelTransparency],
-            size: dPixelSize,
-            outline: {
-              color: PtOutlineColor,
-              width: dOutlineWidth,
-            },
-          },
+	{
+      value: "2020",
+      label: "2020",
+      symbol: {
+        type: "simple-fill",
+		// color: [241, 250, 34, parcelTransparency],
+        color: [255, 255, 190, parcelTransparency],
+        size: dPixelSize,
+        outline: {
+          color: PtOutlineColor,
+          width: dOutlineWidth,
         },
-      ],
-    },
-    {
-      classes: [
-        {
-          values: ["2020"],
-          label: "2020",
-          symbol: {
-            type: "simple-fill",
-            // color: [241, 250, 34, parcelTransparency],
-            color: [255, 255, 190, parcelTransparency],
-            size: dPixelSize,
-            outline: {
-              color: PtOutlineColor,
-              width: dOutlineWidth,
-            },
-          },
-        },
-      ],
+      },
     },
   ],
 };
