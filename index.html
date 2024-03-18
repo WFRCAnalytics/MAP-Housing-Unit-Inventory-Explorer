@@ -594,6 +594,8 @@
           newURL.searchParams.delete("fwye");
           newURL.searchParams.delete("pk");
           newURL.searchParams.delete("trl");
+          newURL.searchParams.delete("yr");
+          
           andButton.click();
           window.history.replaceState(
             { additionalInformation: "Updated the URL with JS" },
@@ -608,6 +610,7 @@
           DataLayers.forEach((layer) => {
             logicOperator = "And";
             generateFullQuery();
+            
             newURL.searchParams.set("op", logicOperator);
             window.history.replaceState(
               { additionalInformation: "Updated the URL with JS" },
@@ -621,6 +624,7 @@
             andButton.style.backgroundColor = "#00619B";
             orButton.style.backgroundColor = "#797979";
           });
+          updateChartsUsingActiveLayerView();
         });
 
         // setup actions for the OR button
@@ -640,6 +644,7 @@
             orButton.style.backgroundColor = "#00619B";
             andButton.style.backgroundColor = "#797979";
           });
+          updateChartsUsingActiveLayerView();
         });
 
         // setup actions for chart toggle
@@ -1365,11 +1370,13 @@
         // chart stuff
         //=========================
 
+        // the chart objects
         let chartTop = null;
         let chartBottom = null;
 
-        const yearCanvas = document.getElementById("year-chart");
-        const typeCanvas = document.getElementById("type-chart");
+        // the canvas containers
+        const canvasTop = document.getElementById("canvas-top");
+        const canvasBottom = document.getElementById("canvas-bottom");
 
         //---------------------------------------
         // query the data the for the Type Bar chart
@@ -1377,9 +1384,8 @@
 
         const queryStatisticsForTypeBarChart = promiseUtils.debounce(
           async function (layerview) {
-            chartTop.options.title.text =
-              "Housing Types - By Decade (Loading...)";
-            chartTop.update();
+
+            canvasTop.style.visibility = "hidden";
 
             // create query definitions for stacked bar chart data
             const decades = [
@@ -1393,27 +1399,7 @@
               "2010",
               "2020",
             ];
-            // const decades = [
-            //   "1840",
-            //   "1850",
-            //   "1860",
-            //   "1870",
-            //   "1880",
-            //   "1890",
-            //   "1900",
-            //   "1910",
-            //   "1920",
-            //   "1930",
-            //   "1940",
-            //   "1950",
-            //   "1960",
-            //   "1970",
-            //   "1980",
-            //   "1990",
-            //   "2000",
-            //   "2010",
-            //   "2020",
-            // ];
+
             const subtypes = [
               "single_family",
               "duplex",
@@ -1533,7 +1519,7 @@
               // console.log(updatedDataArray);
 
               // chartTop.update();
-
+              canvasTop.style.visibility = "visible";
               updateStackedChart(
                 chartTop,
                 uniqueDecades,
@@ -1544,40 +1530,6 @@
           }
         );
 
-        // //---------------------------------------
-        // // query the data for the total units
-        // //---------------------------------------
-
-        // queryStatisticsForTotal = promiseUtils.debounce(function (layerView) {
-        //   document.getElementById("countDiv").innerHTML = "Loading...";
-        //   const statDefinitions = [
-        //     {
-        //       onStatisticField: "(CASE WHEN COUNTY IS NULL) OR (CASE WHEN COUNTY IS NOT NULL) THEN UNIT_COUNT ELSE 0 END",
-        //       outStatisticFieldName: "total",
-        //       statisticType: "sum"
-        //     }
-        //   ];
-
-        //   // query data for the pie chart
-        //   let query
-        //   if (queryMode === 'ALL') {
-        //     query = activeLayer.createQuery();
-        //     query.where = fullQuery
-        //     query.outStatistics = statDefinitions;
-        //     query = activeLayer.queryFeatures(query)
-        //   } if (queryMode === 'GEOG') {
-        //     query = layerView.createQuery();
-        //     query.where = fullQuery
-        //     query.geometry = view.extent;
-        //     query.outStatistics = statDefinitions;
-        //     query = layerView.queryFeatures(query)
-        //   };
-        //   return query.then((result) => {
-        //     const allStats = result.features[0].attributes;
-        //     document.getElementById("countDiv").innerHTML = allStats.total;
-        //   }, console.error);
-        // });
-
         //---------------------------------------
         // query the data the for the Type Pie chart
         //---------------------------------------
@@ -1585,8 +1537,9 @@
         queryStatisticsForTypePieChart = promiseUtils.debounce(function (
           layerView
         ) {
-          chartBottom.options.title.text = "Housing Types (Loading...)";
-          chartBottom.update();
+
+          document.getElementById("countDiv").innerHTML = "Loading...";
+          canvasBottom.style.visibility = "hidden";
 
           const statDefinitions = [
             {
@@ -1675,7 +1628,7 @@
               "#1E8553",
               "#149ECE",
             ];
-
+            canvasBottom.style.visibility = "visible";
             updatePieChart2(
               chartBottom,
               Object.keys(allStats),
@@ -1684,6 +1637,7 @@
               colors
             );
           }, console.error);
+          
         });
 
         //----------------------------------------------
@@ -1692,8 +1646,8 @@
 
         const queryStatisticsForDecadeBarChart = promiseUtils.debounce(
           async function (layerview) {
-            chartTop.options.title.text = "Built Decade (Loading...)";
-            chartTop.update();
+            
+            canvasTop.style.visibility = "hidden";
 
             const decadeChartDefinitions = [
               {
@@ -1804,8 +1758,8 @@
               const filteredColors = uniqueDecades.map(
                 (key) => typeColorMap[key]
               );
-              // console.log(filteredColors);
-
+     
+              canvasTop.style.visibility = "visible";
               updateBarChart(
                 chartTop,
                 uniqueDecades,
@@ -1824,8 +1778,7 @@
         const queryStatisticsForDecadePieChart = promiseUtils.debounce(
           async function (layerview) {
             document.getElementById("countDiv").innerHTML = "Loading...";
-            chartBottom.options.title.text = "Built Decade (Loading...)";
-            chartBottom.update();
+            canvasBottom.style.visibility = "hidden";
 
             const decadeChartDefinitions = [
               {
@@ -1942,19 +1895,8 @@
               const filteredColors = uniqueDecades.map(
                 (key) => typeColorMap[key]
               );
-              // console.log(filteredColors);
 
-              // updatePieChart(chartBottom, [
-              //   allStats.single_family,
-              //   allStats.duplex,
-              //   allStats.single_family_adu,
-              //   allStats.condo,
-              //   allStats.townhome,
-              //   allStats.mobile_home_park,
-              //   allStats.mixed_th_single_family,
-              //   allStats.apartment
-              // ]);
-
+              canvasBottom.style.visibility = "visible";
               updatePieChart2(
                 chartBottom,
                 uniqueDecades,
@@ -1972,8 +1914,8 @@
 
         const queryStatisticsForDensityBarChart = promiseUtils.debounce(
           async function (layerview) {
-            chartTop.options.title.text = "Residential Density (Loading...)";
-            chartTop.update();
+            
+            canvasTop.style.visibility = "hidden";
 
             const decadeChartDefinitions = [
               {
@@ -2094,6 +2036,8 @@
 
               const filteredColors = uniqueKeys.map((key) => colorMap[key]);
               const filteredLabels = uniqueKeys.map((key) => labelMap[key]);
+
+              canvasTop.style.visibility = "visible";
               updateBarChart(
                 chartTop,
                 filteredLabels,
@@ -2112,8 +2056,7 @@
         const queryStatisticsForDensityPieChart = promiseUtils.debounce(
           async function (layerview) {
             document.getElementById("countDiv").innerHTML = "Loading...";
-            chartBottom.options.title.text = "Residential Density (Loading...)";
-            chartBottom.update();
+            canvasBottom.style.visibility = "hidden";
 
             const decadeChartDefinitions = [
               {
@@ -2242,6 +2185,7 @@
 
               const filteredColors = uniqueKeys.map((key) => colorMap[key]);
               const filteredLabels = uniqueKeys.map((key) => labelMap[key]);
+              canvasBottom.style.visibility = "visible";
               updatePieChart2(
                 chartBottom,
                 filteredLabels,
@@ -2259,8 +2203,7 @@
 
         const queryStatisticsForValueBarChart = promiseUtils.debounce(
           async function (layerview) {
-            chartTop.options.title.text = "Value per Acre (Loading...)";
-            chartTop.update();
+            canvasTop.style.visibility = "hidden";
 
             const decadeChartDefinitions = [
               {
@@ -2365,6 +2308,7 @@
 
               const filteredColors = uniqueKeys.map((key) => colorMap[key]);
               const filteredLabels = uniqueKeys.map((key) => labelMap[key]);
+              canvasTop.style.visibility = "visible";
               updateBarChart(
                 chartTop,
                 filteredLabels,
@@ -2383,8 +2327,7 @@
         const queryStatisticsForValuePieChart = promiseUtils.debounce(
           async function (layerview) {
             document.getElementById("countDiv").innerHTML = "Loading...";
-            chartBottom.options.title.text = "Valuation per Acre (Loading...)";
-            chartBottom.update();
+            canvasBottom.style.visibility = "hidden";
 
             const decadeChartDefinitions = [
               {
@@ -2497,6 +2440,9 @@
 
               const filteredColors = uniqueKeys.map((key) => colorMap[key]);
               const filteredLabels = uniqueKeys.map((key) => labelMap[key]);
+
+              canvasBottom.style.visibility = "visible";
+
               updatePieChart2(
                 chartBottom,
                 filteredLabels,
@@ -2507,13 +2453,6 @@
             }, console.error);
           }
         );
-
-        // // Updates the given chart with new data
-        // function updatePieChart(chart, dataValues) {
-        //   chart.data.datasets[0].data = dataValues;
-        //   chartBottom.options.title.text = "Housing Type"
-        //   chart.update();
-        // }
 
         // Updates the given chart with new data
         function updatePieChart2(chart, labels, dataValues, text, colors) {
@@ -2548,8 +2487,7 @@
             chartTop.destroy();
           }
 
-          // const yearCanvas = document.getElementById("year-chart");
-          chartTop = new Chart(yearCanvas.getContext("2d"), {
+          chartTop = new Chart(canvasTop.getContext("2d"), {
             type: "bar",
             data: {
               labels: [],
@@ -2596,20 +2534,20 @@
               },
             },
           });
-          yearCanvas.style.backgroundColor = "rgba(75,75,75,1)";
-          yearCanvas.style.border = "1px solid #ccc";
+          canvasTop.style.backgroundColor = "rgba(75,75,75,1)";
+          canvasTop.style.border = "1px solid #ccc";
         }
 
         // instantiate the type pie chart
         function createTypeChart() {
-          // const typeCanvas = document.getElementById("type-chart");
+          // const canvasBottom = document.getElementById("canvas-bottom");
 
           // Destroy the existing chart instance if it exists
           if (chartBottom) {
             chartBottom.destroy();
           }
 
-          chartBottom = new Chart(typeCanvas.getContext("2d"), {
+          chartBottom = new Chart(canvasBottom.getContext("2d"), {
             type: "doughnut",
             data: {
               labels: [
@@ -2657,8 +2595,8 @@
               },
             },
           });
-          typeCanvas.style.backgroundColor = "rgba(75,75,75,1)";
-          typeCanvas.style.border = "1px solid #ccc";
+          canvasBottom.style.backgroundColor = "rgba(75,75,75,1)";
+          canvasBottom.style.border = "1px solid #ccc";
         }
 
         // create the charts
@@ -2809,10 +2747,16 @@
 
             if (logOpParam != "None" && logOpParam) {
               if (logOpParam === "And") {
-                andButton.click();
+                logicOperator = "And";
+                andButton.style.backgroundColor = "#00619B";
+                orButton.style.backgroundColor = "#797979";
+                // andButton.click();
               }
               if (logOpParam === "Or") {
-                orButton.click();
+                orButton.style.backgroundColor = "#00619B";
+                andButton.style.backgroundColor = "#797979";
+                logicOperator = "Or";
+                // orButton.click();
               }
               logicOperator = logOpParam;
             }
@@ -3091,12 +3035,12 @@
       <br />
 
       <div class="section">
-        <canvas id="year-chart" height="250" width="300"></canvas>
+        <canvas id="canvas-top" height="250" width="300"></canvas>
       </div>
 
       <br />
       <div class="section">
-        <canvas id="type-chart" height="250"></canvas>
+        <canvas id="canvas-bottom" height="250"></canvas>
       </div>
 
       <div class="section">
