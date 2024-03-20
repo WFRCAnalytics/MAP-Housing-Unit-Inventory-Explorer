@@ -1,0 +1,25 @@
+{
+  "name": "Housing-Unit-Inventory-Explorer",
+  "version": "1.0.0",
+  "description": "[https://wfrc.org/housing-inventory-explorer](https://wfrc.org/housing-inventory-explorer)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WFRCAnalytics/Housing-Unit-Inventory-Explorer.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/WFRCAnalytics/Housing-Unit-Inventory-Explorer/issues"
+  },
+  "homepage": "https://github.com/WFRCAnalytics/Housing-Unit-Inventory-Explorer#readme",
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.29.1"
+  }
+}

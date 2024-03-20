@@ -23,6 +23,7 @@
     />
     <script src="https://js.arcgis.com/4.28/"></script>
     <script src="js/symbology.js"></script>
+    <script src="js/year-chart-definitions.js"></script>
     <link rel="stylesheet" href="css/style.css" />
 
     <script>
@@ -107,6 +108,10 @@
         "esri/core/reactiveUtils",
         "esri/core/promiseUtils",
         "esri/rest/support/Query",
+        "esri/smartMapping/labels/clusters",
+        "esri/smartMapping/renderers/pieChart",
+        "esri/layers/support/FeatureEffect",
+        "esri/layers/support/FeatureFilter"
       ], (
         esriConfig,
         Map,
@@ -119,7 +124,11 @@
         BasemapGallery,
         reactiveUtils,
         promiseUtils,
-        Query
+        Query,
+        clusterLabelCreator,
+        pieChartRendererCreator,
+        FeatureEffect,
+        FeatureFilter
       ) => {
         esriConfig.apiKey =
           "AAPK5915b242a27845f389e0a11a17dc46b46gXNFj09FJVdb711lVLGhgoVFJBqdW6ow3bl71N1hx2llpMyogGBeF8kgvrKm3cY";
@@ -181,6 +190,7 @@
           renderer: countyRenderer,
           maxScale: 0,
           visible: false,
+          
         });
 
         const citiesLayer = new FeatureLayer({
@@ -210,6 +220,7 @@
           visible: false,
           popupTemplate: parcelPopupTemplate,
         });
+         
 
         const PointsLayer = new FeatureLayer({
           url: "https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/hui_for_web_gdb/FeatureServer/1",
@@ -217,6 +228,8 @@
           outFields: ["*"],
           visible: true,
         });
+
+        
 
         // store the main data layers in an array for loops later
         const DataLayers = [PointsLayer, ParcelsLayer];
@@ -240,6 +253,131 @@
           zoom: defaultZoom,
           center: [-111.91, 40.8],
         });
+
+
+
+        // // basic clustering
+        // PointsLayer.featureReduction = {
+        //   type: "cluster",
+        //   fields: {
+        //     name: "SUM_UNIT_COUNT",
+        //     onStatisticField: "UNIT_COUNT",
+        //     statisticType: "sum",
+        //   },
+        //   clusterRadius: "120px",
+        //   clusterMinSize: "30px",
+        //   clusterMaxSize: "70px",
+        //   maxScale: 100000,
+        //   labelingInfo: [
+        //     {
+        //       deconflictionStrategy: "none",
+        //       labelExpressionInfo: {
+        //         expression: "Text($feature.SUM_UNIT_COUNT, '#,###')",
+        //       },
+        //       symbol: {
+        //         type: "text",
+        //         color: "#000000",
+        //         font: {
+        //           weight: "bold",
+        //           family: "Noto Sans",
+        //           size: "12px",
+        //         },
+        //       },
+        //       labelPlacement: "center-center",
+        //     },
+        //   ],
+        // };
+
+        // // pie chart clustering
+        // async function generateClusterConfig(layer){
+        //     // generates default labelingInfo
+        //     const { labelingInfo, clusterMinSize } = await clusterLabelCreator
+        //       .getLabelSchemes({ layer, view })
+        //       .then(labelSchemes => labelSchemes.primaryScheme );
+
+        //     const labelSymbol = labelingInfo[0].symbol;
+        //     labelSymbol.color = labelSymbol.haloColor.clone();
+        //     labelSymbol.haloColor = [255,255,255,.8];
+        //     labelSymbol.font.size = 10;
+
+
+        //     const { renderer, fields } = await pieChartRendererCreator
+        //       .createRendererForClustering({
+        //         layer,
+        //         shape: "donut"
+        //       });
+
+        //     renderer.holePercentage = 0.50;
+        //     renderer.fields = {
+        //         name: "SUM_UNIT_COUNT",
+        //         onStatisticField: "UNIT_COUNT",
+        //         statisticType: "sum",
+        //       };
+              
+
+        //     const fieldInfos = fields.map( field => {
+        //       return {
+        //         fieldName: field.name,
+        //         label: field.alias,
+        //         format: {
+        //           places: 0,
+        //           digitSeparator: true
+        //         }
+        //       }
+        //     });
+
+        //     // maps the field names for the popup chart
+        //     const fieldNames = fieldInfos.map(field => {
+        //       return field.fieldName
+        //     });
+
+        //     const popupTemplate = {
+        //       content: [{
+        //         type: "text",
+        //         text: "This cluster represents <b>{SUM_UNIT_COUNT}</b> features."
+        //       },
+        //       {
+        //         type: "media",
+        //         mediaInfos: [{
+        //           title: "Housing Types",
+        //           type: "pie-chart",
+        //           value: {
+        //             fields: fieldNames
+        //           }
+        //         }]
+        //       },
+        //       {
+        //         type: "fields"
+        //       }],
+        //       fieldInfos
+        //     };
+
+        //     return {
+        //       type: "cluster",
+        //       popupTemplate,
+        //       labelingInfo,
+        //       clusterMinSize,
+
+        //       fields,
+        //       renderer
+
+        //     };
+        //   }
+
+        //   PointsLayer.when()
+        //     .then(generateClusterConfig)
+        //     .then((featureReduction) => {
+        //       featureReduction.clusterRadius = "120px";
+        //       featureReduction.clusterMinSize= "30px";
+        //       featureReduction.clusterMaxSize = "70px";
+        //       featureReduction.maxScale = 100000;
+
+        //       PointsLayer.featureReduction = featureReduction;
+
+        //     }).catch((error) => {
+        //       console.error(error);
+        //     });
+
 
         // updates the charts using the layerview of whichever layer is active
         function updateChartsUsingActiveLayerView() {
@@ -595,7 +733,7 @@
           newURL.searchParams.delete("pk");
           newURL.searchParams.delete("trl");
           newURL.searchParams.delete("yr");
-          
+
           andButton.click();
           window.history.replaceState(
             { additionalInformation: "Updated the URL with JS" },
@@ -610,7 +748,7 @@
           DataLayers.forEach((layer) => {
             logicOperator = "And";
             generateFullQuery();
-            
+
             newURL.searchParams.set("op", logicOperator);
             window.history.replaceState(
               { additionalInformation: "Updated the URL with JS" },
@@ -1032,7 +1170,17 @@
             // update the main query
             generateFullQuery();
             view.whenLayerView(layer).then((layerView) => {
-              layerView.filter = { where: fullQuery };
+              // layerView.filter = { where: fullQuery };
+              const featureFilter = new FeatureFilter({
+                where: fullQuery,
+              });
+
+              // set effect on excluded features
+              // make them gray and transparent
+              layerView.featureEffect = new FeatureEffect({
+                filter: featureFilter,
+                excludedEffect: "grayscale(100%) opacity(50%)"
+              });
             });
           });
           updateChartsUsingActiveLayerView();
@@ -1132,7 +1280,7 @@
 
           DataLayers.forEach((layer) => {
             view.whenLayerView(layer).then((layerView) => {
-              layerView.filter = { where: fullQuery };
+              layerView.filter = {where: fullQuery };          
             });
           });
 
@@ -1384,44 +1532,9 @@
 
         const queryStatisticsForTypeBarChart = promiseUtils.debounce(
           async function (layerview) {
-
             canvasTop.style.visibility = "hidden";
 
-            // create query definitions for stacked bar chart data
-            const decades = [
-              "1840-1890",
-              "1900-1950",
-              "1960",
-              "1970",
-              "1980",
-              "1990",
-              "2000",
-              "2010",
-              "2020",
-            ];
-
-            const subtypes = [
-              "single_family",
-              "duplex",
-              "single_family_adu",
-              "condo",
-              "townhome",
-              "mobile_home_park",
-              "mixed th/single_family",
-              "apartment",
-            ];
-            const yearChartDefinitions = [];
-            for (const decade of decades) {
-              for (const subtype of subtypes) {
-                const definition = {
-                  onStatisticField: `CASE WHEN (BLT_DECADE = '${decade}' AND SUBTYPE = '${subtype}') THEN UNIT_COUNT ELSE 0 END`,
-                  outStatisticFieldName: `year_${decade}_${subtype}`,
-                  statisticType: "sum",
-                };
-
-                yearChartDefinitions.push(definition);
-              }
-            }
+            // the year chart definitions are created in a separate js script
             // console.log(yearChartDefinitions)
 
             // query for stacked bar chart data
@@ -1430,12 +1543,14 @@
               yearChartQuery = activeLayer.createQuery();
               yearChartQuery.where = fullQuery;
               yearChartQuery.outStatistics = yearChartDefinitions;
+              yearChartQuery.cacheHint = true;
               yearChartQuery = activeLayer.queryFeatures(yearChartQuery);
             } else if (queryMode === "GEOG") {
               yearChartQuery = layerview.createQuery();
               yearChartQuery.where = fullQuery;
               yearChartQuery.geometry = view.extent;
               yearChartQuery.outStatistics = yearChartDefinitions;
+              yearChartQuery.cacheHint = true;
               yearChartQuery = layerview.queryFeatures(yearChartQuery);
             }
 
@@ -1537,7 +1652,6 @@
         queryStatisticsForTypePieChart = promiseUtils.debounce(function (
           layerView
         ) {
-
           document.getElementById("countDiv").innerHTML = "Loading...";
           canvasBottom.style.visibility = "hidden";
 
@@ -1604,6 +1718,7 @@
             query = activeLayer.createQuery();
             query.where = fullQuery;
             query.outStatistics = statDefinitions;
+            query.cacheHint = true;
             query = activeLayer.queryFeatures(query);
           }
           if (queryMode === "GEOG") {
@@ -1611,6 +1726,7 @@
             query.where = fullQuery;
             query.geometry = view.extent;
             query.outStatistics = statDefinitions;
+            query.cacheHint = true;
             query = layerView.queryFeatures(query);
           }
 
@@ -1637,7 +1753,6 @@
               colors
             );
           }, console.error);
-          
         });
 
         //----------------------------------------------
@@ -1646,7 +1761,6 @@
 
         const queryStatisticsForDecadeBarChart = promiseUtils.debounce(
           async function (layerview) {
-            
             canvasTop.style.visibility = "hidden";
 
             const decadeChartDefinitions = [
@@ -1758,7 +1872,7 @@
               const filteredColors = uniqueDecades.map(
                 (key) => typeColorMap[key]
               );
-     
+
               canvasTop.style.visibility = "visible";
               updateBarChart(
                 chartTop,
@@ -1914,7 +2028,6 @@
 
         const queryStatisticsForDensityBarChart = promiseUtils.debounce(
           async function (layerview) {
-            
             canvasTop.style.visibility = "hidden";
 
             const decadeChartDefinitions = [
@@ -2848,7 +2961,6 @@
 
   <body>
     <div id="headerDiv">
-      
       <div id="logoDiv" class="headerItem">
         <a href="https://wfrc.org/">
           <img src="images/logo.png" id="logo" />
@@ -2862,12 +2974,21 @@
 
       <div id="aboutDiv" class="headerItem">
         <div id="iconDiv">
-          <a href="https://docs.google.com/document/d/1dmgoN0SSVyjYOIDhS_r3c9cc5MlXL709iMiZwK8l1XA/edit"> 
-            <calcite-icon icon="information-f" style="--calcite-ui-icon-color:white"/>
+          <a
+            href="https://docs.google.com/document/d/1dmgoN0SSVyjYOIDhS_r3c9cc5MlXL709iMiZwK8l1XA/edit"
+          >
+            <calcite-icon
+              icon="information-f"
+              style="--calcite-ui-icon-color: white"
+            />
           </a>
         </div>
         <div id="aboutTextDiv">
-          <a href="https://docs.google.com/document/d/1dmgoN0SSVyjYOIDhS_r3c9cc5MlXL709iMiZwK8l1XA/edit" class="my-link" target="_blank"> 
+          <a
+            href="https://docs.google.com/document/d/1dmgoN0SSVyjYOIDhS_r3c9cc5MlXL709iMiZwK8l1XA/edit"
+            class="my-link"
+            target="_blank"
+          >
             About this map
           </a>
         </div>
