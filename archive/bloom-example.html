@@ -1,0 +1,157 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <title>Filter and Zoom</title>
+
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.28/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/4.28/"></script>
+    <script src="../js/symbology.js"></script>
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+      #effectsDiv {
+        padding: 10px;
+        width: 260px;
+      }
+
+      .slider {
+        height: 40px;
+        width: 100%;
+        background-color: transparent;
+      }
+    </style>
+
+    <script>
+      require([
+        'esri/Map',
+        'esri/layers/FeatureLayer',
+        'esri/views/MapView',
+        'esri/widgets/Slider',
+      ], (Map, FeatureLayer, MapView, Slider) => {
+        const PointsLayer = new FeatureLayer({
+          url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/hui_for_web_gdb/FeatureServer/1',
+          // renderer: ptRendererDensity,
+          renderer: ptRendererBuiltDecade,
+          outFields: ['*'],
+          visible: true,
+        });
+
+        // PointsLayer.effect = "bloom(1.3, 0.1px, 15%)";
+
+        const map = new Map({
+          basemap: 'streets-night-vector',
+          // layers: [statesFeatureLayer, countiesFeatureLayer]
+          layers: [PointsLayer],
+        });
+
+        const view = new MapView({
+          container: 'viewDiv',
+          map: map,
+          zoom: 9,
+          center: [-111.95, 40.9],
+        });
+
+        view.ui.add('effectsDiv', 'top-right');
+
+        // Add an event listener for the zoom change
+        view.watch('zoom', function (newValue) {
+          console.log('Zoom level changed to: ', newValue);
+          // Perform your action here based on the new zoom level
+        });
+
+        // get a reference to the applyBloom check box
+        const chkApplyBloom = document.getElementById('applyBloom');
+        // call updateEffects function when user clicks the checkbox
+        chkApplyBloom.addEventListener('click', updateEffects);
+
+        // this function is called when user clicks the applyBloom check box
+        // or when the slider values are changed.
+        // it will apply the bloom effect and adjust its parameters or
+        // it will remove the bloom effect when the user unchecks applyBloom checkbox
+        function updateEffects() {
+          // set the layer effect to null if the user unchecked the applyBloom checkbox
+          if (!chkApplyBloom.checked) {
+            PointsLayer.effect = null;
+            return;
+          }
+          // apply the effect and adjust its parameters if the user checked the applyBloom
+          // check box or updated slider values.
+          const intensity = intensitySlider.values[0];
+          const blur = blurSlider.values[0];
+          const threshold = thresholdSlider.values[0];
+          PointsLayer.effect = `bloom(${intensity}, ${blur}px, ${threshold})`;
+        }
+
+        x = 'dfgdg';
+
+        // set up a slider for the intensity parameter of bloom effect
+        const intensitySlider = createSlider('intensity-slider', 0, 5, 0, 0.2);
+        intensitySlider.on(['thumb-change', 'thumb-drag'], updateEffects);
+
+        // set up a slider for the blur radius parameter of bloom effect
+        const blurSlider = createSlider('blur-slider', 0, 5, 0, 0.5);
+        blurSlider.on(['thumb-change', 'thumb-drag'], updateEffects);
+
+        // set up a slider for the threshold parameter of bloom effect
+        const thresholdSlider = createSlider('threshold-slider', 0, 1, 0, 0.05);
+        thresholdSlider.on(['thumb-change', 'thumb-drag'], updateEffects);
+
+        // create a slider widget with provided parameters
+        function createSlider(container, min, max, val, steps) {
+          const slider = new Slider({
+            container,
+            min,
+            max,
+            values: [val],
+            steps,
+            snapOnClickEnabled: false,
+            visibleElements: {
+              labels: true,
+              rangeLabels: true,
+            },
+            labelInputsEnabled: true,
+            inputFormatFunction: (value, type) => {
+              return value.toFixed(1);
+            },
+          });
+          return slider;
+        }
+      });
+    </script>
+  </head>
+
+  <body>
+    <div id="viewDiv"></div>
+    <div id="effectsDiv" class="esri-widget">
+      <br />
+      <input type="checkbox" id="applyBloom" name="bloom" checked />
+      <label for="applyBloom"> Apply bloom effect</label><br /><br />
+      <h3 class="esri-widget__heading">Bloom parameters</h3>
+      <label id="sliderLabel" class="esri-feature-form__label"
+        >Intensity:</label
+      >
+      <div id="intensity-slider" class="slider"></div>
+      <label id="sliderLabel" class="esri-feature-form__label"
+        >Radius (px):</label
+      >
+      <div id="blur-slider" class="slider"></div>
+      <label id="sliderLabel" class="esri-feature-form__label"
+        >Threshold:</label
+      >
+      <div id="threshold-slider" class="slider"></div>
+    </div>
+  </body>
+</html>
