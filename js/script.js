@@ -865,11 +865,11 @@ require([
 
     // CENTER - filter and zoom features, update select options
     centerSelect.addEventListener('calciteSelectChange', () => {
+        const selectionText = event.target.value;
+        centerSelectionCurrent = selectionText;
+
         DataLayers.forEach((layer) => {
             // fix this to include parcels and points in main app
-
-            const selectionText = event.target.value;
-            centerSelectionCurrent = selectionText;
 
             if (selectionText === 'None') {
                 newURL.searchParams.delete('ctr');
@@ -1236,7 +1236,7 @@ require([
     const inputTRAIL = document.getElementById('inputTRAIL');
     inputTRAIL.value = null;
     inputTRAIL.addEventListener('calciteInputChange', () => {
-         const userInput = inputTRAIL.value;
+        const userInput = inputTRAIL.value;
 
         if ((userInput === null) | (userInput === ' ') | (userInput === '')) {
             newURL.searchParams.delete('trl');
