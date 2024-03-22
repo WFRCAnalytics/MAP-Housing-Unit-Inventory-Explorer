@@ -1446,7 +1446,7 @@ require([
         }
 
         return yearChartQuery.then((result) => {
-            const yearChartQueryResult = result.features[0].attributes;
+            const yearChartQueryResult = result.features;
             // console.log(result.features);
 
             function convertWithCorrectOrder(data) {
@@ -1465,68 +1465,11 @@ require([
                 };
             }
 
-            const convertedData = convertWithCorrectOrder(result.features[0]);
-            // console.log(convertedData);
-
-            const convertedArray = result.features.map(convertWithCorrectOrder);
+            const convertedArray = yearChartQueryResult.map(convertWithCorrectOrder);
             // console.log(convertedArray);
 
-            // const decadeTypeCountArray = [];
-            // for (const property in yearChartQueryResult) {
-            //     if (yearChartQueryResult.hasOwnProperty(property)) {
-            //         const [year, ...typeParts] = property.split('_').slice(1);
-            //         decadeTypeCountArray.push({
-            //             decade: year,
-            //             type: typeParts.join('_'),
-            //             count: yearChartQueryResult[property],
-            //         });
-            //     }
-            // }
-            // // console.log(decadeTypeCountArray);
-
-            // // Calculate the sum of counts for each decade
-            // const decadeSums = decadeTypeCountArray.reduce((acc, entry) => {
-            //     acc[entry.decade] = (acc[entry.decade] || 0) + entry.count;
-            //     return acc;
-            // }, {});
-
-            // // Filter out objects with a sum of 0 and get an array of unique decades
-            // const filteredArray = decadeTypeCountArray.filter(
-            //     (entry) => decadeSums[entry.decade] !== 0,
-            // );
-            // const uniqueDecades = [
-            //     ...new Set(filteredArray.map((entry) => entry.decade)),
-            // ];
             const uniqueDecades = ['1840-1890', '1900-1950', '1960', '1970', '1980', '1990', '2000', '2010', '2020'];
             // // console.log(uniqueDecades);
-
-            // // create data objects for each housing type
-            // const stackedChartDataObjects = [];
-            // const typeData = {};
-            // for (const entry of filteredArray) {
-            //     const { type, count, decade } = entry;
-
-            //     if (!typeData[type]) {
-            //         typeData[type] = {
-            //             label: type,
-            //             data: [],
-            //             backgroundColor: null,
-            //         };
-            //     }
-            //     typeData[type].data.push(count);
-
-            //     // If the decade is not already added to the data object, add it
-            //     if (typeData[type].data.length === 1) {
-            //         typeData[type].decade = decade;
-            //     }
-            // }
-            // // Convert the object values to an array
-            // for (const type in typeData) {
-            //     if (typeData.hasOwnProperty(type)) {
-            //         stackedChartDataObjects.push(typeData[type]);
-            //     }
-            // }
-            // // console.log(stackedChartDataObjects);
 
             // Update the backgroundColor attribute using the typeColorMap
             const typeColorMap = {
@@ -1545,27 +1488,27 @@ require([
                 backgroundColor: typeColorMap[item.label],
             }));
 
-            console.log(updatedDataArray);
+            // console.log(updatedDataArray);
 
             // Function to sum corresponding elements of arrays
             function sumArrays(arrays) {
                 // Find the longest array
                 const maxLength = Math.max(...arrays.map((arr) => arr.length));
                 // Initialize an array of zeros with the length of the longest array
-                const result = new Array(maxLength).fill(0);
+                const sum = new Array(maxLength).fill(0);
                 // Iterate over each array
                 arrays.forEach((arr) => {
                     arr.forEach((num, index) => {
-                        result[index] += num;
+                        sum[index] += num;
                     });
                 });
-                return result;
+                return sum;
             }
 
             // Extract the 'data' arrays and sum them
             const summedData = sumArrays(updatedDataArray.map((obj) => obj.data));
 
-            console.log(summedData);
+            // console.log(summedData);
 
             // Function to find indices of elements that are 0
             function findZeroIndices(arr) {
@@ -1584,7 +1527,7 @@ require([
 
             // Use the function and log the result
             const zeroIndices = findZeroIndices(summedData);
-            console.log(zeroIndices);
+            // console.log(zeroIndices);
 
             // Function to filter out elements by indices
             const filterDataByRemovingIndices = (dataObjects, indices) => {
@@ -1594,19 +1537,17 @@ require([
                 // Map over each dataObject to produce a new array
                 return dataObjects.map((obj) => ({
                     ...obj, // Spread to copy other properties
-                    data: obj.data.filter((_, index) => !indicesSet.has(index))
+                    data: obj.data.filter((_, index) => !indicesSet.has(index)),
                 }));
             };
 
+            // filter out the decades with zero units
             const filteredDataArray = filterDataByRemovingIndices(updatedDataArray, zeroIndices);
-
-            console.log(filteredDataArray);
+            // console.log(filteredDataArray);
 
             const uniqueDecades2 = uniqueDecades.filter((_, index) => !zeroIndices.includes(index));
+            // console.log(uniqueDecades2);
 
-            console.log(uniqueDecades2);
-
-            // chartTop.update();
             canvasTop.style.visibility = 'visible';
             updateStackedChart(
                 chartTop,
