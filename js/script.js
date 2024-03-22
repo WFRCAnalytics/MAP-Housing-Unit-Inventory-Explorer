@@ -450,7 +450,9 @@ require([
     let centerActive = false;
 
     let queryMode = 'ALL'; // ALL or GEOG
+    console.log('queryMode', queryMode);
     let chartMode = 'TYPE'; // TYPE, DECADE, DENSITY, VALUE
+    statsModeToggle.checked = false;
 
     // dynamically create the active query depending on which filters are active
     function generateFullQuery() {
@@ -617,12 +619,12 @@ require([
             queryMode = 'GEOG';
             document.getElementById('countHeader').innerHTML = 'Units in View:';
             updateChartsUsingActiveLayerView();
-        } else {
+        } else if (statsModeToggle.checked === false) {
             queryMode = 'ALL';
             document.getElementById('countHeader').innerHTML = 'Total Units:';
             updateChartsUsingActiveLayerView();
         }
-        console.log(queryMode);
+        console.log('queryMode', queryMode);
     });
 
     // setup actions for the type button
@@ -1363,6 +1365,64 @@ require([
     ) => {
         canvasTop.style.visibility = 'hidden';
 
+        const yearChartDefinitions = [
+
+            {
+                onStatisticField:
+          "CASE WHEN BLT_DECADE = '1840-1890' THEN UNIT_COUNT ELSE 0 END",
+                outStatisticFieldName: '1840-1890',
+                statisticType: 'sum',
+            },
+            {
+                onStatisticField:
+          "CASE WHEN BLT_DECADE = '1900-1950' THEN UNIT_COUNT ELSE 0 END",
+                outStatisticFieldName: '1900-1950',
+                statisticType: 'sum',
+            },
+            {
+                onStatisticField:
+          "CASE WHEN BLT_DECADE = '1960' THEN UNIT_COUNT ELSE 0 END",
+                outStatisticFieldName: '1960',
+                statisticType: 'sum',
+            },
+            {
+                onStatisticField:
+          "CASE WHEN BLT_DECADE = '1970' THEN UNIT_COUNT ELSE 0 END",
+                outStatisticFieldName: '1970',
+                statisticType: 'sum',
+            },
+            {
+                onStatisticField:
+          "CASE WHEN BLT_DECADE = '1980' THEN UNIT_COUNT ELSE 0 END",
+                outStatisticFieldName: '1980',
+                statisticType: 'sum',
+            },
+            {
+                onStatisticField:
+          "CASE WHEN BLT_DECADE = '1990' THEN UNIT_COUNT ELSE 0 END",
+                outStatisticFieldName: '1990',
+                statisticType: 'sum',
+            },
+            {
+                onStatisticField:
+          "CASE WHEN BLT_DECADE = '2000' THEN UNIT_COUNT ELSE 0 END",
+                outStatisticFieldName: '2000',
+                statisticType: 'sum',
+            },
+            {
+                onStatisticField:
+          "CASE WHEN BLT_DECADE = '2010' THEN UNIT_COUNT ELSE 0 END",
+                outStatisticFieldName: '2010',
+                statisticType: 'sum',
+            },
+            {
+                onStatisticField:
+          "CASE WHEN BLT_DECADE = '2020' THEN UNIT_COUNT ELSE 0 END",
+                outStatisticFieldName: '2020',
+                statisticType: 'sum',
+            },
+        ];
+
         // the yearChartDefinintions are instantiated in a separate script
         // console.log(yearChartDefinitions)
 
@@ -1372,76 +1432,101 @@ require([
             yearChartQuery = activeLayer.createQuery();
             yearChartQuery.where = fullQuery;
             yearChartQuery.outStatistics = yearChartDefinitions;
-            yearChartQuery = activeLayer.queryFeatures(yearChartQuery);
             yearChartQuery.cacheHint = true;
+            yearChartQuery.groupByFieldsForStatistics = ['SUBTYPE'];
+            yearChartQuery = activeLayer.queryFeatures(yearChartQuery);
         } else if (queryMode === 'GEOG') {
             yearChartQuery = layerview.createQuery();
             yearChartQuery.where = fullQuery;
             yearChartQuery.geometry = view.extent;
             yearChartQuery.outStatistics = yearChartDefinitions;
             yearChartQuery.cacheHint = true;
+            yearChartQuery.groupByFieldsForStatistics = ['SUBTYPE'];
             yearChartQuery = layerview.queryFeatures(yearChartQuery);
         }
 
         return yearChartQuery.then((result) => {
             const yearChartQueryResult = result.features[0].attributes;
-            // console.log(yearChartQueryResult)
+            // console.log(result.features);
 
-            const decadeTypeCountArray = [];
-            for (const property in yearChartQueryResult) {
-                if (yearChartQueryResult.hasOwnProperty(property)) {
-                    const [year, ...typeParts] = property.split('_').slice(1);
-                    decadeTypeCountArray.push({
-                        decade: year,
-                        type: typeParts.join('_'),
-                        count: yearChartQueryResult[property],
-                    });
-                }
+            function convertWithCorrectOrder(data) {
+                const { attributes } = data;
+                const label = attributes.SUBTYPE;
+                // Specify the order of keys based on user's request
+                const orderedKeys = ['1840-1890', '1900-1950'].concat(
+                    Object.keys(attributes).filter((key) => key.match(/^\d{4}$/)).sort((a, b) => parseInt(a) - parseInt(b)),
+                );
+                const dataValues = orderedKeys.map((key) => attributes[key]).filter((value) => typeof value === 'number');
+
+                return {
+                    label,
+                    data: dataValues,
+                    backgroundColor: null,
+                };
             }
-            // console.log(decadeTypeCountArray);
 
-            // Calculate the sum of counts for each decade
-            const decadeSums = decadeTypeCountArray.reduce((acc, entry) => {
-                acc[entry.decade] = (acc[entry.decade] || 0) + entry.count;
-                return acc;
-            }, {});
+            const convertedData = convertWithCorrectOrder(result.features[0]);
+            // console.log(convertedData);
 
-            // Filter out objects with a sum of 0 and get an array of unique decades
-            const filteredArray = decadeTypeCountArray.filter(
-                (entry) => decadeSums[entry.decade] !== 0,
-            );
-            const uniqueDecades = [
-                ...new Set(filteredArray.map((entry) => entry.decade)),
-            ];
-            // console.log(uniqueDecades);
+            const convertedArray = result.features.map(convertWithCorrectOrder);
+            // console.log(convertedArray);
 
-            // create data objects for each housing type
-            const stackedChartDataObjects = [];
-            const typeData = {};
-            for (const entry of filteredArray) {
-                const { type, count, decade } = entry;
+            // const decadeTypeCountArray = [];
+            // for (const property in yearChartQueryResult) {
+            //     if (yearChartQueryResult.hasOwnProperty(property)) {
+            //         const [year, ...typeParts] = property.split('_').slice(1);
+            //         decadeTypeCountArray.push({
+            //             decade: year,
+            //             type: typeParts.join('_'),
+            //             count: yearChartQueryResult[property],
+            //         });
+            //     }
+            // }
+            // // console.log(decadeTypeCountArray);
 
-                if (!typeData[type]) {
-                    typeData[type] = {
-                        label: type,
-                        data: [],
-                        backgroundColor: null,
-                    };
-                }
-                typeData[type].data.push(count);
+            // // Calculate the sum of counts for each decade
+            // const decadeSums = decadeTypeCountArray.reduce((acc, entry) => {
+            //     acc[entry.decade] = (acc[entry.decade] || 0) + entry.count;
+            //     return acc;
+            // }, {});
 
-                // If the decade is not already added to the data object, add it
-                if (typeData[type].data.length === 1) {
-                    typeData[type].decade = decade;
-                }
-            }
-            // Convert the object values to an array
-            for (const type in typeData) {
-                if (typeData.hasOwnProperty(type)) {
-                    stackedChartDataObjects.push(typeData[type]);
-                }
-            }
-            // console.log(stackedChartDataObjects);
+            // // Filter out objects with a sum of 0 and get an array of unique decades
+            // const filteredArray = decadeTypeCountArray.filter(
+            //     (entry) => decadeSums[entry.decade] !== 0,
+            // );
+            // const uniqueDecades = [
+            //     ...new Set(filteredArray.map((entry) => entry.decade)),
+            // ];
+            const uniqueDecades = ['1840-1890', '1900-1950', '1960', '1970', '1980', '1990', '2000', '2010', '2020'];
+            // // console.log(uniqueDecades);
+
+            // // create data objects for each housing type
+            // const stackedChartDataObjects = [];
+            // const typeData = {};
+            // for (const entry of filteredArray) {
+            //     const { type, count, decade } = entry;
+
+            //     if (!typeData[type]) {
+            //         typeData[type] = {
+            //             label: type,
+            //             data: [],
+            //             backgroundColor: null,
+            //         };
+            //     }
+            //     typeData[type].data.push(count);
+
+            //     // If the decade is not already added to the data object, add it
+            //     if (typeData[type].data.length === 1) {
+            //         typeData[type].decade = decade;
+            //     }
+            // }
+            // // Convert the object values to an array
+            // for (const type in typeData) {
+            //     if (typeData.hasOwnProperty(type)) {
+            //         stackedChartDataObjects.push(typeData[type]);
+            //     }
+            // }
+            // // console.log(stackedChartDataObjects);
 
             // Update the backgroundColor attribute using the typeColorMap
             const typeColorMap = {
@@ -1455,19 +1540,78 @@ require([
                 apartment: '#149ECE',
             };
 
-            const updatedDataArray = stackedChartDataObjects.map((item) => ({
+            const updatedDataArray = convertedArray.map((item) => ({
                 ...item,
                 backgroundColor: typeColorMap[item.label],
             }));
 
-            // console.log(updatedDataArray);
+            console.log(updatedDataArray);
+
+            // Function to sum corresponding elements of arrays
+            function sumArrays(arrays) {
+                // Find the longest array
+                const maxLength = Math.max(...arrays.map((arr) => arr.length));
+                // Initialize an array of zeros with the length of the longest array
+                const result = new Array(maxLength).fill(0);
+                // Iterate over each array
+                arrays.forEach((arr) => {
+                    arr.forEach((num, index) => {
+                        result[index] += num;
+                    });
+                });
+                return result;
+            }
+
+            // Extract the 'data' arrays and sum them
+            const summedData = sumArrays(updatedDataArray.map((obj) => obj.data));
+
+            console.log(summedData);
+
+            // Function to find indices of elements that are 0
+            function findZeroIndices(arr) {
+                const zeroIndices = [];
+
+                // Iterate through the array
+                arr.forEach((value, index) => {
+                    if (value === 0) {
+                        // If the value is 0, push the index to zeroIndices
+                        zeroIndices.push(index);
+                    }
+                });
+
+                return zeroIndices;
+            }
+
+            // Use the function and log the result
+            const zeroIndices = findZeroIndices(summedData);
+            console.log(zeroIndices);
+
+            // Function to filter out elements by indices
+            const filterDataByRemovingIndices = (dataObjects, indices) => {
+                // Convert indices to a Set for faster lookup
+                const indicesSet = new Set(indices);
+
+                // Map over each dataObject to produce a new array
+                return dataObjects.map((obj) => ({
+                    ...obj, // Spread to copy other properties
+                    data: obj.data.filter((_, index) => !indicesSet.has(index))
+                }));
+            };
+
+            const filteredDataArray = filterDataByRemovingIndices(updatedDataArray, zeroIndices);
+
+            console.log(filteredDataArray);
+
+            const uniqueDecades2 = uniqueDecades.filter((_, index) => !zeroIndices.includes(index));
+
+            console.log(uniqueDecades2);
 
             // chartTop.update();
             canvasTop.style.visibility = 'visible';
             updateStackedChart(
                 chartTop,
-                uniqueDecades,
-                updatedDataArray,
+                uniqueDecades2,
+                filteredDataArray,
                 'Housing Types - By Decade',
             );
         }, console.error);
@@ -1484,7 +1628,7 @@ require([
         const statDefinitions = [
             {
                 onStatisticField:
-          'CASE WHEN (COUNTY IS NULL) OR (COUNTY IS NOT NULL) THEN UNIT_COUNT ELSE 0 END',
+        'CASE WHEN (COUNTY IS NULL) OR (COUNTY IS NOT NULL) THEN UNIT_COUNT ELSE 0 END',
                 outStatisticFieldName: 'total',
                 statisticType: 'sum',
             },
