@@ -948,45 +948,43 @@ require([
 
     // SUBTYPE Select
     subtypeSelect.addEventListener('calciteComboboxChange', (event) => {
-        DataLayers.forEach((layer) => {
-            // fix this to include parcels and points in main app
+        let selection = event.target.value;
 
-            let selection = event.target.value;
-
-            if (Array.isArray(selection) === false) {
-                if ((selection === null) || (selection === ' ') || (selection === '')) {
-                    newURL.searchParams.delete('type');
-                    window.history.replaceState(
-                        { additionalInformation: 'Updated the URL with JS' },
-                        '',
-                        newURL,
-                    );
-                    subtypeQuery = defaultSubtypeQuery;
-                } else {
-                    // update URL params
-
-                    newURL.searchParams.set('type', selection);
-                    window.history.replaceState(
-                        { additionalInformation: 'Updated the URL with JS' },
-                        '',
-                        newURL,
-                    );
-
-                    subtypeQuery = `SUBTYPE IN ('${selection}')`;
-                }
+        if (Array.isArray(selection) === false) {
+            if ((selection === null) || (selection === ' ') || (selection === '')) {
+                newURL.searchParams.delete('type');
+                window.history.replaceState(
+                    { additionalInformation: 'Updated the URL with JS' },
+                    '',
+                    newURL,
+                );
+                subtypeQuery = defaultSubtypeQuery;
             } else {
+                // update URL params
+
                 newURL.searchParams.set('type', selection);
                 window.history.replaceState(
                     { additionalInformation: 'Updated the URL with JS' },
                     '',
                     newURL,
                 );
-                selection = selection.map((value) => `'${value}'`);
-                subtypeQuery = `SUBTYPE IN (${selection})`;
-            }
 
-            // update the main query
-            generateFullQuery();
+                subtypeQuery = `SUBTYPE IN ('${selection}')`;
+            }
+        } else {
+            newURL.searchParams.set('type', selection);
+            window.history.replaceState(
+                { additionalInformation: 'Updated the URL with JS' },
+                '',
+                newURL,
+            );
+            selection = selection.map((value) => `'${value}'`);
+            subtypeQuery = `SUBTYPE IN (${selection})`;
+        }
+
+        // update the main query
+        generateFullQuery();
+        DataLayers.forEach((layer) => {
             view.whenLayerView(layer).then((layerView) => {
                 layerView.filter = { where: fullQuery };
             });
@@ -997,44 +995,42 @@ require([
     // CENTERTYPE Select
     centerTypeSelect.addEventListener('calciteComboboxChange', (event) => {
         let selection = event.target.value;
-
-        DataLayers.forEach((layer) => {
-            // fix this to include parcels and points in main app
-
-            if (Array.isArray(selection) === false) {
-                if ((selection === null) || (selection === ' ') || (selection === '')) {
-                    newURL.searchParams.delete('cen');
-                    window.history.replaceState(
-                        { additionalInformation: 'Updated the URL with JS' },
-                        '',
-                        newURL,
-                    );
-                    centerTypeQuery = defaultCenterTypeQuery;
-                } else {
-                    // update URL params
-
-                    newURL.searchParams.set('cen', selection);
-                    window.history.replaceState(
-                        { additionalInformation: 'Updated the URL with JS' },
-                        '',
-                        newURL,
-                    );
-
-                    centerTypeQuery = `CENTERTYPE IN ('${selection}')`;
-                }
+        if (Array.isArray(selection) === false) {
+            if ((selection === null) || (selection === ' ') || (selection === '')) {
+                newURL.searchParams.delete('cen');
+                window.history.replaceState(
+                    { additionalInformation: 'Updated the URL with JS' },
+                    '',
+                    newURL,
+                );
+                centerTypeQuery = defaultCenterTypeQuery;
             } else {
+                // update URL params
+
                 newURL.searchParams.set('cen', selection);
                 window.history.replaceState(
                     { additionalInformation: 'Updated the URL with JS' },
                     '',
                     newURL,
                 );
-                selection = selection.map((value) => `'${value}'`);
-                centerTypeQuery = `CENTERTYPE IN (${selection})`;
-            }
 
-            // update the main query
-            generateFullQuery();
+                centerTypeQuery = `CENTERTYPE IN ('${selection}')`;
+            }
+        } else {
+            newURL.searchParams.set('cen', selection);
+            window.history.replaceState(
+                { additionalInformation: 'Updated the URL with JS' },
+                '',
+                newURL,
+            );
+            selection = selection.map((value) => `'${value}'`);
+            centerTypeQuery = `CENTERTYPE IN (${selection})`;
+        }
+
+        // update the main query
+        generateFullQuery();
+
+        DataLayers.forEach((layer) => {
             view.whenLayerView(layer).then((layerView) => {
                 layerView.filter = { where: fullQuery };
             });
