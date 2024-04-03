@@ -951,7 +951,7 @@ require([
         DataLayers.forEach((layer) => {
             // fix this to include parcels and points in main app
 
-            const selection = event.target.value;
+            let selection = event.target.value;
 
             if (Array.isArray(selection) === false) {
                 if ((selection === null) || (selection === ' ') || (selection === '')) {
@@ -996,7 +996,7 @@ require([
 
     // CENTERTYPE Select
     centerTypeSelect.addEventListener('calciteComboboxChange', (event) => {
-        const selection = event.target.value;
+        let selection = event.target.value;
 
         DataLayers.forEach((layer) => {
             // fix this to include parcels and points in main app
