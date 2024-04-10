@@ -375,7 +375,7 @@ require([
         // watch the time slider for changes
         document
             .getElementById('timeSlider')
-            .addEventListener('pointerup', (event) => {
+            .addEventListener('pointerup', () => {
                 const yStart = timeSlider.timeExtent.start.getFullYear();
                 const yEnd = timeSlider.timeExtent.end.getFullYear();
 
@@ -614,7 +614,7 @@ require([
     });
 
     // setup actions for chart toggle
-    statsModeToggle.addEventListener('click', () => {
+    statsModeToggle.addEventListener('calciteCheckboxChange', () => {
         if (statsModeToggle.checked === true) {
             queryMode = 'GEOG';
             document.getElementById('countHeader').innerHTML = 'Units in View:';
@@ -686,7 +686,7 @@ require([
     // COUNTY - filter and zoom features, update select options
     countySelect.addEventListener('calciteSelectChange', () => {
         // get the selection text
-        const selectionText = event.target.value;
+        const selectionText = countySelect.value;
         countySelectionCurrent = selectionText;
 
         DataLayers.forEach((layer) => {
@@ -769,7 +769,7 @@ require([
 
     // CITY - filter and zoom features, update select options
     citySelect.addEventListener('calciteSelectChange', () => {
-        const selectionText = event.target.value;
+        const selectionText = citySelect.value;
         citySelectionCurrent = selectionText;
 
         DataLayers.forEach((layer) => {
@@ -867,7 +867,7 @@ require([
 
     // CENTER - filter and zoom features, update select options
     centerSelect.addEventListener('calciteSelectChange', () => {
-        const selectionText = event.target.value;
+        const selectionText = centerSelect.value;
         centerSelectionCurrent = selectionText;
 
         DataLayers.forEach((layer) => {
@@ -947,8 +947,8 @@ require([
     });
 
     // SUBTYPE Select
-    subtypeSelect.addEventListener('calciteComboboxChange', (event) => {
-        let selection = event.target.value;
+    subtypeSelect.addEventListener('calciteComboboxChange', () => {
+        let selection = subtypeSelect.value;
 
         if (Array.isArray(selection) === false) {
             if ((selection === null) || (selection === ' ') || (selection === '')) {
@@ -993,8 +993,8 @@ require([
     });
 
     // CENTERTYPE Select
-    centerTypeSelect.addEventListener('calciteComboboxChange', (event) => {
-        let selection = event.target.value;
+    centerTypeSelect.addEventListener('calciteComboboxChange', () => {
+        let selection = centerTypeSelect.value;
         if (Array.isArray(selection) === false) {
             if ((selection === null) || (selection === ' ') || (selection === '')) {
                 newURL.searchParams.delete('cen');
