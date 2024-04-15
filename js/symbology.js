@@ -1342,3 +1342,18 @@ const pclRendererBuiltDecade = {
         },
     ],
 };
+
+// // light rail stations
+// const lrStationsRenderer = {
+//     type: 'simple', // autocasts as new SimpleRenderer()
+//     symbol: {
+//         type: 'simple-marker', // autocasts as new SimpleMarkerSymbol()
+//         style: 'diamond',
+//         size: 8,
+//         color: [0, 0, 0],
+//         outline: { // autocasts as new SimpleLineSymbol()
+//             width: 1.5,
+//             color: [255, 255, 255],
+//         },
+//     },
+// };

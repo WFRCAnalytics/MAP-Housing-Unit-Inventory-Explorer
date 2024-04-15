@@ -134,6 +134,7 @@ require([
     let yParam;
     let zoomParam;
     let yearParam;
+    let baseMapParam;
     let timeSlider;
     let year0;
     let year1;
@@ -204,6 +205,66 @@ require([
         popupTemplate: centerPopupTemplate,
     });
 
+    // const lrStationsLayer = new FeatureLayer({
+    //     // outFields: ['AreaName', 'AreaType'],
+    //     url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/Tranportation_Layers_For_Housing_Explorer_gdb/FeatureServer/1',
+    //     renderer: lrStationsRenderer,
+    //     maxScale: 0,
+    //     // minScale: 50000,
+    //     visible: false,
+    //     // popupTemplate: '',
+    // });
+
+    // const lrRouteLayer = new FeatureLayer({
+    //     outFields: ['AreaName', 'AreaType'],
+    //     url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/Tranportation_Layers_For_Housing_Explorer_gdb/FeatureServer/4',
+    //     // renderer: '',
+    //     maxScale: 0,
+    //     // minScale: 50000,
+    //     visible: false,
+    //     // popupTemplate: '',
+    // });
+
+    // const crStationsLayer = new FeatureLayer({
+    //     outFields: ['AreaName', 'AreaType'],
+    //     url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/Tranportation_Layers_For_Housing_Explorer_gdb/FeatureServer/2',
+    //     // renderer: '',
+    //     maxScale: 0,
+    //     // minScale: 50000,
+    //     visible: false,
+    //     // popupTemplate: '',
+    // });
+
+    // const crRouteLayer = new FeatureLayer({
+    //     outFields: ['AreaName', 'AreaType'],
+    //     url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/Tranportation_Layers_For_Housing_Explorer_gdb/FeatureServer/5',
+    //     // renderer: '',
+    //     maxScale: 0,
+    //     // minScale: 50000,
+    //     visible: false,
+    //     // popupTemplate: '',
+    // });
+
+    // const brtStationsLayer = new FeatureLayer({
+    //     outFields: ['AreaName', 'AreaType'],
+    //     url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/Tranportation_Layers_For_Housing_Explorer_gdb/FeatureServer/3',
+    //     // renderer: '',
+    //     maxScale: 0,
+    //     // minScale: 50000,
+    //     visible: false,
+    //     // popupTemplate: '',
+    // });
+
+    // const fwyInterchangesLayer = new FeatureLayer({
+    //     outFields: ['AreaName', 'AreaType'],
+    //     url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/Tranportation_Layers_For_Housing_Explorer_gdb/FeatureServer/0',
+    //     // renderer: '',
+    //     maxScale: 0,
+    //     // minScale: 50000,
+    //     visible: false,
+    //     // popupTemplate: '',
+    // });
+
     const ParcelsLayer = new FeatureLayer({
         outFields: ['*'],
         url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/hui_for_web_gdb/FeatureServer/0',
@@ -233,6 +294,7 @@ require([
             centersLayer,
             citiesLayer,
             countiesLayer,
+            // lrStationsLayer,
         ],
     });
 
@@ -248,10 +310,10 @@ require([
 
     if (newURL.searchParams.toString() === '') {
         activeLayer = PointsLayer;
-        console.log('no url params');
+        // console.log('no url params');
     } else {
     // var newURL = new URL(providedURL)
-        console.log('has url params');
+        // console.log('has url params');
         const { searchParams } = newURL;
         geomParam = searchParams.get('geom');
 
@@ -273,6 +335,7 @@ require([
         yParam = Number(searchParams.get('y'));
         zoomParam = Number(searchParams.get('zoom'));
         yearParam = searchParams.get('yr');
+        baseMapParam = searchParams.get('bmap');
 
         if (geomParam === 'pcl') {
             activeLayer = ParcelsLayer;
@@ -299,13 +362,16 @@ require([
         group: 'top-right',
     });
 
-    // close the expand whenever a basemap is selected
-    // on mobile devices
+    // basemap on change functions
     reactiveUtils.watch(
         () => basemapGallery.activeBasemap,
         () => {
+            // set basemap url param
+            if (basemapGallery.activeBasemap.title !== 'Basemap') { // catchs unwanted basemap value, might be fixed with Map.when()
+                newURL.searchParams.set('bmap', basemapGallery.activeBasemap.title);
+            }
+            // close the expand whenever a basemap is selected
             const mobileSize = view.heightBreakpoint === 'xsmall' || view.widthBreakpoint === 'xsmall';
-
             if (mobileSize) {
                 bgExpand.collapse();
             }
@@ -450,7 +516,7 @@ require([
     let centerActive = false;
 
     let queryMode = 'ALL'; // ALL or GEOG
-    console.log('queryMode', queryMode);
+    // console.log('queryMode', queryMode);
     let chartMode = 'TYPE'; // TYPE, DECADE, DENSITY, VALUE
     statsModeToggle.checked = false;
 
@@ -562,6 +628,7 @@ require([
         newURL.searchParams.delete('trl');
         newURL.searchParams.delete('yr');
         newURL.searchParams.set('op', logicOperator);
+        newURL.searchParams.delete('bmap');
 
         window.history.replaceState(
             { additionalInformation: 'Updated the URL with JS' },
@@ -624,7 +691,7 @@ require([
             document.getElementById('countHeader').innerHTML = 'Total Units:';
             updateChartsUsingActiveLayerView();
         }
-        console.log('queryMode', queryMode);
+        // console.log('queryMode', queryMode);
     });
 
     // setup actions for the type button
@@ -1085,6 +1152,13 @@ require([
         });
 
         updateChartsUsingActiveLayerView();
+
+        // // stations (currently disabled)
+        // if (userInput > 0) {
+        //     lrStationsLayer.visible = true;
+        // } else {
+        //     lrStationsLayer.visible = false;
+        // }
     });
 
     // initialize frontrunner dist filter
@@ -2797,6 +2871,57 @@ require([
             // override center and zoom
             view.center = pt;
             view.zoom = zoomParam;
+
+            // override basemap
+            if (baseMapParam) {
+                const basemapLookup = {
+                    'Charted Territory Map': 'arcgis-charted-territory',
+                    'Charted Territory': 'arcgis-charted-territory',
+                    'Colored Pencil Map': 'arcgis-colored-pencil',
+                    'Colored Pencil': 'arcgis-colored-pencil',
+                    'Community Map': 'arcgis-community',
+                    Community: 'arcgis-community',
+                    'Dark Gray Canvas': 'arcgis-dark-gray',
+                    // '':"arcgis-hillshade-dark",
+                    // '':"arcgis-hillshade-light",
+                    'Human Geography Map': 'arcgis-human-geography',
+                    'Human Geography': 'arcgis-human-geography',
+                    'Human Geography Dark Map': 'arcgis-human-geography-dark',
+                    'Human Geography Dark': 'arcgis-human-geography-dark',
+                    Imagery: 'satellite',
+                    'Imagery Hybrid': 'hybrid',
+                    // '':"arcgis-imagery-standard",
+                    'Light Gray Canvas': 'arcgis-light-gray',
+                    'Mid-Century Map': 'arcgis-midcentury',
+                    'Mid-Century': 'arcgis-midcentury',
+                    'Modern Antique Map': 'arcgis-modern-antique',
+                    'Modern Antique': 'arcgis-modern-antique',
+                    Navigation: 'streets-navigation-vector',
+                    'Navigation (Night)': 'streets-night-vector',
+                    'Newspaper Map': 'arcgis-newspaper',
+                    Newspaper: 'arcgis-newspaper',
+                    'Nova Map': 'arcgis-nova',
+                    Nova: 'arcgis-nova',
+                    Oceans: 'oceans',
+                    Streets: 'arcgis-streets',
+                    'Streets (Night)': 'arcgis-streets-night',
+                    'Streets (with Relief)': 'arcgis-streets-relief',
+                    'Terrain with Labels': 'arcgis-terrain',
+                    Topographic: 'topo',
+                    // '':"navigation-3d",
+                    // '':"navigation-dark-3d",
+                    'OpenStreetMap (Dark Gray Canvas)': 'osm-dark-gray',
+                    'OpenStreetMap (Light Gray Canvas)': 'osm-light-gray',
+                    OpenStreetMap: 'osm-standard',
+                    'OpenStreetMap (with Relief)': 'osm-standard-relief',
+                    'OpenStreetMap (Streets)': 'osm-streets',
+                    'OpenStreetMap (Streets with Relief)': 'osm-streets-relief',
+                    // '':"topo-3d"
+
+                };
+                baseMapParam = basemapLookup[baseMapParam];
+                map.basemap = baseMapParam;
+            }
 
             if (yearParam !== 'None' && yearParam) {
                 const yeerStart = yearParam.split('_')[0];
