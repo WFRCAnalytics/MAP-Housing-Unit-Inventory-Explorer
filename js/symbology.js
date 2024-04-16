@@ -842,7 +842,6 @@ const pclRendererDensity = {
 // renderer for Total Value symbolization on points
 const ptRendererValue = {
     type: 'class-breaks',
-    // field: "TOT_VALUE",
     legendOptions: {
         title: 'Assessed Value',
     },
@@ -853,7 +852,7 @@ const ptRendererValue = {
             maxValue: 1200000,
             symbol: {
                 type: 'simple-marker',
-                color: [240, 38, 28, transparency],
+                color: [61, 161, 209, transparency],  // Swapped color
                 size: dPixelSize,
                 outline: {
                     color: PtOutlineColor,
@@ -867,7 +866,7 @@ const ptRendererValue = {
             maxValue: 1600000,
             symbol: {
                 type: 'simple-marker',
-                color: [247, 120, 51, transparency],
+                color: [134, 186, 189, transparency],  // Swapped color
                 size: dPixelSize,
                 outline: {
                     color: PtOutlineColor,
@@ -881,7 +880,7 @@ const ptRendererValue = {
             maxValue: 1900000,
             symbol: {
                 type: 'simple-marker',
-                color: [248, 175, 78, transparency],
+                color: [255, 227, 0, transparency],  // Swapped color
                 size: dPixelSize,
                 outline: {
                     color: PtOutlineColor,
@@ -895,7 +894,7 @@ const ptRendererValue = {
             maxValue: 2100000,
             symbol: {
                 type: 'simple-marker',
-                color: [246, 227, 107, transparency],
+                color: [222, 238, 137, transparency],  // Swapped color
                 size: dPixelSize,
                 outline: {
                     color: PtOutlineColor,
@@ -909,7 +908,7 @@ const ptRendererValue = {
             maxValue: 2400000,
             symbol: {
                 type: 'simple-marker',
-                color: [222, 238, 137, transparency],
+                color: [246, 227, 107, transparency],  // Swapped color
                 size: dPixelSize,
                 outline: {
                     color: PtOutlineColor,
@@ -923,7 +922,7 @@ const ptRendererValue = {
             maxValue: 2800000,
             symbol: {
                 type: 'simple-marker',
-                color: [255, 227, 0, transparency],
+                color: [248, 175, 78, transparency],  // Swapped color
                 size: dPixelSize,
                 outline: {
                     color: PtOutlineColor,
@@ -937,7 +936,7 @@ const ptRendererValue = {
             maxValue: 3500000,
             symbol: {
                 type: 'simple-marker',
-                color: [134, 186, 189, transparency],
+                color: [247, 120, 51, transparency],  // Swapped color
                 size: dPixelSize,
                 outline: {
                     color: PtOutlineColor,
@@ -951,7 +950,7 @@ const ptRendererValue = {
             maxValue: Infinity,
             symbol: {
                 type: 'simple-marker',
-                color: [61, 161, 209, transparency],
+                color: [240, 38, 28, transparency],  // Swapped color
                 size: dPixelSize,
                 outline: {
                     color: PtOutlineColor,
@@ -966,7 +965,6 @@ const ptRendererValue = {
 // renderer for Total Value symbolization on points
 const pclRendererValue = {
     type: 'class-breaks',
-    // field: "TOT_VALUE",
     legendOptions: {
         title: 'Assessed Value',
     },
@@ -977,7 +975,7 @@ const pclRendererValue = {
             maxValue: 1200000,
             symbol: {
                 type: 'simple-fill',
-                color: [240, 38, 28, parcelTransparency],
+                color: [61, 161, 209, parcelTransparency], // Swapped color
                 size: dPixelSize,
                 outline: {
                     color: PtOutlineColor,
@@ -991,7 +989,7 @@ const pclRendererValue = {
             maxValue: 1600000,
             symbol: {
                 type: 'simple-fill',
-                color: [247, 120, 51, parcelTransparency],
+                color: [134, 186, 189, parcelTransparency], // Swapped color
                 size: dPixelSize,
                 outline: {
                     color: PtOutlineColor,
@@ -1005,7 +1003,7 @@ const pclRendererValue = {
             maxValue: 1900000,
             symbol: {
                 type: 'simple-fill',
-                color: [248, 175, 78, parcelTransparency],
+                color: [255, 227, 0, parcelTransparency], // Swapped color
                 size: dPixelSize,
                 outline: {
                     color: PtOutlineColor,
@@ -1019,7 +1017,7 @@ const pclRendererValue = {
             maxValue: 2100000,
             symbol: {
                 type: 'simple-fill',
-                color: [246, 227, 107, parcelTransparency],
+                color: [222, 238, 137, parcelTransparency], // Swapped color
                 size: dPixelSize,
                 outline: {
                     color: PtOutlineColor,
@@ -1033,7 +1031,7 @@ const pclRendererValue = {
             maxValue: 2400000,
             symbol: {
                 type: 'simple-fill',
-                color: [222, 238, 137, parcelTransparency],
+                color: [246, 227, 107, parcelTransparency], // Swapped color
                 size: dPixelSize,
                 outline: {
                     color: PtOutlineColor,
@@ -1047,7 +1045,7 @@ const pclRendererValue = {
             maxValue: 2800000,
             symbol: {
                 type: 'simple-fill',
-                color: [255, 227, 0, parcelTransparency],
+                color: [248, 175, 78, parcelTransparency], // Swapped color
                 size: dPixelSize,
                 outline: {
                     color: PtOutlineColor,
@@ -1061,7 +1059,7 @@ const pclRendererValue = {
             maxValue: 3500000,
             symbol: {
                 type: 'simple-fill',
-                color: [134, 186, 189, parcelTransparency],
+                color: [247, 120, 51, parcelTransparency], // Swapped color
                 size: dPixelSize,
                 outline: {
                     color: PtOutlineColor,
@@ -1075,7 +1073,7 @@ const pclRendererValue = {
             maxValue: Infinity,
             symbol: {
                 type: 'simple-fill',
-                color: [61, 161, 209, parcelTransparency],
+                color: [240, 38, 28, parcelTransparency], // Swapped color
                 size: dPixelSize,
                 outline: {
                     color: PtOutlineColor,
