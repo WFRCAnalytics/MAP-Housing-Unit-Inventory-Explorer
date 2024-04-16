@@ -2369,14 +2369,14 @@ require([
 
             // Update the backgroundColor attribute using the typeColorMap
             const colorMap = {
-                class1: '#F0261C',
-                class2: '#F77833',
-                class3: '#F8AF4E',
-                class4: '#F6E36B',
-                class5: '#DEEE89',
-                class6: '#FFE300',
-                class7: '#86BAD9',
-                class8: '#3DA1D1',
+                class1: '#3DA1D1',
+                class2: '#86BAD9',
+                class3: '#FFE300',
+                class4: '#DEEE89',
+                class5: '#F6E36B',
+                class6: '#F8AF4E',
+                class7: '#F77833',
+                class8: '#F0261C',
             };
 
             const labelMap = {
