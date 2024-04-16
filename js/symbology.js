@@ -852,7 +852,7 @@ const ptRendererValue = {
             maxValue: 1200000,
             symbol: {
                 type: 'simple-marker',
-                color: [61, 161, 209, transparency],  // Swapped color
+                color: [61, 161, 209, transparency], // Swapped color
                 size: dPixelSize,
                 outline: {
                     color: PtOutlineColor,
@@ -866,7 +866,7 @@ const ptRendererValue = {
             maxValue: 1600000,
             symbol: {
                 type: 'simple-marker',
-                color: [134, 186, 189, transparency],  // Swapped color
+                color: [134, 186, 189, transparency], // Swapped color
                 size: dPixelSize,
                 outline: {
                     color: PtOutlineColor,
@@ -880,7 +880,7 @@ const ptRendererValue = {
             maxValue: 1900000,
             symbol: {
                 type: 'simple-marker',
-                color: [255, 227, 0, transparency],  // Swapped color
+                color: [255, 227, 0, transparency], // Swapped color
                 size: dPixelSize,
                 outline: {
                     color: PtOutlineColor,
@@ -894,7 +894,7 @@ const ptRendererValue = {
             maxValue: 2100000,
             symbol: {
                 type: 'simple-marker',
-                color: [222, 238, 137, transparency],  // Swapped color
+                color: [222, 238, 137, transparency], // Swapped color
                 size: dPixelSize,
                 outline: {
                     color: PtOutlineColor,
@@ -908,7 +908,7 @@ const ptRendererValue = {
             maxValue: 2400000,
             symbol: {
                 type: 'simple-marker',
-                color: [246, 227, 107, transparency],  // Swapped color
+                color: [246, 227, 107, transparency], // Swapped color
                 size: dPixelSize,
                 outline: {
                     color: PtOutlineColor,
@@ -922,7 +922,7 @@ const ptRendererValue = {
             maxValue: 2800000,
             symbol: {
                 type: 'simple-marker',
-                color: [248, 175, 78, transparency],  // Swapped color
+                color: [248, 175, 78, transparency], // Swapped color
                 size: dPixelSize,
                 outline: {
                     color: PtOutlineColor,
@@ -936,7 +936,7 @@ const ptRendererValue = {
             maxValue: 3500000,
             symbol: {
                 type: 'simple-marker',
-                color: [247, 120, 51, transparency],  // Swapped color
+                color: [247, 120, 51, transparency], // Swapped color
                 size: dPixelSize,
                 outline: {
                     color: PtOutlineColor,
@@ -950,7 +950,7 @@ const ptRendererValue = {
             maxValue: Infinity,
             symbol: {
                 type: 'simple-marker',
-                color: [240, 38, 28, transparency],  // Swapped color
+                color: [240, 38, 28, transparency], // Swapped color
                 size: dPixelSize,
                 outline: {
                     color: PtOutlineColor,

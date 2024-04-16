@@ -135,6 +135,8 @@ require([
     let zoomParam;
     let yearParam;
     let baseMapParam;
+    let symbologyParam;
+    let queryModeParam;
     let timeSlider;
     let year0;
     let year1;
@@ -330,12 +332,14 @@ require([
         pkParam = searchParams.get('pk');
         trlParam = searchParams.get('trl');
         logOpParam = searchParams.get('op');
+        queryModeParam = searchParams.get('mode');
 
         xParam = Number(searchParams.get('x'));
         yParam = Number(searchParams.get('y'));
         zoomParam = Number(searchParams.get('zoom'));
         yearParam = searchParams.get('yr');
         baseMapParam = searchParams.get('bmap');
+        symbologyParam = searchParams.get('sym');
 
         if (geomParam === 'pcl') {
             activeLayer = ParcelsLayer;
@@ -369,6 +373,7 @@ require([
             // set basemap url param
             if (basemapGallery.activeBasemap.title !== 'Basemap') { // catchs unwanted basemap value, might be fixed with Map.when()
                 newURL.searchParams.set('bmap', basemapGallery.activeBasemap.title);
+                window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, '', newURL);
             }
             // close the expand whenever a basemap is selected
             const mobileSize = view.heightBreakpoint === 'xsmall' || view.widthBreakpoint === 'xsmall';
@@ -446,11 +451,8 @@ require([
                 const yEnd = timeSlider.timeExtent.end.getFullYear();
 
                 newURL.searchParams.set('yr', `${yStart}_${yEnd}`);
-                window.history.replaceState(
-                    { additionalInformation: 'Updated the URL with JS' },
-                    '',
-                    newURL,
-                );
+                window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, '', newURL);
+
                 yearQuery = `(APX_BLT_YR >= ${yStart} AND APX_BLT_YR <= ${yEnd})`;
                 generateFullQuery();
                 updateChartsUsingActiveLayerView();
@@ -516,8 +518,7 @@ require([
     let centerActive = false;
 
     let queryMode = 'ALL'; // ALL or GEOG
-    // console.log('queryMode', queryMode);
-    let chartMode = 'TYPE'; // TYPE, DECADE, DENSITY, VALUE
+    let colorMode = 'TYPE'; // TYPE, DECADE, DENSITY, VALUE
     statsModeToggle.checked = false;
 
     // dynamically create the active query depending on which filters are active
@@ -628,7 +629,6 @@ require([
         newURL.searchParams.delete('trl');
         newURL.searchParams.delete('yr');
         newURL.searchParams.set('op', logicOperator);
-        newURL.searchParams.delete('bmap');
 
         window.history.replaceState(
             { additionalInformation: 'Updated the URL with JS' },
@@ -691,6 +691,9 @@ require([
             document.getElementById('countHeader').innerHTML = 'Total Units:';
             updateChartsUsingActiveLayerView();
         }
+        // url params
+        newURL.searchParams.set('mode', queryMode);
+        window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, '', newURL);
         // console.log('queryMode', queryMode);
     });
 
@@ -702,7 +705,9 @@ require([
         valueButton.style.backgroundColor = '#797979';
         PointsLayer.renderer = ptRendererType;
         ParcelsLayer.renderer = pclRendererType;
-        chartMode = 'TYPE';
+        colorMode = 'TYPE';
+        newURL.searchParams.set('sym', colorMode);
+        window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, '', newURL);
         createYearChart();
         createTypeChart();
         updateChartsUsingActiveLayerView();
@@ -716,7 +721,12 @@ require([
         valueButton.style.backgroundColor = '#797979';
         PointsLayer.renderer = ptRendererBuiltDecade;
         ParcelsLayer.renderer = pclRendererBuiltDecade;
-        chartMode = 'DECADE';
+        colorMode = 'DECADE';
+
+        // url params
+        newURL.searchParams.set('sym', colorMode);
+        window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, '', newURL);
+
         createYearChart();
         createTypeChart();
         updateChartsUsingActiveLayerView();
@@ -730,7 +740,12 @@ require([
         valueButton.style.backgroundColor = '#797979';
         PointsLayer.renderer = ptRendererDensity;
         ParcelsLayer.renderer = pclRendererDensity;
-        chartMode = 'DENSITY';
+        colorMode = 'DENSITY';
+
+        // url params
+        newURL.searchParams.set('sym', colorMode);
+        window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, '', newURL);
+
         createYearChart();
         createTypeChart();
         updateChartsUsingActiveLayerView();
@@ -744,7 +759,12 @@ require([
         valueButton.style.backgroundColor = '#00619B';
         PointsLayer.renderer = ptRendererValue;
         ParcelsLayer.renderer = pclRendererValue;
-        chartMode = 'VALUE';
+        colorMode = 'VALUE';
+
+        // url params
+        newURL.searchParams.set('sym', colorMode);
+        window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, '', newURL);
+
         createYearChart();
         createTypeChart();
         updateChartsUsingActiveLayerView();
@@ -2544,7 +2564,7 @@ require([
             reactiveUtils
                 .whenOnce(() => !layerView.updating)
                 .then(() => {
-                    switch (chartMode) {
+                    switch (colorMode) {
                     case 'TYPE':
                         queryStatisticsForTypePieChart(layerView);
                         queryStatisticsForTypeBarChart(layerView);
@@ -2847,6 +2867,7 @@ require([
                 logicOperator = logOpParam;
             }
 
+            // disable geo selections if params are provided, lazy solution
             if (countyParam || cityParam || centerParam) {
                 countySelect.disabled = true;
                 citySelect.disabled = true;
@@ -2938,6 +2959,52 @@ require([
             if (geomParam === 'pt') {
                 ParcelsLayer.visible = false;
                 PointsLayer.visible = true;
+            }
+
+            // symbology url params
+            switch (symbologyParam) {
+            case 'TYPE':
+                break;
+            case 'DECADE':
+                typeButton.style.backgroundColor = '#797979';
+                bltDecButton.style.backgroundColor = '#00619B';
+                densityButton.style.backgroundColor = '#797979';
+                valueButton.style.backgroundColor = '#797979';
+                PointsLayer.renderer = ptRendererBuiltDecade;
+                ParcelsLayer.renderer = pclRendererBuiltDecade;
+                colorMode = 'DECADE';
+                break;
+            case 'DENSITY':
+                typeButton.style.backgroundColor = '#797979';
+                bltDecButton.style.backgroundColor = '#797979';
+                densityButton.style.backgroundColor = '#00619B';
+                valueButton.style.backgroundColor = '#797979';
+                PointsLayer.renderer = ptRendererDensity;
+                ParcelsLayer.renderer = pclRendererDensity;
+                colorMode = 'DENSITY';
+                break;
+            case 'VALUE':
+                typeButton.style.backgroundColor = '#797979';
+                bltDecButton.style.backgroundColor = '#797979';
+                densityButton.style.backgroundColor = '#797979';
+                valueButton.style.backgroundColor = '#00619B';
+                PointsLayer.renderer = ptRendererValue;
+                ParcelsLayer.renderer = pclRendererValue;
+                colorMode = 'VALUE';
+                break;
+            default:
+                break;
+            }
+
+            // symbology url params
+            switch (queryModeParam) {
+            case 'GEOG':
+                statsModeToggle.checked = true;
+                queryMode = 'GEOG';
+                document.getElementById('countHeader').innerHTML = 'Units in View:';
+                break;
+            default:
+                break;
             }
         }
     });
