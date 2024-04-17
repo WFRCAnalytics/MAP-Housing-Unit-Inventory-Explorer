@@ -443,20 +443,24 @@ require([
 
         view.ui.add(timeSliderExpand, { position: positionTS });
 
-        // watch the time slider for changes
-        document
-            .getElementById('timeSlider')
-            .addEventListener('pointerup', () => {
-                const yStart = timeSlider.timeExtent.start.getFullYear();
-                const yEnd = timeSlider.timeExtent.end.getFullYear();
+        // routine for timeslider stored in function
+        function timeSliderChangeFunction() {
+            // get the year from the slider
+            const yStart = timeSlider.timeExtent.start.getFullYear();
+            const yEnd = timeSlider.timeExtent.end.getFullYear();
 
-                newURL.searchParams.set('yr', `${yStart}_${yEnd}`);
-                window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, '', newURL);
+            // set url params
+            newURL.searchParams.set('yr', `${yStart}_${yEnd}`);
+            window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, '', newURL);
 
-                yearQuery = `(APX_BLT_YR >= ${yStart} AND APX_BLT_YR <= ${yEnd})`;
-                generateFullQuery();
-                updateChartsUsingActiveLayerView();
-            });
+            // update active query
+            yearQuery = `(APX_BLT_YR >= ${yStart} AND APX_BLT_YR <= ${yEnd})`;
+            generateFullQuery();
+            updateChartsUsingActiveLayerView();
+        }
+        // watch the time slider for changes (mouse release or arrow key press)
+        document.getElementById('timeSlider').addEventListener('pointerup', timeSliderChangeFunction);
+        document.getElementById('timeSlider').addEventListener('keydown', timeSliderChangeFunction);
     });
 
     // store ui objects as variables
@@ -2874,6 +2878,14 @@ require([
                 centerSelect.disabled = true;
             }
 
+            if (yearParam !== 'None' && yearParam) {
+                const yeerStart = yearParam.split('_')[0];
+                const yeerEnd = yearParam.split('_')[1];
+                timeSlider.timeExtent.start = new Date(yeerStart, 0, 1);
+                timeSlider.timeExtent.end = new Date(yeerEnd, 0, 1);
+                yearQuery = `(APX_BLT_YR >= ${yeerStart} AND APX_BLT_YR <= ${yeerEnd})`;
+            }
+
             generateFullQuery();
             DataLayers.forEach((layer) => {
                 view.whenLayerView(layer).then((layerView) => {
@@ -2942,14 +2954,6 @@ require([
                 };
                 baseMapParam = basemapLookup[baseMapParam];
                 map.basemap = baseMapParam;
-            }
-
-            if (yearParam !== 'None' && yearParam) {
-                const yeerStart = yearParam.split('_')[0];
-                const yeerEnd = yearParam.split('_')[1];
-                timeSlider.timeExtent.start = new Date(yeerStart, 0, 1);
-                timeSlider.timeExtent.end = new Date(yeerEnd, 0, 1);
-                yearQuery = `(APX_BLT_YR >= ${yeerStart} AND APX_BLT_YR <= ${yeerEnd})`;
             }
 
             if (geomParam === 'pcl') {
