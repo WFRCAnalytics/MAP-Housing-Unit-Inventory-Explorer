@@ -387,6 +387,7 @@ require([
     view.when(() => {
         timeSlider = new TimeSlider({
             container: 'timeSlider',
+            mode: 'time-window',
             view,
             // full min max of time slider
             fullTimeExtent: {
