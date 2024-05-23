@@ -84,6 +84,8 @@ require([
     'esri/core/reactiveUtils',
     'esri/core/promiseUtils',
     'esri/rest/support/Query',
+    'esri/widgets/Sketch/SketchViewModel',
+    'esri/layers/GraphicsLayer',
 ], (
     esriConfig,
     Map,
@@ -295,6 +297,8 @@ require([
         visible: true,
     });
 
+    const graphicsLayer = new GraphicsLayer({ title: 'graphicsLayer' });
+
     // store the main data layers in an array for loops later
     const DataLayers = [PointsLayer, ParcelsLayer];
 
@@ -309,6 +313,7 @@ require([
             citiesLayer,
             countiesLayer,
             subregionsLayer,
+            graphicsLayer,
             // lrStationsLayer,
         ],
     });
