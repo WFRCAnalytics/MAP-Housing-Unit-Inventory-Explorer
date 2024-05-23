@@ -1,0 +1,51 @@
+[
+	{
+		"NAME":"North Davis County",
+		"COUNTY":["None", "Davis", "Weber"],
+		"SUBREGION":["None", "North Davis County", "North Salt Lake County", "North Weber County", "South Davis County", "South Weber County", "Southeast Salt Lake County", "Southwest Salt Lake County"],
+		"CITY":["None", "Clearfield", "Clinton", "Kaysville", "Layton", "Riverdale", "South Weber", "Sunset", "Syracuse", "West Point"],
+		"CENTER":["None", "Antelope & Main Town Center", "Church & Hwy 193 Town Center", "Clinton Town Center", "Downtown Clearfield", "Downtown Kaysville", "East Antelope Center", "East Gate Business Center", "Freeport Center", "Gentile & Fairfield Town Center", "Gordon & Fairfield Town Center", "Layton Downtown", "Layton Industrial Center", "Layton Midtown", "Sunset SR 126", "Syracuse City Center", "Syracuse SR 193 Center", "Weber State University Davis", "West Point City Center", "West Point West Davis"]
+	},
+	{
+		"NAME":"North Salt Lake County",
+		"COUNTY":["None", "Salt Lake"],
+		"SUBREGION":["None", "North Davis County", "North Salt Lake County", "North Weber County", "South Davis County", "South Weber County", "Southeast Salt Lake County", "Southwest Salt Lake County"],
+		"CITY":["None", "Emigration Canyon", "Magna Township", "Millcreek", "Murray", "Salt Lake City", "South Salt Lake", "West Jordan", "West Valley City"],
+		"CENTER":["None", "21st and 21st", "2300 East 3300 South", "2700 South Station", "900 East Station", "9th and 9th Center", "Ballpark", "Cottonwood Village", "Decker Lake Center", "Downtown South Salt Lake", "Fairbourne Station", "Fireclay Center", "Glendale Center", "Granary District", "Highberry Center", "Historic Magna Main Street", "Hunter Town Center", "Ivy Place Center", "Marmalade", "Meadowbrook Station", "Millcreek City Center", "Millcreek Station", "North Temple Center", "Oquirrh View Center", "Pleasant Green", "Research Park", "River Trail Station", "Rose Park Center", "S-Line Center", "Salt Lake 15th and 15th", "Salt Lake 900 West", "Salt Lake City CBD", "Salt Lake City East Downtown", "Salt Lake City Northwest Quadrant", "South Salt Lake State Street", "Sugarhouse", "University Gardens", "University of Utah", "Village Green Center", "West Valley Redwood Center", "Westpointe Center"]
+	},
+	{
+		"NAME":"North Weber County",
+		"COUNTY":["None", "Weber"],
+		"SUBREGION":["None", "North Davis County", "North Salt Lake County", "North Weber County", "South Davis County", "South Weber County", "Southeast Salt Lake County", "Southwest Salt Lake County"],
+		"CITY":["None", "Farr West", "Harrisville", "Marriott-Slaterville", "North Ogden", "Ogden", "Plain City", "Pleasant View", "West Haven"],
+		"CENTER":["None", "Business Depot Ogden", "Farr West 2700 North", "Five Points", "Harrisville US 89", "Marriott-Slaterville Employment District", "North Ogden Downtown", "North Ogden Southtown", "Plain City Gateway", "Pleasant View 2700 North", "Pleasant View Employment Center", "West 12th Street", "West Haven City Center", "West Warren Center", "West Weber", "Wheeler Village"]
+	},
+	{
+		"NAME":"South Davis County",
+		"COUNTY":["None", "Davis"],
+		"SUBREGION":["None", "North Davis County", "North Salt Lake County", "North Weber County", "South Davis County", "South Weber County", "Southeast Salt Lake County", "Southwest Salt Lake County"],
+		"CITY":["None", "Bountiful", "Centerville", "Farmington", "Fruit Heights", "Kaysville", "Layton", "North Salt Lake", "West Bountiful", "Woods Cross"],
+		"CENTER":["None", "2600 South Center", "Bountiful 200 West", "Bountiful 500 South", "Bountiful Downtown", "Centerville Downtown", "Courthouse Downtown", "Downtown Kaysville", "Foxboro", "Gateway Crossing", "Kaysville Business Park", "Legacy Crossing", "Legacy Gateway", "North Salt Lake / Woods Cross Industrial District", "North Salt Lake Town Center", "North Station", "Orchard Drive 2200 South", "Pages Lane Center", "Renaissance Towne Center", "Station Park", "West Bountiful Industrial District"]
+	},
+	{
+		"NAME":"South Weber County",
+		"COUNTY":["None", "Davis", "Weber"],
+		"SUBREGION":["None", "North Davis County", "North Salt Lake County", "North Weber County", "South Davis County", "South Weber County", "Southeast Salt Lake County", "Southwest Salt Lake County"],
+		"CITY":["None", "Hooper", "North Ogden", "Ogden", "Riverdale", "Roy", "South Ogden", "Uintah", "Washington Terrace", "West Haven"],
+		"CENTER":["None", "Business Depot Ogden", "Five Points", "Newgate Center", "Ogden 12th Street", "Ogden Airport Industrial District", "Ogden Downtown", "Ogden Harrison Boulevard North", "Ogden Harrison Boulevard South", "Riverdale City Center", "Roy Downtown", "Roy Station", "South Ogden City Center", "South Ogden Gateway", "South Ogden US 89", "Washington Terrace US 89", "Weber State University", "West Haven City Center", "West Haven Midland Drive", "West Ogden Center", "West Riverdale Center"]
+	},
+	{
+		"NAME":"Southeast Salt Lake County",
+		"COUNTY":["None", "Salt Lake"],
+		"SUBREGION":["None", "North Davis County", "North Salt Lake County", "North Weber County", "South Davis County", "South Weber County", "Southeast Salt Lake County", "Southwest Salt Lake County"],
+		"CITY":["None", "Cottonwood Heights", "Draper", "Holladay", "Midvale", "Millcreek", "Murray", "Sandy", "Taylorsville", "White City Township"],
+		"CENTER":["None", "7th Street Sandy Point", "Bingham Junction", "Cottonwood Heights Fort Union", "Draper City Center", "Draper Kimballs Lane Station", "Fashion Place West", "Fireclay Center", "Fort Union Canyon Center", "Highline", "Historic Sandy Station", "Holladay City Center", "Jordan Bluffs", "Lone Peak Parkway Employment Center", "Meadowbrook Station", "Midvale Center Station", "Midvale Fort Union Station", "Midvale Main Street", "Murray Downtown", "Murray Industrial District", "Murray Medical Park", "Oakwood Village Center", "Quarry Bend Center", "Sandy Union Park", "Sandy Village Center", "The Cairns", "Union Park", "Vista Station"]
+	},
+	{
+		"NAME":"Southwest Salt Lake County",
+		"COUNTY":["None", "Salt Lake"],
+		"SUBREGION":["None", "North Davis County", "North Salt Lake County", "North Weber County", "South Davis County", "South Weber County", "Southeast Salt Lake County", "Southwest Salt Lake County"],
+		"CITY":["None", "Bluffdale", "Copperton", "Herriman", "Kearns Township", "Murray", "Riverton", "South Jordan", "Taylorsville", "West Jordan", "West Valley City"],
+		"CENTER":["None", "12600 South Mountain View Corridor", "4800 South Redwood", "5400 South Redwood", "Copperton Community Center", "Daybreak", "Downtown Riverton", "Fore Lakes Center", "Gardner Village", "Herriman Porter Rockwell Center", "Herriman Town Center", "Highlands Loop Center", "Independence", "Jordan Valley", "Marketview Center", "Mountain View Village", "North Shore", "River Park", "SoDa Row", "Sorenson Research Park", "South Jordan Gateway", "South Jordan Towne Center", "Taylrosville West Point Center", "The District", "West Jordan City Center"]
+	}
+]

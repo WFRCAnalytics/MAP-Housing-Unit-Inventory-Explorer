@@ -51,6 +51,52 @@ const countyRenderer = {
     ],
 };
 
+const subregionRenderer = {
+    type: 'unique-value',
+    legendOptions: {
+        title: 'County',
+    },
+    field: 'MPO',
+    uniqueValueInfos: [
+        {
+            value: 'WFRC',
+            label: 'WFRC',
+            symbol: {
+                type: 'simple-fill',
+                color: null,
+                outline: {
+                    color: [222, 45, 38, 1],
+                    width: 2,
+                },
+            },
+        },
+        {
+            value: 'WFRC-Box Elder',
+            label: 'WFRC-Box Elder',
+            symbol: {
+                type: 'simple-fill',
+                color: null,
+                outline: {
+                    color: [0, 0, 0, 0.75],
+                    width: 1,
+                },
+            },
+        },
+        {
+            value: 'MAG',
+            label: 'MAG',
+            symbol: {
+                type: 'simple-fill',
+                color: null,
+                outline: {
+                    color: [0, 0, 0, 0.75],
+                    width: 1,
+                },
+            },
+        },
+    ],
+};
+
 const cityRenderer = {
     type: 'unique-value',
     legendOptions: {
@@ -494,6 +540,10 @@ const parcelPopupTemplate = {
                 {
                     fieldName: 'COUNTY',
                     label: 'County',
+                },
+                {
+                    fieldName: 'SUBCOUNTY',
+                    label: 'Subregion',
                 },
                 {
                     fieldName: 'CITY',
