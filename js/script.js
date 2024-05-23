@@ -107,6 +107,7 @@ require([
     // store paths to jsons
     const jsonBase = 'json/BASE.json';
     const jsonCounty = 'json/COUNTY.json';
+    const jsonSubregion = 'json/SUBREGION.json';
     const jsonCity = 'json/CITY.json';
     const jsonCenter = 'json/CENTER.json';
     const jsonType = 'json/TYPE.json';
@@ -119,6 +120,7 @@ require([
     let expanded;
     let geomParam;
     let countyParam;
+    let subregionParam;
     let cityParam;
     let centerParam;
     let subtypeParam;
@@ -161,9 +163,11 @@ require([
     // initialize geographic filter options
     fetchLocalJsonArray(jsonBase).then((data) => {
         const countyArray = data[0].COUNTY;
+        const subregionArray = data[0].SUBREGION;
         const cityArray = data[0].CITY;
         const centerArray = data[0].CENTER;
         populateSelectBox('countySelect', countyArray);
+        populateSelectBox('subregionSelect', subregionArray);
         populateSelectBox('citySelect', cityArray);
         populateSelectBox('centerSelect', centerArray);
     });
@@ -184,6 +188,14 @@ require([
         outFields: ['CO_NAME'],
         url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/Boundaries_gdb/FeatureServer/1',
         renderer: countyRenderer,
+        maxScale: 0,
+        visible: false,
+    });
+
+    const subregionsLayer = new FeatureLayer({
+        // outFields: ['CO_NAME'],
+        url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/SubCountyArea_2019/FeatureServer',
+        renderer: subregionRenderer,
         maxScale: 0,
         visible: false,
     });
@@ -296,6 +308,7 @@ require([
             centersLayer,
             citiesLayer,
             countiesLayer,
+            subregionsLayer,
             // lrStationsLayer,
         ],
     });
@@ -307,9 +320,6 @@ require([
         center: [-111.91, 40.8],
     });
 
-    // // move the zoom icon
-    // view.ui.move("zoom", "bottom-left");
-
     if (newURL.searchParams.toString() === '') {
         activeLayer = PointsLayer;
         // console.log('no url params');
@@ -320,6 +330,7 @@ require([
         geomParam = searchParams.get('geom');
 
         countyParam = searchParams.get('cny');
+        subregionParam = searchParams.get('srgn');
         cityParam = searchParams.get('cty');
         centerParam = searchParams.get('ctr');
         subtypeParam = searchParams.get('type');
@@ -466,6 +477,7 @@ require([
 
     // store ui objects as variables
     const countySelect = document.getElementById('countySelect');
+    const subregionSelect = document.getElementById('subregionSelect');
     const citySelect = document.getElementById('citySelect');
     const centerSelect = document.getElementById('centerSelect');
     const subtypeSelect = document.getElementById('subtypeSelect');
@@ -481,6 +493,7 @@ require([
 
     // define default queries
     const defaultCountyQuery = '(COUNTY IS NULL OR COUNTY IS NOT NULL)';
+    const defaultSubregionQuery = '(SUBCOUNTY IS NULL OR SUBCOUNTY IS NOT NULL)';
     const defaultCityQuery = '(CITY IS NULL OR CITY IS NOT NULL)';
     const defaultCenterQuery = '(CENTER IS NULL OR CENTER IS NOT NULL)';
     const defaultSubtypeQuery = '(SUBTYPE IS NULL OR SUBTYPE IS NOT NULL)';
@@ -498,10 +511,12 @@ require([
 
     // set initial selection for geography filters - could switch to a placeholder?
     let countySelectionCurrent = null;
+    let subregionSelectionCurrent = null;
     let citySelectionCurrent = null;
     let centerSelectionCurrent = null;
 
     let countyQuery = defaultCountyQuery;
+    let subregionQuery = defaultSubregionQuery;
     let cityQuery = defaultCityQuery;
     let centerQuery = defaultCenterQuery;
     let subtypeQuery = defaultSubtypeQuery;
@@ -519,6 +534,7 @@ require([
     let fullQuery = null;
 
     let countyActive = false;
+    let subregionActive = false;
     let cityActive = false;
     let centerActive = false;
 
@@ -530,6 +546,7 @@ require([
     function generateFullQuery() {
         const queryComponents = [
             countyQuery,
+            subregionQuery,
             cityQuery,
             centerQuery,
             subtypeQuery,
@@ -565,31 +582,38 @@ require([
         });
 
         hideAndResetDefinition(countiesLayer);
+        hideAndResetDefinition(subregionsLayer);
         hideAndResetDefinition(citiesLayer);
         hideAndResetDefinition(centersLayer);
 
         countyActive = false;
+        subregionActive = false;
         cityActive = false;
         centerActive = false;
 
         countySelectionCurrent = 'None';
+        subregionSelectionCurrent = 'None';
         citySelectionCurrent = 'None';
         centerSelectionCurrent = 'None';
 
         countySelect.disabled = false;
+        subregionSelect.disabled = false;
         citySelect.disabled = false;
         centerSelect.disabled = false;
 
         fetchLocalJsonArray(jsonBase).then((data) => {
             const countyArray = data[0].COUNTY;
+            const subregionArray = data[0].SUBREGION;
             const cityArray = data[0].CITY;
             const centerArray = data[0].CENTER;
             populateSelectBox('countySelect', countyArray);
+            populateSelectBox('subregionSelect', subregionArray);
             populateSelectBox('citySelect', cityArray);
             populateSelectBox('centerSelect', centerArray);
         });
 
         countyQuery = defaultCountyQuery;
+        subregionQuery = defaultSubregionQuery;
         cityQuery = defaultCityQuery;
         centerQuery = defaultCenterQuery;
         subtypeQuery = defaultSubtypeQuery;
@@ -623,6 +647,7 @@ require([
 
         // remove all search params
         newURL.searchParams.delete('cny');
+        newURL.searchParams.delete('srgn');
         newURL.searchParams.delete('cty');
         newURL.searchParams.delete('ctr');
         newURL.searchParams.delete('type');
@@ -814,11 +839,13 @@ require([
             fetchLocalJsonArray(jsonCounty).then((data) => {
                 if (selectionText !== 'None') {
                     const dataFiltered = data.find((item) => item.NAME === selectionText);
-                    const countyArray = dataFiltered.COUNTY;
+                    // const countyArray = dataFiltered.COUNTY;
+                    const subregionArray = dataFiltered.SUBREGION;
                     const cityArray = dataFiltered.CITY;
                     const centerArray = dataFiltered.CENTER;
 
-                    if (cityActive !== true && centerActive !== true) {
+                    if (subregionActive !== true && cityActive !== true && centerActive !== true) {
+                        populateSelectBox('subregionSelect', subregionArray);
                         populateSelectBox('citySelect', cityArray);
                         populateSelectBox('centerSelect', centerArray);
                     }
@@ -826,21 +853,25 @@ require([
                 if (selectionText === 'None') {
                     fetchLocalJsonArray(jsonBase).then((data) => {
                         const countyArray = data[0].COUNTY;
+                        const subregionArray = data[0].SUBREGION;
                         const cityArray = data[0].CITY;
                         const centerArray = data[0].CENTER;
                         populateSelectBox('countySelect', countyArray);
+                        populateSelectBox('subregionSelect', subregionArray);
                         populateSelectBox('citySelect', cityArray);
                         populateSelectBox('centerSelect', centerArray);
                     });
                 }
 
                 setCalciteSelectValue(countySelect, countySelectionCurrent);
+                setCalciteSelectValue(subregionSelect, subregionSelectionCurrent);
                 setCalciteSelectValue(citySelect, citySelectionCurrent);
                 setCalciteSelectValue(centerSelect, centerSelectionCurrent);
             });
         });
 
         // show county outline
+        hideAndResetDefinition(subregionsLayer);
         hideAndResetDefinition(citiesLayer);
         hideAndResetDefinition(centersLayer);
         countiesLayer.definitionExpression = `CO_NAME = '${selectionText}'`;
@@ -851,6 +882,100 @@ require([
             const query = new Query();
             query.where = `CO_NAME = '${selectionText}'`;
             countiesLayer.queryExtent(query).then((results) => {
+                view.goTo(results.extent);
+            });
+        }
+        if (queryMode === 'ALL') {
+            updateChartsUsingActiveLayerView();
+        }
+    });
+
+    // SUBREGION - filter and zoom features, update select options
+    subregionSelect.addEventListener('calciteSelectChange', () => {
+        // get the selection text
+        const selectionText = subregionSelect.value;
+        subregionSelectionCurrent = selectionText;
+
+        DataLayers.forEach((layer) => {
+            if (selectionText === 'None') {
+                newURL.searchParams.delete('cny');
+                window.history.replaceState(
+                    { additionalInformation: 'Updated the URL with JS' },
+                    '',
+                    newURL,
+                );
+                subregionQuery = defaultSubregionQuery;
+                subregionActive = false;
+            } else {
+                newURL.searchParams.set('srgn', selectionText);
+                window.history.replaceState(
+                    { additionalInformation: 'Updated the URL with JS' },
+                    '',
+                    newURL,
+                );
+                subregionQuery = `SUBCOUNTY = '${selectionText}'`;
+                subregionActive = true;
+            }
+
+            // update the main query
+            generateFullQuery();
+
+            // filter the view of both layers
+            view.whenLayerView(layer).then((layerView) => {
+                layerView.filter = { where: fullQuery };
+            });
+
+            // update the select options
+            fetchLocalJsonArray(jsonSubregion).then((data) => {
+                if (selectionText !== 'None') {
+                    const dataFiltered = data.find((item) => item.NAME === selectionText);
+                    const countyArray = dataFiltered.COUNTY;
+                    const cityArray = dataFiltered.CITY;
+                    const centerArray = dataFiltered.CENTER;
+
+                    if (countyActive !== true && cityActive !== true && centerActive !== true) {
+                        populateSelectBox('countySelect', countyArray);
+                        populateSelectBox('citySelect', cityArray);
+                        populateSelectBox('centerSelect', centerArray);
+                    }
+                    if (countyActive === true) {
+                        populateSelectBox('countySelect', countyArray);
+                        populateSelectBox('citySelect', cityArray);
+                        populateSelectBox('centerSelect', centerArray);
+                    }
+                }
+                if (selectionText === 'None') {
+                    fetchLocalJsonArray(jsonBase).then((data) => {
+                        const countyArray = data[0].COUNTY;
+                        const subregionArray = data[0].SUBREGION;
+                        const cityArray = data[0].CITY;
+                        const centerArray = data[0].CENTER;
+                        populateSelectBox('countySelect', countyArray);
+                        populateSelectBox('subregionSelect', subregionArray);
+                        populateSelectBox('citySelect', cityArray);
+                        populateSelectBox('centerSelect', centerArray);
+                    });
+                }
+
+                setCalciteSelectValue(countySelect, countySelectionCurrent);
+                setCalciteSelectValue(subregionSelect, subregionSelectionCurrent);
+                setCalciteSelectValue(citySelect, citySelectionCurrent);
+                setCalciteSelectValue(centerSelect, centerSelectionCurrent);
+            });
+        });
+
+        // show subregion outline
+        hideAndResetDefinition(countiesLayer);
+        hideAndResetDefinition(citiesLayer);
+        hideAndResetDefinition(centersLayer);
+        subregionsLayer.definitionExpression = `NewSA = '${selectionText}'`;
+        subregionsLayer.visible = true;
+
+        // zoom to the boundary layer (faster but zooms farther out)
+        if (selectionText !== 'None') {
+            const query = new Query();
+            query.where = `NewSA = '${selectionText}'`;
+            subregionsLayer.queryExtent(query).then((results) => {
                 view.goTo(results.extent);
             });
         }
@@ -899,15 +1024,23 @@ require([
                 if (selectionText !== 'None') {
                     const dataFiltered = data.find((item) => item.NAME === selectionText);
                     const countyArray = dataFiltered.COUNTY;
-                    const cityArray = dataFiltered.CITY;
+                    const subregionArray = dataFiltered.SUBREGION;
                     const centerArray = dataFiltered.CENTER;
 
-                    if (countyActive !== true && centerActive !== true) {
+                    // eslint-disable-next-line max-len
+                    if (countyActive !== true && subregionActive !== true && centerActive !== true) {
                         populateSelectBox('countySelect', countyArray);
+                        populateSelectBox('subregionSelect', subregionArray);
                         populateSelectBox('centerSelect', centerArray);
                     }
                     if (countyActive === true) {
                         populateSelectBox('countySelect', countyArray);
+                        populateSelectBox('centerSelect', centerArray);
+                    }
+
+                    if (subregionActive === true) {
+                        populateSelectBox('countySelect', countyArray);
+                        populateSelectBox('subregionSelect', subregionArray);
                         populateSelectBox('centerSelect', centerArray);
                     }
                     if (centerActive === true) {
@@ -933,6 +1066,7 @@ require([
                 }
 
                 setCalciteSelectValue(countySelect, countySelectionCurrent);
+                setCalciteSelectValue(subregionSelect, subregionSelectionCurrent);
                 setCalciteSelectValue(citySelect, citySelectionCurrent);
                 setCalciteSelectValue(centerSelect, centerSelectionCurrent);
             });
@@ -940,6 +1074,7 @@ require([
 
         // show city outline
         hideAndResetDefinition(countiesLayer);
+        hideAndResetDefinition(subregionsLayer);
         hideAndResetDefinition(centersLayer);
         citiesLayer.definitionExpression = `NAME = '${selectionText}'`;
         citiesLayer.visible = true;
@@ -999,15 +1134,23 @@ require([
             fetchLocalJsonArray(jsonCenter).then((data) => {
                 const dataFiltered = data.find((item) => item.NAME === selectionText);
                 const countyArray = dataFiltered.COUNTY;
+                const subregionArray = dataFiltered.SUBREGION;
                 const cityArray = dataFiltered.CITY;
-                const centerArray = dataFiltered.CENTER;
+                // const centerArray = dataFiltered.CENTER;
 
-                if (countyActive !== true && cityActive !== true) {
+                if (countyActive !== true && subregionActive !== true && cityActive !== true) {
                     populateSelectBox('countySelect', countyArray);
+                    populateSelectBox('subregionSelect', subregionArray);
                     populateSelectBox('citySelect', cityArray);
                 }
                 if (countyActive === true) {
                     populateSelectBox('countySelect', countyArray);
+                    populateSelectBox('subregionSelect', subregionArray);
+                    populateSelectBox('citySelect', cityArray);
+                }
+                if (subregionActive === true) {
+                    populateSelectBox('countySelect', countyArray);
+                    populateSelectBox('subregionSelect', subregionArray);
                     populateSelectBox('citySelect', cityArray);
                 }
                 if (cityActive === true) {
@@ -1015,6 +1158,7 @@ require([
                 }
 
                 setCalciteSelectValue(countySelect, countySelectionCurrent);
+                setCalciteSelectValue(subregionSelect, subregionSelectionCurrent);
                 setCalciteSelectValue(citySelect, citySelectionCurrent);
                 setCalciteSelectValue(centerSelect, centerSelectionCurrent);
             });
@@ -1022,6 +1166,7 @@ require([
 
         // show center outline
         hideAndResetDefinition(countiesLayer);
+        hideAndResetDefinition(subregionsLayer);
         hideAndResetDefinition(citiesLayer);
         centersLayer.definitionExpression = `AreaName = '${selectionText}'`;
         centersLayer.visible = true;
@@ -1130,6 +1275,7 @@ require([
 
         // show center outline
         hideAndResetDefinition(countiesLayer);
+        hideAndResetDefinition(subregionsLayer);
         hideAndResetDefinition(citiesLayer);
 
         if (Array.isArray(selection) === false) {
@@ -2773,6 +2919,9 @@ require([
     view.ui.add(chartExpand, { position: positionChartBaseMap });
     view.ui.add(bgExpand, { position: positionChartBaseMap });
 
+    // move the zoom icon
+    view.ui.move('zoom', 'bottom-right');
+
     // make these divs visible once the view has loaded
     view.when(() => {
         filtersPanel.style.display = 'block';
@@ -2791,18 +2940,19 @@ require([
                 countyQuery = `COUNTY = '${countyParam}'`;
                 // console.log(countyParam);
             }
-
+            if (subregionParam !== 'None' && subregionParam) {
+                subregionSelect.value = subregionParam;
+                subregionQuery = `SUBCOUNTY = '${subregionParam}'`;
+            }
             if (cityParam !== 'None' && cityParam) {
                 citySelect.value = cityParam;
                 cityQuery = `CITY = '${cityParam}'`;
             }
-
             // center url params
             if (centerParam !== 'None' && centerParam) {
                 centerSelect.value = centerParam;
                 centerQuery = `CENTER = '${centerParam}'`;
             }
-
             // subtype url params
             if (subtypeParam !== 'None' && subtypeParam) {
                 if (subtypeParam.includes(',')) {
@@ -2814,7 +2964,6 @@ require([
                     subtypeQuery = `SUBTYPE IN ('${subtypeParam}')`;
                 }
             }
-
             // centertype url params
             if (centerTypeParam !== 'None' && centerTypeParam) {
                 if (centerTypeParam.includes(',')) {
@@ -2826,33 +2975,27 @@ require([
                     centerTypeQuery = `CENTERTYPE IN ('${centerTypeParam}')`;
                 }
             }
-
             // light rail url params
             if (lrParam !== 'None' && lrParam) {
                 inputLR.value = lrParam;
                 LRquery = `DIST_LR <= '${lrParam}'`;
             }
-
             if (frParam !== 'None' && frParam) {
                 inputFR.value = frParam;
                 FRquery = `DIST_FR <= '${frParam}'`;
             }
-
             if (brtParam !== 'None' && brtParam) {
                 inputBRT.value = brtParam;
                 BRTquery = `DIST_BRT <= '${brtParam}'`;
             }
-
             if (fwyeParam !== 'None' && fwyeParam) {
                 inputFWYE.value = fwyeParam;
                 FWYEquery = `DIST_FWYE <= '${fwyeParam}'`;
             }
-
             if (pkParam !== 'None' && pkParam) {
                 inputPARK.value = pkParam;
                 PARKquery = `DIST_PARK <= '${pkParam}'`;
             }
-
             if (trlParam !== 'None' && trlParam) {
                 inputTRAIL.value = trlParam;
                 TRAILquery = `DIST_TRAIL <= '${trlParam}'`;
@@ -2872,9 +3015,28 @@ require([
                 logicOperator = logOpParam;
             }
 
+            // add geography boundary to map on load
+            if (countyParam && subregionParam == null && cityParam == null && centerParam == null) {
+                countiesLayer.definitionExpression = `CO_NAME = '${countyParam}'`;
+                countiesLayer.visible = true;
+            }
+            if (subregionParam && cityParam == null && centerParam == null) {
+                subregionsLayer.definitionExpression = `SUBCOUNTY = '${subregionParam}'`;
+                subregionsLayer.visible = true;
+            }
+            if (cityParam && centerParam == null) {
+                citiesLayer.definitionExpression = `NAME = '${cityParam}'`;
+                citiesLayer.visible = true;
+            }
+            if (centerParam) {
+                centersLayer.definitionExpression = `AreaName = '${centerParam}'`;
+                centersLayer.visible = true;
+            }
+
             // disable geo selections if params are provided, lazy solution
-            if (countyParam || cityParam || centerParam) {
+            if (countyParam || subregionParam || cityParam || centerParam) {
                 countySelect.disabled = true;
+                subregionSelect.disabled = true;
                 citySelect.disabled = true;
                 centerSelect.disabled = true;
             }
