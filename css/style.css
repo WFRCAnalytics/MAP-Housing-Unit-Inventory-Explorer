@@ -178,6 +178,32 @@ body {
   grid-gap: 0.5vh;
 }
 
+.geometry-options {
+  display: flex;
+  flex-direction: row;
+  /* grid-template-columns: .5fr .5fr .5fr .5fr; */
+  /* grid-gap: 10px; */
+  border: .5px solid #757575;
+  background-color: #2c2c2c;
+  justify-content: center;
+}
+
+.geometry-button {
+  flex: 1;
+  /* border-style: solid; */
+  /* border-width: 1px; */
+  border-image: none;
+  background: #2c2c2c;
+  color: #e9e9e9;
+  
+}
+
+#clearBtn:active{
+  background-color: #00619b;
+}
+
+
+
 #sbHeader {
   font-weight: bold;
   text-decoration: underline;
@@ -196,7 +222,7 @@ body {
   display: none;
   width: 400px;
   padding: 10px;
-  height: 75vh;
+  height: 78vh;
   overflow-y: auto;
   border: 2px solid #ccc;
   background-color: #353535;

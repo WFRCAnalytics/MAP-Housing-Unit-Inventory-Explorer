@@ -99,6 +99,8 @@ require([
     reactiveUtils,
     promiseUtils,
     Query,
+    SketchViewModel,
+    GraphicsLayer,
 ) => {
     esriConfig.apiKey = 'AAPK5915b242a27845f389e0a11a17dc46b46gXNFj09FJVdb711lVLGhgoVFJBqdW6ow3bl71N1hx2llpMyogGBeF8kgvrKm3cY';
 
@@ -297,7 +299,7 @@ require([
         visible: true,
     });
 
-    const graphicsLayer = new GraphicsLayer({ title: 'graphicsLayer' });
+    const sketchLayer = new GraphicsLayer();
 
     // store the main data layers in an array for loops later
     const DataLayers = [PointsLayer, ParcelsLayer];
@@ -313,7 +315,7 @@ require([
             citiesLayer,
             countiesLayer,
             subregionsLayer,
-            graphicsLayer,
+            sketchLayer,
             // lrStationsLayer,
         ],
     });
@@ -323,6 +325,29 @@ require([
         map,
         zoom: defaultZoom,
         center: [-111.91, 40.8],
+    });
+
+    // use SketchViewModel to draw polygons that are used as a query
+    let sketchGeometry = null;
+    const sketchViewModel = new SketchViewModel({
+        layer: sketchLayer,
+
+        // defaultUpdateOptions: {
+        //     tool: 'reshape',
+        //     toggleToolOnClick: false,
+        // },
+        view,
+        polygonSymbol: {
+            type: 'simple-fill',
+            style: 'cross', // backward-diagonal, horizontal, horizontal
+            // color: '#EFC8B1',
+            outline: {
+                width: 3,
+                style: 'solid',
+                color: '#23e4eb',
+            },
+        },
+        defaultCreateOptions: { hasZ: false },
     });
 
     if (newURL.searchParams.toString() === '') {
@@ -649,6 +674,9 @@ require([
         // reset time slider
         timeSlider.timeExtent.start = new Date(1850, 0, 1);
         timeSlider.timeExtent.end = new Date(2022, 0, 1);
+
+        // clear sketches
+        clearBtn.click();
 
         // remove all search params
         newURL.searchParams.delete('cny');
@@ -1518,9 +1546,84 @@ require([
         updateChartsUsingActiveLayerView();
     });
 
-    //= =============================================
+    // =========================
+    // sketch model actions
+    // =========================
+    const polygonBtn = document.getElementById('polygonBtn');
+    const circleBtn = document.getElementById('circleBtn');
+    const rectangleBtn = document.getElementById('rectangleBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    // const selectBtn = document.getElementById('selectBtn');
+
+    polygonBtn.onclick = () => {
+        sketchViewModel.create('polygon');
+        polygonBtn.style.backgroundColor = '#00619b';
+    };
+    circleBtn.onclick = () => {
+        sketchViewModel.create('circle');
+        circleBtn.style.backgroundColor = '#00619b';
+    };
+    rectangleBtn.onclick = () => {
+        sketchViewModel.create('rectangle');
+        rectangleBtn.style.backgroundColor = '#00619b';
+    };
+    clearBtn.onclick = () => {
+        sketchViewModel.layer.removeAll();
+        console.log('sketch deleted');
+        sketchGeometry = null;
+        polygonBtn.style.backgroundColor = '#2c2c2c';
+        circleBtn.style.backgroundColor = '#2c2c2c';
+        rectangleBtn.style.backgroundColor = '#2c2c2c';
+        DataLayers.forEach((layer) => {
+            view.whenLayerView(layer).then((layerView) => {
+                layerView.featureEffect = null;
+                layerView.filter = { where: fullQuery, geometry: sketchGeometry };
+            });
+        });
+        updateChartsUsingActiveLayerView();
+    };
+    // selectBtn.onclick = () => { sketchViewModel.cancel(); };
+
+    sketchViewModel.on('create', (event) => {
+        if (event.state === 'complete') {
+            sketchGeometry = event.graphic.geometry;
+            console.log('sketch created');
+
+            // apply a grayscale feature effect to non selected features
+            DataLayers.forEach((layer) => {
+                view.whenLayerView(layer).then((layerView) => {
+                    const featureFilter = { where: fullQuery, geometry: sketchGeometry };
+                    layerView.featureEffect = {
+                        filter: featureFilter,
+                        excludedEffect: 'grayscale(100%) opacity(70%)',
+                    };
+                });
+            });
+            updateChartsUsingActiveLayerView();
+        }
+    });
+
+    sketchViewModel.on('update', (event) => {
+        // if (event.state === 'complete') {
+        sketchGeometry = event.graphics[0].geometry;
+        console.log('sketch updated');
+
+        DataLayers.forEach((layer) => {
+            view.whenLayerView(layer).then((layerView) => {
+                const featureFilter = { where: fullQuery, geometry: sketchGeometry };
+                layerView.featureEffect = {
+                    filter: featureFilter,
+                    excludedEffect: 'grayscale(100%) opacity(50%)',
+                };
+            });
+        });
+        updateChartsUsingActiveLayerView();
+        // }
+    });
+
+    // ==============================================
     // on zoom, change unit of representaion
-    //= =============================================
+    // ==============================================
 
     view.watch('zoom', (newZoom) => {
     // console.log("Zoom level changed to: ", newZoom);
@@ -1680,6 +1783,9 @@ require([
             yearChartQuery.outStatistics = yearChartDefinitions;
             yearChartQuery.cacheHint = true;
             yearChartQuery.groupByFieldsForStatistics = ['SUBTYPE'];
+            if (sketchGeometry) {
+                yearChartQuery.geometry = sketchGeometry;
+            }
             yearChartQuery = activeLayer.queryFeatures(yearChartQuery);
         } else if (queryMode === 'GEOG') {
             yearChartQuery = layerview.createQuery();
@@ -1688,6 +1794,9 @@ require([
             yearChartQuery.outStatistics = yearChartDefinitions;
             yearChartQuery.cacheHint = true;
             yearChartQuery.groupByFieldsForStatistics = ['SUBTYPE'];
+            if (sketchGeometry) {
+                yearChartQuery.geometry = sketchGeometry;
+            }
             yearChartQuery = layerview.queryFeatures(yearChartQuery);
         }
 
@@ -1875,6 +1984,9 @@ require([
             query = activeLayer.createQuery();
             query.where = fullQuery;
             query.outStatistics = statDefinitions;
+            if (sketchGeometry) {
+                query.geometry = sketchGeometry;
+            }
             query.cacheHint = true;
             query = activeLayer.queryFeatures(query);
         }
@@ -1883,6 +1995,9 @@ require([
             query.where = fullQuery;
             query.geometry = view.extent;
             query.outStatistics = statDefinitions;
+            if (sketchGeometry) {
+                query.geometry = sketchGeometry;
+            }
             query.cacheHint = true;
             query = layerView.queryFeatures(query);
         }
@@ -1975,6 +2090,9 @@ require([
                 yearChartQuery = activeLayer.createQuery();
                 yearChartQuery.where = fullQuery;
                 yearChartQuery.outStatistics = decadeChartDefinitions;
+                if (sketchGeometry) {
+                    yearChartQuery.geometry = sketchGeometry;
+                }
                 yearChartQuery.cacheHint = true;
                 yearChartQuery = activeLayer.queryFeatures(yearChartQuery);
             } else if (queryMode === 'GEOG') {
@@ -1982,6 +2100,9 @@ require([
                 yearChartQuery.where = fullQuery;
                 yearChartQuery.geometry = view.extent;
                 yearChartQuery.outStatistics = decadeChartDefinitions;
+                if (sketchGeometry) {
+                    yearChartQuery.geometry = sketchGeometry;
+                }
                 yearChartQuery.cacheHint = true;
                 yearChartQuery = layerview.queryFeatures(yearChartQuery);
             }
@@ -2110,6 +2231,9 @@ require([
                 yearChartQuery = activeLayer.createQuery();
                 yearChartQuery.where = fullQuery;
                 yearChartQuery.outStatistics = decadeChartDefinitions;
+                if (sketchGeometry) {
+                    yearChartQuery.geometry = sketchGeometry;
+                }
                 yearChartQuery.cacheHint = true;
                 yearChartQuery = activeLayer.queryFeatures(yearChartQuery);
             } else if (queryMode === 'GEOG') {
@@ -2117,6 +2241,9 @@ require([
                 yearChartQuery.where = fullQuery;
                 yearChartQuery.geometry = view.extent;
                 yearChartQuery.outStatistics = decadeChartDefinitions;
+                if (sketchGeometry) {
+                    yearChartQuery.geometry = sketchGeometry;
+                }
                 yearChartQuery.cacheHint = true;
                 yearChartQuery = layerview.queryFeatures(yearChartQuery);
             }
@@ -2242,6 +2369,9 @@ require([
                 yearChartQuery = activeLayer.createQuery();
                 yearChartQuery.where = fullQuery;
                 yearChartQuery.outStatistics = decadeChartDefinitions;
+                if (sketchGeometry) {
+                    yearChartQuery.geometry = sketchGeometry;
+                }
                 yearChartQuery.cacheHint = true;
                 yearChartQuery = activeLayer.queryFeatures(yearChartQuery);
             } else if (queryMode === 'GEOG') {
@@ -2249,6 +2379,9 @@ require([
                 yearChartQuery.where = fullQuery;
                 yearChartQuery.geometry = view.extent;
                 yearChartQuery.outStatistics = decadeChartDefinitions;
+                if (sketchGeometry) {
+                    yearChartQuery.geometry = sketchGeometry;
+                }
                 yearChartQuery.cacheHint = true;
                 yearChartQuery = layerview.queryFeatures(yearChartQuery);
             }
@@ -2389,6 +2522,9 @@ require([
                 yearChartQuery = activeLayer.createQuery();
                 yearChartQuery.where = fullQuery;
                 yearChartQuery.outStatistics = decadeChartDefinitions;
+                if (sketchGeometry) {
+                    yearChartQuery.geometry = sketchGeometry;
+                }
                 yearChartQuery.cacheHint = true;
                 yearChartQuery = activeLayer.queryFeatures(yearChartQuery);
             } else if (queryMode === 'GEOG') {
@@ -2396,6 +2532,9 @@ require([
                 yearChartQuery.where = fullQuery;
                 yearChartQuery.geometry = view.extent;
                 yearChartQuery.outStatistics = decadeChartDefinitions;
+                if (sketchGeometry) {
+                    yearChartQuery.geometry = sketchGeometry;
+                }
                 yearChartQuery.cacheHint = true;
                 yearChartQuery = layerview.queryFeatures(yearChartQuery);
             }
@@ -2520,6 +2659,9 @@ require([
             yearChartQuery = activeLayer.createQuery();
             yearChartQuery.where = fullQuery;
             yearChartQuery.outStatistics = decadeChartDefinitions;
+            if (sketchGeometry) {
+                yearChartQuery.geometry = sketchGeometry;
+            }
             yearChartQuery.cacheHint = true;
             yearChartQuery = activeLayer.queryFeatures(yearChartQuery);
         } else if (queryMode === 'GEOG') {
@@ -2527,6 +2669,9 @@ require([
             yearChartQuery.where = fullQuery;
             yearChartQuery.geometry = view.extent;
             yearChartQuery.outStatistics = decadeChartDefinitions;
+            if (sketchGeometry) {
+                yearChartQuery.geometry = sketchGeometry;
+            }
             yearChartQuery.cacheHint = true;
             yearChartQuery = layerview.queryFeatures(yearChartQuery);
         }
@@ -2652,6 +2797,9 @@ require([
             yearChartQuery = activeLayer.createQuery();
             yearChartQuery.where = fullQuery;
             yearChartQuery.outStatistics = decadeChartDefinitions;
+            if (sketchGeometry) {
+                yearChartQuery.geometry = sketchGeometry;
+            }
             yearChartQuery.cacheHint = true;
             yearChartQuery = activeLayer.queryFeatures(yearChartQuery);
         } else if (queryMode === 'GEOG') {
@@ -2659,6 +2807,9 @@ require([
             yearChartQuery.where = fullQuery;
             yearChartQuery.geometry = view.extent;
             yearChartQuery.outStatistics = decadeChartDefinitions;
+            if (sketchGeometry) {
+                yearChartQuery.geometry = sketchGeometry;
+            }
             yearChartQuery.cacheHint = true;
             yearChartQuery = layerview.queryFeatures(yearChartQuery);
         }
