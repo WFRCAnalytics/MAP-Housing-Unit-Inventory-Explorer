@@ -1568,6 +1568,7 @@ require([
         rectangleBtn.style.backgroundColor = '#00619b';
     };
     clearBtn.onclick = () => {
+        sketchViewModel.complete();
         sketchViewModel.layer.removeAll();
         console.log('sketch deleted');
         sketchGeometry = null;
