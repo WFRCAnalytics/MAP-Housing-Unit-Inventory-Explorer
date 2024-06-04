@@ -111,25 +111,25 @@
               class="esri-widget--button esri-icon-polygon geometry-button"
               id="polygonBtn"
               value="polygon"
-              title="Filter by polygon"
+              title="Draw a polygon"
             ></button>
             <button
               class="esri-widget--button esri-icon-checkbox-unchecked geometry-button"
               id="rectangleBtn"
               value="rectangle"
-              title="Filter by rectangle"
+              title="Draw a rectangle"
             ></button>
             <button
               class="esri-widget--button esri-icon-radio-unchecked geometry-button"
               id="circleBtn"
               value="circle"
-              title="Filter by circle"
+              title="Draw a circle"
             ></button>
             <button
               class="esri-widget--button esri-icon-trash geometry-button"
               id="clearBtn"
               value="clear"
-              title="clear polygon"
+              title="Clear all drawn polygon(s)"
             ></button>
           </div>
         </div>
@@ -145,6 +145,7 @@
                 id="andButton"
                 type="button"
                 value="Match All"
+                title="Match all of the buffer filters"
                 class="esri-button"
                 style="background-color: #00619b"
               />
@@ -154,6 +155,7 @@
                 id="orButton"
                 type="button"
                 value="Match Any"
+                title="Match any of the buffer filters"
                 class="esri-button"
                 style="background-color: #797979"
               />
@@ -233,6 +235,7 @@
           id="resetButton"
           type="button"
           value="Clear All Filters"
+          title="Clear all filters and delete drawn polygons"
           class="esri-button"
           style="width: 60%; background-color: #00619b"
         />

@@ -86,6 +86,7 @@ require([
     'esri/rest/support/Query',
     'esri/widgets/Sketch/SketchViewModel',
     'esri/layers/GraphicsLayer',
+    'esri/geometry/geometryEngineAsync',
 ], (
     esriConfig,
     Map,
@@ -101,6 +102,7 @@ require([
     Query,
     SketchViewModel,
     GraphicsLayer,
+    geometryEngineAsync,
 ) => {
     esriConfig.apiKey = 'AAPK5915b242a27845f389e0a11a17dc46b46gXNFj09FJVdb711lVLGhgoVFJBqdW6ow3bl71N1hx2llpMyogGBeF8kgvrKm3cY';
 
@@ -329,6 +331,7 @@ require([
 
     // use SketchViewModel to draw polygons that are used as a query
     let sketchGeometry = null;
+    // let sketchGeometry = new GroupLayer({});
     const sketchViewModel = new SketchViewModel({
         layer: sketchLayer,
 
@@ -1553,7 +1556,6 @@ require([
     const circleBtn = document.getElementById('circleBtn');
     const rectangleBtn = document.getElementById('rectangleBtn');
     const clearBtn = document.getElementById('clearBtn');
-    // const selectBtn = document.getElementById('selectBtn');
 
     polygonBtn.onclick = () => {
         sketchViewModel.create('polygon');
@@ -1583,12 +1585,11 @@ require([
         });
         updateChartsUsingActiveLayerView();
     };
-    // selectBtn.onclick = () => { sketchViewModel.cancel(); };
 
-    sketchViewModel.on('create', (event) => {
+    sketchViewModel.on('create', async (event) => {
         if (event.state === 'complete') {
-            sketchGeometry = event.graphic.geometry;
-            console.log('sketch created');
+            const geometries = sketchLayer.graphics.map((graphic) => graphic.geometry);
+            sketchGeometry = await geometryEngineAsync.union(geometries.toArray());
 
             // apply a grayscale feature effect to non selected features
             DataLayers.forEach((layer) => {
@@ -1604,10 +1605,10 @@ require([
         }
     });
 
-    sketchViewModel.on('update', (event) => {
-        // if (event.state === 'complete') {
-        sketchGeometry = event.graphics[0].geometry;
-        console.log('sketch updated');
+    sketchViewModel.on('update', async (event) => {
+        // if (event.state === 'complete') // omitting this redraws the charts upon each edit event
+        const geometries = sketchLayer.graphics.map((graphic) => graphic.geometry);
+        sketchGeometry = await geometryEngineAsync.union(geometries.toArray());
 
         DataLayers.forEach((layer) => {
             view.whenLayerView(layer).then((layerView) => {
