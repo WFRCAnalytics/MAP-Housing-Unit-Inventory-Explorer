@@ -1597,7 +1597,7 @@ require([
                     const featureFilter = { where: fullQuery, geometry: sketchGeometry };
                     layerView.featureEffect = {
                         filter: featureFilter,
-                        excludedEffect: 'grayscale(100%) opacity(70%)',
+                        excludedEffect: 'grayscale(100%) opacity(90%)',
                     };
                 });
             });
@@ -1615,7 +1615,7 @@ require([
                 const featureFilter = { where: fullQuery, geometry: sketchGeometry };
                 layerView.featureEffect = {
                     filter: featureFilter,
-                    excludedEffect: 'grayscale(100%) opacity(50%)',
+                    excludedEffect: 'grayscale(100%) opacity(90%)',
                 };
             });
         });

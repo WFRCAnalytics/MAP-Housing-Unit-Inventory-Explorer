@@ -1,9 +1,4 @@
 # Folders
-Default.gdb/
 Outputs/
-.ipynb_checkpoints/
-.backups/
-GpMessages/
-inputs/housing_unit_inventory_2022.gdb
-inputs/housing_unit_inventory_2022_20240122.gdb
-inputs/Stations_Interchanges.gdb
+inputs/housing_unit_inventory_2022_20240718.gdb
+inputs/housing_unit_inventory_2022_*
