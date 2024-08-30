@@ -31,8 +31,8 @@ const countyRenderer = {
                 type: 'simple-fill',
                 color: null,
                 outline: {
-                    color: [0, 0, 0, 0.75],
-                    width: 1,
+                    color: [222, 45, 38, 1],
+                    width: 2,
                 },
             },
         },
@@ -43,8 +43,8 @@ const countyRenderer = {
                 type: 'simple-fill',
                 color: null,
                 outline: {
-                    color: [0, 0, 0, 0.75],
-                    width: 1,
+                    color: [222, 45, 38, 1],
+                    width: 2,
                 },
             },
         },
@@ -77,7 +77,7 @@ const subregionRenderer = {
                 type: 'simple-fill',
                 color: null,
                 outline: {
-                    color: [0, 0, 0, 0.75],
+                    color: [222, 45, 38, 1],
                     width: 1,
                 },
             },
@@ -89,7 +89,7 @@ const subregionRenderer = {
                 type: 'simple-fill',
                 color: null,
                 outline: {
-                    color: [0, 0, 0, 0.75],
+                    color: [222, 45, 38, 1],
                     width: 1,
                 },
             },
@@ -123,7 +123,7 @@ const cityRenderer = {
                 type: 'simple-fill',
                 color: null,
                 outline: {
-                    color: [0, 0, 255, 0.5],
+                    color: [222, 45, 38, 1],
                     width: 1,
                 },
             },
@@ -135,7 +135,7 @@ const cityRenderer = {
                 type: 'simple-fill',
                 color: null,
                 outline: {
-                    color: [0, 0, 255, 0.5],
+                    color: [222, 45, 38, 1],
                     width: 1,
                 },
             },
@@ -556,6 +556,10 @@ const parcelPopupTemplate = {
                 {
                     fieldName: 'CENTERTYPE',
                     label: 'Center Type',
+                },
+                {
+                    fieldName: 'VINTAGE',
+                    label: 'Parcel Data Year',
                 },
             ],
         },

@@ -28,16 +28,45 @@
   </head>
 
   <body>
+    <!-- Splash Page -->
+    <div id="splash-page" class="splash-page">
+      <div class="splash-content">
+        <p>
+          The <b>Housing Inventory Explorer</b> presents residential housing
+          locations together with tools to further explore the housing landscape
+          and trends over time.
+        </p>
+        <p>
+          Housing data shown on the map was sourced from
+          <b>County Assessors</b> and <b>UGRC</b>, and reprocessed by
+          <b>WFRC</b> and <b>MAG</b> to work within this web app.
+        </p>
+        <p>
+          The data is current as of:
+          <li>Jan 1, 2022 WFRC Area (Davis, Salt Lake, and Weber Counties)</li>
+          <li>Jan 1, 2023 Mountainland AOG Area (Utah County)</li>
+        </p>
+        <p>
+          Click the <em>About the Data & Map</em> link in the upper-right for
+          more information.
+        </p>
+        <p><em>Click anywhere to continue...</em></p>
+      </div>
+    </div>
+
+    <!-- Main Content -->
     <div id="headerDiv">
       <div id="logoDiv" class="headerItem">
-        <a href="https://wfrc.org/">
+        <a href="https://maps.wfrc.org/">
           <img src="images/logo.png" id="logo" />
+        </a>
+        <a href="https://magutah.org/analytics/">
+          <img src="images/MAG_Logo_Stacked.png" id="logo2" />
         </a>
       </div>
 
       <div id="titleDiv" class="headerItem">
-        <div id="title1">WFRC-Area Housing Inventory Explorer</div>
-        <div id="title2">(data shown: January 2022)</div>
+        <div id="title1">Utah Housing Inventory Explorer</div>
       </div>
 
       <div id="aboutDiv" class="headerItem">
@@ -57,7 +86,7 @@
             class="my-link"
             target="_blank"
           >
-            About this map
+            About Data & Map
           </a>
         </div>
       </div>
@@ -246,8 +275,8 @@
       <div class="sectionChartToggle">
         <calcite-checkbox id="statsModeToggle"></calcite-checkbox>
         <div>
-          Dynamically update charts according to the <b>geographic extent</b> of
-          the map.
+          Dynamically update charts according to the
+          <b>geographic extent</b> of the map.
         </div>
       </div>
 

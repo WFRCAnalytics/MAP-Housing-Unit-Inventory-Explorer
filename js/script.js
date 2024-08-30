@@ -4,6 +4,7 @@
 /* eslint-disable import/no-amd */
 /* eslint-disable linebreak-style */
 // sets the calcite select boxes to a specified value
+
 function setCalciteSelectValue(selectElement, newValue) {
     // Find the option with the specified value
     const optionToSelect = Array.from(selectElement.children).find(
@@ -105,6 +106,11 @@ require([
     geometryEngineAsync,
 ) => {
     esriConfig.apiKey = 'AAPK5915b242a27845f389e0a11a17dc46b46gXNFj09FJVdb711lVLGhgoVFJBqdW6ow3bl71N1hx2llpMyogGBeF8kgvrKm3cY';
+
+    // Splash page
+    document.getElementById('splash-page').addEventListener('click', function () {
+        this.style.display = 'none'; // Hide the splash page when clicked
+    });
 
     // store the base url
     const providedURL = window.location;
@@ -287,7 +293,7 @@ require([
 
     const ParcelsLayer = new FeatureLayer({
         outFields: ['*'],
-        url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/hui_for_web_gdb/FeatureServer/0',
+        url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/hui_for_web_v2_gdb/FeatureServer/0',
         renderer: pclRendererType,
         maxScale: 0,
         visible: false,
@@ -295,7 +301,7 @@ require([
     });
 
     const PointsLayer = new FeatureLayer({
-        url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/hui_for_web_gdb/FeatureServer/1',
+        url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/hui_for_web_v2_gdb/FeatureServer/1',
         renderer: ptRendererType,
         outFields: ['*'],
         visible: true,
