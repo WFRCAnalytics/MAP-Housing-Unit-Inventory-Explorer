@@ -1,5 +1,6 @@
 # Folders
 Outputs/
-inputs/WFRC_Housing_Unit_Inventory_20240725.gdb
-inputs/WFRC_Housing_Unit_Inventory_*
-inputs/MAG_Housing_Unit_Inventory_20240819.gdb
+inputs/housing_unit_inventory_2022_20240718.gdb
+inputs/housing_unit_inventory_2022_*
+inputs/*.gdb/
+inputs/*.gdb

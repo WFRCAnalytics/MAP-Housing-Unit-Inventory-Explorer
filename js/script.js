@@ -442,12 +442,12 @@ require([
             // full min max of time slider
             fullTimeExtent: {
                 start: new Date(1850, 0, 1),
-                end: new Date(2022, 0, 1),
+                end: new Date(2024, 0, 1),
             },
             // starting min max of time slider
             timeExtent: {
                 start: new Date(1850, 0, 1),
-                end: new Date(2022, 0, 1),
+                end: new Date(2024, 0, 1),
             },
             // play speed, not needed?
             playRate: 2000,
@@ -682,7 +682,7 @@ require([
 
         // reset time slider
         timeSlider.timeExtent.start = new Date(1850, 0, 1);
-        timeSlider.timeExtent.end = new Date(2022, 0, 1);
+        timeSlider.timeExtent.end = new Date(2024, 0, 1);
 
         // clear sketches
         clearBtn.click();
