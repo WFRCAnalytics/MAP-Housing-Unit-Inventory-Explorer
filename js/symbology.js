@@ -25,8 +25,8 @@ const countyRenderer = {
             },
         },
         {
-            value: 'WFRC-Box Elder',
-            label: 'WFRC-Box Elder',
+            value: 'WFRC',
+            label: 'WFRC',
             symbol: {
                 type: 'simple-fill',
                 color: null,
@@ -78,7 +78,7 @@ const subregionRenderer = {
                 color: null,
                 outline: {
                     color: [222, 45, 38, 1],
-                    width: 1,
+                    width: 2,
                 },
             },
         },
@@ -90,7 +90,7 @@ const subregionRenderer = {
                 color: null,
                 outline: {
                     color: [222, 45, 38, 1],
-                    width: 1,
+                    width: 2,
                 },
             },
         },
@@ -124,7 +124,7 @@ const cityRenderer = {
                 color: null,
                 outline: {
                     color: [222, 45, 38, 1],
-                    width: 1,
+                    width: 2,
                 },
             },
         },
@@ -136,7 +136,7 @@ const cityRenderer = {
                 color: null,
                 outline: {
                     color: [222, 45, 38, 1],
-                    width: 1,
+                    width: 2,
                 },
             },
         },

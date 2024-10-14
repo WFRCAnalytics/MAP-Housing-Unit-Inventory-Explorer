@@ -1,7 +1,7 @@
 [
 	{
 		"NAME":"Box Elder (WFRC)",
-		"COUNTY":["None", "Box Elder"],
+		"COUNTY":["None", "Box Elder (MPO Area)"],
 		"SUBREGION":["None", "Box Elder (WFRC)", "Central Utah County", "North Davis County", "North Salt Lake County", "North Utah County", "North Weber County", "South Davis County", "South Utah County", "South Weber County", "Southeast Salt Lake County", "Southwest Salt Lake County", "West Utah County"],
 		"CITY":["None", "Brigham City", "Perry", "Willard"],
 		"CENTER":["None", "1100 South Center", "Brigham City 900 North Main", "Brigham City Historic Downtown", "Brigham City Industrial Center", "Brigham City Main Street", "Brigham City Medical Center", "Maddox Center", "Perry Park Center", "USU Brigham City", "Willard 750 North Center", "Willard Main Street Center"]
@@ -10,7 +10,7 @@
 		"NAME":"Central Utah County",
 		"COUNTY":["None", "Utah"],
 		"SUBREGION":["None", "Box Elder (WFRC)", "Central Utah County", "North Davis County", "North Salt Lake County", "North Utah County", "North Weber County", "South Davis County", "South Utah County", "South Weber County", "Southeast Salt Lake County", "Southwest Salt Lake County", "West Utah County"],
-		"CITY":["None", "Lindon", "Orem", "Provo", "Springville", "Vineyard"],
+		"CITY":["None", "Lindon", "Provo", "Springville", "Vineyard"],
 		"CENTER":["None", "BYU", "Downtown Provo", "East Bay", "Hillcrest", "Orem-1600 North", "Orem-800 North", "Orem-Center Street", "Riverwoods", "Scera Park", "Springville Industrial Park", "UVU", "UVU West", "University Center", "Vineyard", "West Orem"]
 	},
 	{
@@ -24,14 +24,14 @@
 		"NAME":"North Salt Lake County",
 		"COUNTY":["None", "Salt Lake"],
 		"SUBREGION":["None", "Box Elder (WFRC)", "Central Utah County", "North Davis County", "North Salt Lake County", "North Utah County", "North Weber County", "South Davis County", "South Utah County", "South Weber County", "Southeast Salt Lake County", "Southwest Salt Lake County", "West Utah County"],
-		"CITY":["None", "Emigration Canyon", "Magna Township", "Millcreek", "Murray", "Salt Lake City", "South Salt Lake", "West Jordan", "West Valley City"],
+		"CITY":["None", "Emigration Canyon", "Magna City", "Millcreek", "Murray", "Salt Lake City", "South Salt Lake", "West Jordan", "West Valley City"],
 		"CENTER":["None", "21st and 21st", "2300 East 3300 South", "2700 South Station", "900 East Station", "9th and 9th Center", "Ballpark", "Cottonwood Village", "Decker Lake Center", "Downtown South Salt Lake", "Fairbourne Station", "Fireclay Center", "Glendale Center", "Granary District", "Highberry Center", "Historic Magna Main Street", "Hunter Town Center", "Ivy Place Center", "Marmalade", "Meadowbrook Station", "Millcreek City Center", "Millcreek Station", "North Temple Center", "Oquirrh View Center", "Pleasant Green", "Research Park", "River Trail Station", "Rose Park Center", "S-Line Center", "Salt Lake 15th and 15th", "Salt Lake 900 West", "Salt Lake City CBD", "Salt Lake City East Downtown", "Salt Lake City Northwest Quadrant", "South Salt Lake State Street", "Sugarhouse", "University Gardens", "University of Utah", "Village Green Center", "West Valley Redwood Center", "Westpointe Center"]
 	},
 	{
 		"NAME":"North Utah County",
 		"COUNTY":["None", "Utah"],
 		"SUBREGION":["None", "Box Elder (WFRC)", "Central Utah County", "North Davis County", "North Salt Lake County", "North Utah County", "North Weber County", "South Davis County", "South Utah County", "South Weber County", "Southeast Salt Lake County", "Southwest Salt Lake County", "West Utah County"],
-		"CITY":["None", "Alpine", "American Fork", "Cedar Hills", "Draper", "Highland", "Lehi", "Lindon", "Orem", "Pleasant Grove", "Vineyard"],
+		"CITY":["None", "Alpine", "American Fork", "Cedar Hills", "Draper-Utah", "Highland", "Lehi", "Lindon", "Pleasant Grove", "Vineyard"],
 		"CENTER":["None", "Highland", "Lindon", "Meadows", "Pleasant Grove", "Timpanogos"]
 	},
 	{
@@ -57,7 +57,7 @@
 	},
 	{
 		"NAME":"South Weber County",
-		"COUNTY":["None", "Davis", "Weber"],
+		"COUNTY":["None", "Weber"],
 		"SUBREGION":["None", "Box Elder (WFRC)", "Central Utah County", "North Davis County", "North Salt Lake County", "North Utah County", "North Weber County", "South Davis County", "South Utah County", "South Weber County", "Southeast Salt Lake County", "Southwest Salt Lake County", "West Utah County"],
 		"CITY":["None", "Hooper", "North Ogden", "Ogden", "Riverdale", "Roy", "South Ogden", "Uintah", "Washington Terrace", "West Haven"],
 		"CENTER":["None", "Business Depot Ogden", "Five Points", "Newgate Center", "Ogden 12th Street", "Ogden Airport Industrial District", "Ogden Downtown", "Ogden Harrison Boulevard North", "Ogden Harrison Boulevard South", "Riverdale City Center", "Roy Downtown", "Roy Station", "South Ogden City Center", "South Ogden Gateway", "South Ogden US 89", "Washington Terrace US 89", "Weber State University", "West Haven City Center", "West Haven Midland Drive", "West Ogden Center", "West Riverdale Center"]
@@ -66,21 +66,21 @@
 		"NAME":"Southeast Salt Lake County",
 		"COUNTY":["None", "Salt Lake"],
 		"SUBREGION":["None", "Box Elder (WFRC)", "Central Utah County", "North Davis County", "North Salt Lake County", "North Utah County", "North Weber County", "South Davis County", "South Utah County", "South Weber County", "Southeast Salt Lake County", "Southwest Salt Lake County", "West Utah County"],
-		"CITY":["None", "Cottonwood Heights", "Draper", "Holladay", "Midvale", "Millcreek", "Murray", "Sandy", "Taylorsville", "White City Township"],
+		"CITY":["None", "Cottonwood Heights", "Draper-SL", "Holladay", "Midvale", "Millcreek", "Murray", "Sandy", "Taylorsville", "White City"],
 		"CENTER":["None", "7th Street Sandy Point", "Bingham Junction", "Cottonwood Heights Fort Union", "Draper City Center", "Draper Kimballs Lane Station", "Fashion Place West", "Fireclay Center", "Fort Union Canyon Center", "Highline", "Historic Sandy Station", "Holladay City Center", "Jordan Bluffs", "Lone Peak Parkway Employment Center", "Meadowbrook Station", "Midvale Center Station", "Midvale Fort Union Station", "Midvale Main Street", "Murray Downtown", "Murray Industrial District", "Murray Medical Park", "Oakwood Village Center", "Quarry Bend Center", "Sandy Union Park", "Sandy Village Center", "The Cairns", "Union Park", "Vista Station"]
 	},
 	{
 		"NAME":"Southwest Salt Lake County",
 		"COUNTY":["None", "Salt Lake"],
 		"SUBREGION":["None", "Box Elder (WFRC)", "Central Utah County", "North Davis County", "North Salt Lake County", "North Utah County", "North Weber County", "South Davis County", "South Utah County", "South Weber County", "Southeast Salt Lake County", "Southwest Salt Lake County", "West Utah County"],
-		"CITY":["None", "Bluffdale", "Copperton", "Herriman", "Kearns Township", "Murray", "Riverton", "South Jordan", "Taylorsville", "West Jordan", "West Valley City"],
+		"CITY":["None", "Bluffdale-SL", "Copperton", "Herriman", "Kearns", "Murray", "Riverton", "South Jordan", "Taylorsville", "West Jordan", "West Valley City"],
 		"CENTER":["None", "12600 South Mountain View Corridor", "4800 South Redwood", "5400 South Redwood", "Copperton Community Center", "Daybreak", "Downtown Riverton", "Fore Lakes Center", "Gardner Village", "Herriman Porter Rockwell Center", "Herriman Town Center", "Highlands Loop Center", "Independence", "Jordan Valley", "Marketview Center", "Mountain View Village", "North Shore", "River Park", "SoDa Row", "Sorenson Research Park", "South Jordan Gateway", "South Jordan Towne Center", "Taylrosville West Point Center", "The District", "West Jordan City Center"]
 	},
 	{
 		"NAME":"West Utah County",
 		"COUNTY":["None", "Utah"],
 		"SUBREGION":["None", "Box Elder (WFRC)", "Central Utah County", "North Davis County", "North Salt Lake County", "North Utah County", "North Weber County", "South Davis County", "South Utah County", "South Weber County", "Southeast Salt Lake County", "Southwest Salt Lake County", "West Utah County"],
-		"CITY":["None", "American Fork", "Cedar Fort", "Draper", "Eagle Mountain", "Fairfield", "Highland", "Lehi", "Saratoga Springs"],
+		"CITY":["None", "American Fork", "Cedar Fort", "Draper-Utah", "Eagle Mountain", "Fairfield", "Highland", "Lehi", "Saratoga Springs"],
 		"CENTER":["None", "Crossroads", "Eagle Mountain", "Lehi Main Street", "Meadows", "Thanksgiving Point"]
 	}
 ]

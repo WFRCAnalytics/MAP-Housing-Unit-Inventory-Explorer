@@ -107,6 +107,58 @@ require([
 ) => {
     esriConfig.apiKey = 'AAPK5915b242a27845f389e0a11a17dc46b46gXNFj09FJVdb711lVLGhgoVFJBqdW6ow3bl71N1hx2llpMyogGBeF8kgvrKm3cY';
 
+    function createTimeSlider() {
+        const timeSlider = new TimeSlider({
+            container: 'timeSlider',
+            visible: true,
+            mode: 'time-window',
+            view,
+            // full min max of time slider
+            fullTimeExtent: {
+                start: new Date(1850, 0, 1),
+                end: new Date(2024, 0, 1),
+            },
+            // starting min max of time slider
+            timeExtent: {
+                start: new Date(1850, 0, 1),
+                end: new Date(2024, 0, 1),
+            },
+            // play speed, not needed?
+            playRate: 2000,
+            stops: {
+                interval: {
+                    value: 1,
+                    unit: 'years',
+                },
+            },
+
+            // set custom labels for the timeslider's min, max, and extent dates
+            labelFormatFunction: (value, type, element, layout) => {
+                const options = { year: 'numeric' };
+                const normal = new Intl.DateTimeFormat('en-us', options);
+                switch (type) {
+                case 'min':
+                    element.setAttribute('style', 'color: #0091e6;font-size: 16px;');
+                    element.innerText = normal.format(value);
+                    break;
+                case 'max':
+                    element.setAttribute('style', 'color: #0091e6;font-size: 16px;');
+                    element.innerText = normal.format(value);
+                    break;
+                case 'extent':
+                    year0 = value[0].getFullYear();
+                    year1 = value[1].getFullYear();
+                    element.innerText = `Year Built:
+                        ${year0} - ${year1}`;
+                    break;
+                default:
+        // do nothing
+                }
+            },
+        });
+        return timeSlider;
+    }
+
     // Splash page
     document.getElementById('splash-page').addEventListener('click', function () {
         this.style.display = 'none'; // Hide the splash page when clicked
@@ -197,8 +249,8 @@ require([
     });
 
     const countiesLayer = new FeatureLayer({
-        outFields: ['CO_NAME'],
-        url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/Boundaries_gdb/FeatureServer/1',
+        outFields: ['NAME'],
+        url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/Boundaries_gdb/FeatureServer/0',
         renderer: countyRenderer,
         maxScale: 0,
         visible: false,
@@ -214,7 +266,7 @@ require([
 
     const citiesLayer = new FeatureLayer({
         outFields: ['NAME'],
-        url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/Boundaries_gdb/FeatureServer/0',
+        url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/Boundaries_gdb/FeatureServer/1',
         renderer: cityRenderer,
         maxScale: 0,
         // minScale: 100000,
@@ -293,7 +345,7 @@ require([
 
     const ParcelsLayer = new FeatureLayer({
         outFields: ['*'],
-        url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/hui_for_web_v2_gdb/FeatureServer/0',
+        url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/hui_for_web2_gdb/FeatureServer/0',
         renderer: pclRendererType,
         maxScale: 0,
         visible: false,
@@ -301,7 +353,7 @@ require([
     });
 
     const PointsLayer = new FeatureLayer({
-        url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/hui_for_web_v2_gdb/FeatureServer/1',
+        url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/hui_for_web2_gdb/FeatureServer/1',
         renderer: ptRendererType,
         outFields: ['*'],
         visible: true,
@@ -433,87 +485,6 @@ require([
         },
     );
 
-    // when the view object is created, create a time slider
-    view.when(() => {
-        timeSlider = new TimeSlider({
-            container: 'timeSlider',
-            mode: 'time-window',
-            view,
-            // full min max of time slider
-            fullTimeExtent: {
-                start: new Date(1850, 0, 1),
-                end: new Date(2024, 0, 1),
-            },
-            // starting min max of time slider
-            timeExtent: {
-                start: new Date(1850, 0, 1),
-                end: new Date(2024, 0, 1),
-            },
-            // play speed, not needed?
-            playRate: 2000,
-            stops: {
-                interval: {
-                    value: 1,
-                    unit: 'years',
-                },
-            },
-
-            // set custom labels for the timeslider's min, max, and extent dates
-            labelFormatFunction: (value, type, element, layout) => {
-                const options = { year: 'numeric' };
-                const normal = new Intl.DateTimeFormat('en-us', options);
-                switch (type) {
-                case 'min':
-                    element.setAttribute('style', 'color: #0091e6;font-size: 16px;');
-                    element.innerText = normal.format(value);
-                    break;
-                case 'max':
-                    element.setAttribute('style', 'color: #0091e6;font-size: 16px;');
-                    element.innerText = normal.format(value);
-                    break;
-                case 'extent':
-                    year0 = value[0].getFullYear();
-                    year1 = value[1].getFullYear();
-                    element.innerText = `Year Built:
-                            ${year0} - ${year1}`;
-                    break;
-                default:
-            // do nothing
-                }
-            },
-        });
-
-        // Option 1: time slider expand
-        const timeSliderExpand = new Expand({
-            expandIcon: 'date-time',
-            expandTooltip: 'TimeSlider',
-            view,
-            content: timeSlider.container,
-            expanded: false,
-        });
-
-        view.ui.add(timeSliderExpand, { position: positionTS });
-
-        // routine for timeslider stored in function
-        function timeSliderChangeFunction() {
-            // get the year from the slider
-            const yStart = timeSlider.timeExtent.start.getFullYear();
-            const yEnd = timeSlider.timeExtent.end.getFullYear();
-
-            // set url params
-            newURL.searchParams.set('yr', `${yStart}_${yEnd}`);
-            window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, '', newURL);
-
-            // update active query
-            yearQuery = `(APX_BLT_YR >= ${yStart} AND APX_BLT_YR <= ${yEnd})`;
-            generateFullQuery();
-            updateChartsUsingActiveLayerView();
-        }
-        // watch the time slider for changes (mouse release or arrow key press)
-        document.getElementById('timeSlider').addEventListener('pointerup', timeSliderChangeFunction);
-        document.getElementById('timeSlider').addEventListener('keydown', timeSliderChangeFunction);
-    });
-
     // store ui objects as variables
     const countySelect = document.getElementById('countySelect');
     const subregionSelect = document.getElementById('subregionSelect');
@@ -580,6 +551,60 @@ require([
     let queryMode = 'ALL'; // ALL or GEOG
     let colorMode = 'TYPE'; // TYPE, DECADE, DENSITY, VALUE
     statsModeToggle.checked = false;
+
+    // when the view object is created, create a time slider
+    view.when(() => {
+        // Option 1: time slider expand
+        const timeSliderExpand = new Expand({
+            expandIcon: 'date-time',
+            expandTooltip: 'TimeSlider',
+            view,
+            // content: timeSlider.container,
+            content: null,
+            expanded: false,
+        });
+
+        view.ui.add(timeSliderExpand, { position: positionTS });
+
+        // if the timeslider expand widget is expanded create the timeslider
+        timeSliderExpand.watch('expanded', (value) => {
+            if (document.getElementById('timeSlider').innerHTML.trim() === '') {
+                timeSlider = createTimeSlider();
+                timeSliderExpand.content = timeSlider.container;
+            }
+        });
+
+        // url params for the time slider
+        if (yearParam !== 'None' && yearParam) {
+            timeSlider = createTimeSlider();
+            timeSliderExpand.content = timeSlider.container;
+
+            const yeerStart = yearParam.split('_')[0];
+            const yeerEnd = yearParam.split('_')[1];
+            timeSlider.timeExtent.start = new Date(yeerStart, 0, 1);
+            timeSlider.timeExtent.end = new Date(yeerEnd, 0, 1);
+            yearQuery = `(APX_BLT_YR >= ${yeerStart} AND APX_BLT_YR <= ${yeerEnd})`;
+        }
+
+        // routine for timeslider stored in function
+        function timeSliderChangeFunction() {
+            // get the year from the slider
+            const yStart = timeSlider.timeExtent.start.getFullYear();
+            const yEnd = timeSlider.timeExtent.end.getFullYear();
+
+            // set url params
+            newURL.searchParams.set('yr', `${yStart}_${yEnd}`);
+            window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, '', newURL);
+
+            // update active query
+            yearQuery = `(APX_BLT_YR >= ${yStart} AND APX_BLT_YR <= ${yEnd})`;
+            generateFullQuery();
+            updateChartsUsingActiveLayerView();
+        }
+        // watch the time slider for changes (mouse release or arrow key press)
+        document.getElementById('timeSlider').addEventListener('pointerup', timeSliderChangeFunction);
+        document.getElementById('timeSlider').addEventListener('keydown', timeSliderChangeFunction);
+    });
 
     // dynamically create the active query depending on which filters are active
     function generateFullQuery() {
@@ -916,13 +941,13 @@ require([
         hideAndResetDefinition(subregionsLayer);
         hideAndResetDefinition(citiesLayer);
         hideAndResetDefinition(centersLayer);
-        countiesLayer.definitionExpression = `CO_NAME = '${selectionText}'`;
+        countiesLayer.definitionExpression = `NAME = '${selectionText}'`;
         countiesLayer.visible = true;
 
         // zoom to the boundary layer (faster but zooms farther out)
         if (selectionText !== 'None') {
             const query = new Query();
-            query.where = `CO_NAME = '${selectionText}'`;
+            query.where = `NAME = '${selectionText}'`;
             countiesLayer.queryExtent(query).then((results) => {
                 view.goTo(results.extent);
             });
@@ -3181,7 +3206,7 @@ require([
 
             // add geography boundary to map on load
             if (countyParam && subregionParam == null && cityParam == null && centerParam == null) {
-                countiesLayer.definitionExpression = `CO_NAME = '${countyParam}'`;
+                countiesLayer.definitionExpression = `NAME = '${countyParam}'`;
                 countiesLayer.visible = true;
             }
             if (subregionParam && cityParam == null && centerParam == null) {
@@ -3203,14 +3228,6 @@ require([
                 subregionSelect.disabled = true;
                 citySelect.disabled = true;
                 centerSelect.disabled = true;
-            }
-
-            if (yearParam !== 'None' && yearParam) {
-                const yeerStart = yearParam.split('_')[0];
-                const yeerEnd = yearParam.split('_')[1];
-                timeSlider.timeExtent.start = new Date(yeerStart, 0, 1);
-                timeSlider.timeExtent.end = new Date(yeerEnd, 0, 1);
-                yearQuery = `(APX_BLT_YR >= ${yeerStart} AND APX_BLT_YR <= ${yeerEnd})`;
             }
 
             generateFullQuery();
