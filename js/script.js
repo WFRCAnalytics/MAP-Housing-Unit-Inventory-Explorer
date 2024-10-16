@@ -706,9 +706,10 @@ require([
         orButton.style.backgroundColor = '#797979';
 
         // reset time slider
-        timeSlider.timeExtent.start = new Date(1850, 0, 1);
-        timeSlider.timeExtent.end = new Date(2024, 0, 1);
-
+        if (timeSlider) {
+            timeSlider.timeExtent.start = new Date(1850, 0, 1);
+            timeSlider.timeExtent.end = new Date(2024, 0, 1);
+        }
         // clear sketches
         clearBtn.click();
 
