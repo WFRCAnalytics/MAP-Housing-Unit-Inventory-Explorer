@@ -1,44 +1,51 @@
 [
 	{
 		"NAME":"Box Elder (MPO Area)",
-		"COUNTY":["None", "Box Elder (MPO Area)", "Davis", "Salt Lake", "Tooele", "Utah", "Weber"],
+		"COUNTY":["None", "Box Elder (MPO Area)", "Davis", "Morgan", "Salt Lake", "Tooele", "Utah", "Weber"],
 		"SUBREGION":["None", "Box Elder (WFRC)"],
 		"CITY":["None", "Brigham City", "Perry", "Willard"],
 		"CENTER":["None", "1100 South Center", "Brigham City 900 North Main", "Brigham City Historic Downtown", "Brigham City Industrial Center", "Brigham City Main Street", "Brigham City Medical Center", "Maddox Center", "Perry Park Center", "USU Brigham City", "Willard 750 North Center", "Willard Main Street Center"]
 	},
 	{
 		"NAME":"Davis",
-		"COUNTY":["None", "Box Elder (MPO Area)", "Davis", "Salt Lake", "Tooele", "Utah", "Weber"],
-		"SUBREGION":["None", "North Davis County", "South Davis County"],
+		"COUNTY":["None", "Box Elder (MPO Area)", "Davis", "Morgan", "Salt Lake", "Tooele", "Utah", "Weber"],
+		"SUBREGION":["None", "North Davis County", "South Davis County", "South Weber County"],
 		"CITY":["None", "Bountiful", "Centerville", "Clearfield", "Clinton", "Farmington", "Fruit Heights", "Kaysville", "Layton", "North Salt Lake", "South Weber", "Sunset", "Syracuse", "West Bountiful", "West Point", "Woods Cross"],
 		"CENTER":["None", "2600 South Center", "Antelope & Main Town Center", "Bountiful 200 West", "Bountiful 500 South", "Bountiful Downtown", "Centerville Downtown", "Church & Hwy 193 Town Center", "Clinton Town Center", "Courthouse Downtown", "Downtown Clearfield", "Downtown Kaysville", "East Antelope Center", "East Gate Business Center", "Foxboro", "Freeport Center", "Gateway Crossing", "Gentile & Fairfield Town Center", "Gordon & Fairfield Town Center", "Kaysville Business Park", "Layton Downtown", "Layton Industrial Center", "Layton Midtown", "Legacy Crossing", "Legacy Gateway", "North Salt Lake / Woods Cross Industrial District", "North Salt Lake Town Center", "North Station", "Orchard Drive 2200 South", "Pages Lane Center", "Renaissance Towne Center", "Station Park", "Sunset SR 126", "Syracuse City Center", "Syracuse SR 193 Center", "Weber State University Davis", "West Bountiful Industrial District", "West Point City Center", "West Point West Davis"]
 	},
 	{
+		"NAME":"Morgan",
+		"COUNTY":["None", "Box Elder (MPO Area)", "Davis", "Morgan", "Salt Lake", "Tooele", "Utah", "Weber"],
+		"SUBREGION":["None"],
+		"CITY":["None", "Morgan"],
+		"CENTER":["None", "Morgan Main Street", "Mountain Green Town Center"]
+	},
+	{
 		"NAME":"Salt Lake",
-		"COUNTY":["None", "Box Elder (MPO Area)", "Davis", "Salt Lake", "Tooele", "Utah", "Weber"],
-		"SUBREGION":["None", "North Salt Lake County", "Southeast Salt Lake County", "Southwest Salt Lake County"],
+		"COUNTY":["None", "Box Elder (MPO Area)", "Davis", "Morgan", "Salt Lake", "Tooele", "Utah", "Weber"],
+		"SUBREGION":["None", "North Salt Lake County", "North Utah County", "Southeast Salt Lake County", "Southwest Salt Lake County"],
 		"CITY":["None", "Bluffdale-SL", "Copperton", "Cottonwood Heights", "Draper-SL", "Emigration Canyon", "Herriman", "Holladay", "Kearns", "Magna City", "Midvale", "Millcreek", "Murray", "Riverton", "Salt Lake City", "Sandy", "South Jordan", "South Salt Lake", "Taylorsville", "West Jordan", "West Valley City", "White City"],
 		"CENTER":["None", "12600 South Mountain View Corridor", "21st and 21st", "2300 East 3300 South", "2700 South Station", "4800 South Redwood", "5400 South Redwood", "7th Street Sandy Point", "900 East Station", "9th and 9th Center", "Ballpark", "Bingham Junction", "Copperton Community Center", "Cottonwood Heights Fort Union", "Cottonwood Village", "Daybreak", "Decker Lake Center", "Downtown Riverton", "Downtown South Salt Lake", "Draper City Center", "Draper Kimballs Lane Station", "Fairbourne Station", "Fashion Place West", "Fireclay Center", "Fore Lakes Center", "Fort Union Canyon Center", "Gardner Village", "Glendale Center", "Granary District", "Herriman Porter Rockwell Center", "Herriman Town Center", "Highberry Center", "Highlands Loop Center", "Highline", "Historic Magna Main Street", "Historic Sandy Station", "Holladay City Center", "Hunter Town Center", "Independence", "Ivy Place Center", "Jordan Bluffs", "Jordan Valley", "Lone Peak Parkway Employment Center", "Marketview Center", "Marmalade", "Meadowbrook Station", "Midvale Center Station", "Midvale Fort Union Station", "Midvale Main Street", "Millcreek City Center", "Millcreek Station", "Mountain View Village", "Murray Downtown", "Murray Industrial District", "Murray Medical Park", "North Shore", "North Temple Center", "Oakwood Village Center", "Oquirrh View Center", "Pleasant Green", "Quarry Bend Center", "Research Park", "River Park", "River Trail Station", "Rose Park Center", "S-Line Center", "Salt Lake 15th and 15th", "Salt Lake 900 West", "Salt Lake City CBD", "Salt Lake City East Downtown", "Salt Lake City Northwest Quadrant", "Sandy Union Park", "Sandy Village Center", "SoDa Row", "Sorenson Research Park", "South Jordan Gateway", "South Jordan Towne Center", "South Salt Lake State Street", "Sugarhouse", "Taylrosville West Point Center", "The Cairns", "The District", "Union Park", "University Gardens", "University of Utah", "Village Green Center", "Vista Station", "West Jordan City Center", "West Valley Redwood Center", "Westpointe Center"]
 	},
 	{
 		"NAME":"Tooele",
-		"COUNTY":["None", "Box Elder (MPO Area)", "Davis", "Salt Lake", "Tooele", "Utah", "Weber"],
+		"COUNTY":["None", "Box Elder (MPO Area)", "Davis", "Morgan", "Salt Lake", "Tooele", "Utah", "Weber"],
 		"SUBREGION":["None"],
 		"CITY":["None", "Erda", "Grantsville", "Lake Point", "Rush Valley", "Stockton", "Tooele", "Vernon", "Wendover"],
 		"CENTER":["None", "Airport Employment Area", "Grantsville Main Street", "Industrial Area", "Lake Point", "North Tooele", "SR 36 / Bates Canyon", "SR 36 / Erda Way", "SR 36 / Harwood Pkwy", "Skywalk", "Tooele Army Depot", "Tooele Main Street", "Tooele Valley Airport"]
 	},
 	{
 		"NAME":"Utah",
-		"COUNTY":["None", "Box Elder (MPO Area)", "Davis", "Salt Lake", "Tooele", "Utah", "Weber"],
-		"SUBREGION":["None", "Central Utah County", "North Utah County", "South Utah County", "West Utah County"],
+		"COUNTY":["None", "Box Elder (MPO Area)", "Davis", "Morgan", "Salt Lake", "Tooele", "Utah", "Weber"],
+		"SUBREGION":["None", "Central Utah County", "North Utah County", "South Utah County", "Southeast Salt Lake County"],
 		"CITY":["None", "Alpine", "American Fork", "Cedar Fort", "Cedar Hills", "Draper-Utah", "Eagle Mountain", "Elk Ridge", "Fairfield", "Genola", "Goshen", "Highland", "Lehi", "Lindon", "Mapleton", "Payson", "Pleasant Grove", "Provo", "Salem", "Santaquin", "Saratoga Springs", "Spanish Fork", "Springville", "Vineyard", "Woodland Hills"],
 		"CENTER":["None", "BYU", "Crossroads", "Downtown Provo", "Downtown Springville", "Eagle Mountain", "East Bay", "Highland", "Hillcrest", "Lehi Main Street", "Lindon", "Meadows", "North Park", "Orem-1600 North", "Orem-800 North", "Orem-Center Street", "Payson Industrial", "Payson Main Street", "Pleasant Grove", "Riverwoods", "Salem", "Scera Park", "Spanish Fork Industrial", "Spanish Fork Main Street", "Spanish Fork West", "Springville Industrial Park", "Thanksgiving Point", "Timpanogos", "UVU", "UVU West", "University Center", "Vineyard", "West Orem"]
 	},
 	{
 		"NAME":"Weber",
-		"COUNTY":["None", "Box Elder (MPO Area)", "Davis", "Salt Lake", "Tooele", "Utah", "Weber"],
+		"COUNTY":["None", "Box Elder (MPO Area)", "Davis", "Morgan", "Salt Lake", "Tooele", "Utah", "Weber"],
 		"SUBREGION":["None", "North Davis County", "North Weber County", "South Weber County"],
-		"CITY":["None", "Farr West", "Harrisville", "Hooper", "Marriott-Slaterville", "North Ogden", "Ogden", "Plain City", "Pleasant View", "Riverdale", "Roy", "South Ogden", "Uintah", "Washington Terrace", "West Haven"],
-		"CENTER":["None", "Business Depot Ogden", "Farr West 2700 North", "Five Points", "Harrisville US 89", "Marriott-Slaterville Employment District", "Newgate Center", "North Ogden Downtown", "North Ogden Southtown", "Ogden 12th Street", "Ogden Airport Industrial District", "Ogden Downtown", "Ogden Harrison Boulevard North", "Ogden Harrison Boulevard South", "Plain City Gateway", "Pleasant View 2700 North", "Pleasant View Employment Center", "Riverdale City Center", "Roy Downtown", "Roy Station", "South Ogden City Center", "South Ogden Gateway", "South Ogden US 89", "Washington Terrace US 89", "Weber State University", "West 12th Street", "West Haven City Center", "West Haven Midland Drive", "West Ogden Center", "West Riverdale Center", "West Warren Center", "West Weber", "Wheeler Village"]
+		"CITY":["None", "Farr West", "Harrisville", "Hooper", "Huntsville", "Marriott-Slaterville", "North Ogden", "Ogden", "Plain City", "Pleasant View", "Riverdale", "Roy", "South Ogden", "Uintah", "Washington Terrace", "West Haven"],
+		"CENTER":["None", "Business Depot Ogden", "Eden City Center", "Eden Park", "Farr West 2700 North", "Five Points", "Harrisville US 89", "Huntsville City Center", "Lakeside Resort Properties", "Marriott-Slaterville Employment District", "Newgate Center", "North Ogden Downtown", "North Ogden Southtown", "Ogden 12th Street", "Ogden Airport Industrial District", "Ogden Downtown", "Ogden Harrison Boulevard North", "Ogden Harrison Boulevard South", "Plain City Gateway", "Pleasant View 2700 North", "Pleasant View Employment Center", "Riverdale City Center", "Roy Downtown", "Roy Station", "Snowbasin Valley Center", "South Ogden City Center", "South Ogden Gateway", "South Ogden US 89", "Southfork", "Washington Terrace US 89", "Weber State University", "West 12th Street", "West Haven City Center", "West Haven Midland Drive", "West Ogden Center", "West Riverdale Center", "West Warren Center", "West Weber", "Wheeler Village", "Wolf Creek Village"]
 	}
 ]
