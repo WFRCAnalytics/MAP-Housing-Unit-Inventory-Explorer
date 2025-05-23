@@ -6,148 +6,55 @@ const transparency = 1;
 const PtOutlineColor = [40, 40, 40];
 
 const countyRenderer = {
-    type: 'unique-value',
+    type: 'simple',
     legendOptions: {
         title: 'County',
     },
-    field: 'MPO',
-    uniqueValueInfos: [
-        {
-            value: 'WFRC',
-            label: 'WFRC',
-            symbol: {
-                type: 'simple-fill',
-                color: null,
-                outline: {
-                    color: [222, 45, 38, 1],
-                    width: 2,
-                },
-            },
+    symbol: {
+        type: 'simple-fill',
+        color: null,
+        outline: {
+            color: [222, 45, 38, 1],
+            width: 2,
         },
-        {
-            value: 'WFRC',
-            label: 'WFRC',
-            symbol: {
-                type: 'simple-fill',
-                color: null,
-                outline: {
-                    color: [222, 45, 38, 1],
-                    width: 2,
-                },
-            },
-        },
-        {
-            value: 'MAG',
-            label: 'MAG',
-            symbol: {
-                type: 'simple-fill',
-                color: null,
-                outline: {
-                    color: [222, 45, 38, 1],
-                    width: 2,
-                },
-            },
-        },
-    ],
+    },
 };
 
 const subregionRenderer = {
-    type: 'unique-value',
+    type: 'simple',
     legendOptions: {
-        title: 'County',
+        title: 'Subregion',
     },
-    field: 'MPO',
-    uniqueValueInfos: [
-        {
-            value: 'WFRC',
-            label: 'WFRC',
-            symbol: {
-                type: 'simple-fill',
-                color: null,
-                outline: {
-                    color: [222, 45, 38, 1],
-                    width: 2,
-                },
-            },
+    symbol: {
+        type: 'simple-fill',
+        color: null,
+        outline: {
+            color: [222, 45, 38, 1],
+            width: 2,
         },
-        {
-            value: 'WFRC-Box Elder',
-            label: 'WFRC-Box Elder',
-            symbol: {
-                type: 'simple-fill',
-                color: null,
-                outline: {
-                    color: [222, 45, 38, 1],
-                    width: 2,
-                },
-            },
-        },
-        {
-            value: 'MAG',
-            label: 'MAG',
-            symbol: {
-                type: 'simple-fill',
-                color: null,
-                outline: {
-                    color: [222, 45, 38, 1],
-                    width: 2,
-                },
-            },
-        },
-    ],
+    },
 };
 
 const cityRenderer = {
-    type: 'unique-value',
+    type: 'simple',
     legendOptions: {
         title: 'City',
     },
-    field: 'MPO',
-    uniqueValueInfos: [
-        {
-            value: 'WFRC',
-            label: 'WFRC',
-            symbol: {
-                type: 'simple-fill',
-                color: null,
-                outline: {
-                    color: [222, 45, 38, 1],
-                    width: 2,
-                },
-            },
+    symbol: {
+        type: 'simple-fill',
+        color: null,
+        outline: {
+            color: [222, 45, 38, 1],
+            width: 2,
         },
-        {
-            value: 'WFRC-Box Elder',
-            label: 'WFRC-Box Elder',
-            symbol: {
-                type: 'simple-fill',
-                color: null,
-                outline: {
-                    color: [222, 45, 38, 1],
-                    width: 2,
-                },
-            },
-        },
-        {
-            value: 'MAG',
-            label: 'MAG',
-            symbol: {
-                type: 'simple-fill',
-                color: null,
-                outline: {
-                    color: [222, 45, 38, 1],
-                    width: 2,
-                },
-            },
-        },
-    ],
+    },
 };
 const centerRenderer = {
     type: 'unique-value',
     legendOptions: {
-        title: 'City',
+        title: 'Center',
     },
-    field: 'AreaType',
+    field: 'CenterType',
     uniqueValueInfos: [
         {
             value: 'Metropolitan Center',
@@ -156,7 +63,7 @@ const centerRenderer = {
                 type: 'simple-fill',
                 color: null,
                 outline: {
-                    color: [241, 88, 7, 1],
+                    color: [166, 33, 101, 1],
                     width: 3,
                 },
             },
@@ -168,7 +75,7 @@ const centerRenderer = {
                 type: 'simple-fill',
                 color: null,
                 outline: {
-                    color: [231, 144, 42, 1],
+                    color: [230, 89, 55, 1],
                     width: 3,
                 },
             },
@@ -180,7 +87,7 @@ const centerRenderer = {
                 type: 'simple-fill',
                 color: null,
                 outline: {
-                    color: [252, 182, 34, 1],
+                    color: [242, 160, 62, 1],
                     width: 3,
                 },
             },
@@ -192,7 +99,7 @@ const centerRenderer = {
                 type: 'simple-fill',
                 color: null,
                 outline: {
-                    color: [254, 219, 151, 1],
+                    color: [248, 220, 38, 1],
                     width: 3,
                 },
             },
@@ -204,7 +111,19 @@ const centerRenderer = {
                 type: 'simple-fill',
                 color: null,
                 outline: {
-                    color: [190, 190, 190, 1],
+                    color: [178, 178, 178, 1],
+                    width: 3,
+                },
+            },
+        },
+        {
+            value: 'Retail District',
+            label: 'Retail District',
+            symbol: {
+                type: 'simple-fill',
+                color: null,
+                outline: {
+                    color: [244, 202, 205, 1],
                     width: 3,
                 },
             },
@@ -216,7 +135,7 @@ const centerRenderer = {
                 type: 'simple-fill',
                 color: null,
                 outline: {
-                    color: [193, 160, 203, 1],
+                    color: [222, 210, 232, 1],
                     width: 3,
                 },
             },
@@ -228,19 +147,19 @@ const centerRenderer = {
                 type: 'simple-fill',
                 color: null,
                 outline: {
-                    color: [216, 161, 159, 1],
+                    color: [244, 171, 205, 1],
                     width: 3,
                 },
             },
         },
         {
-            value: 'Educational Center',
-            label: 'Educational Center',
+            value: 'Educational District',
+            label: 'Educational District',
             symbol: {
                 type: 'simple-fill',
                 color: null,
                 outline: {
-                    color: [27, 185, 209, 1],
+                    color: [186, 217, 214, 1],
                     width: 3,
                 },
             },

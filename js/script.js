@@ -273,9 +273,19 @@ require([
         visible: false,
     });
 
+    // const centersLayer = new FeatureLayer({
+    //     outFields: ['AreaName', 'AreaType'],
+    //     url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/Boundaries_gdb/FeatureServer/2',
+    //     renderer: centerRenderer,
+    //     maxScale: 0,
+    //     // minScale: 50000,
+    //     visible: false,
+    //     popupTemplate: centerPopupTemplate,
+    // });
+
     const centersLayer = new FeatureLayer({
-        outFields: ['AreaName', 'AreaType'],
-        url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/Boundaries_gdb/FeatureServer/2',
+        outFields: ['CenterName', 'CenterType'],
+        url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/WCV_Centers_and_Regional_Land_Uses/FeatureServer/0',
         renderer: centerRenderer,
         maxScale: 0,
         // minScale: 50000,
@@ -1236,12 +1246,12 @@ require([
         hideAndResetDefinition(countiesLayer);
         hideAndResetDefinition(subregionsLayer);
         hideAndResetDefinition(citiesLayer);
-        centersLayer.definitionExpression = `AreaName = '${selectionText}'`;
+        centersLayer.definitionExpression = `CenterName = '${selectionText}'`;
         centersLayer.visible = true;
 
         // zoom to the boundary layer instead
         const query = new Query();
-        query.where = `AreaName = '${selectionText}'`;
+        query.where = `CenterName = '${selectionText}'`;
         centersLayer.queryExtent(query).then((results) => {
             view.goTo(results.extent);
         });
@@ -1347,9 +1357,9 @@ require([
         hideAndResetDefinition(citiesLayer);
 
         if (Array.isArray(selection) === false) {
-            centersLayer.definitionExpression = `AreaType IN ('${selection}')`;
+            centersLayer.definitionExpression = `CenterType IN ('${selection}')`;
         } else {
-            centersLayer.definitionExpression = `AreaType IN (${selection})`;
+            centersLayer.definitionExpression = `CenterType IN (${selection})`;
         }
         centersLayer.visible = true;
 
@@ -3219,7 +3229,7 @@ require([
                 citiesLayer.visible = true;
             }
             if (centerParam) {
-                centersLayer.definitionExpression = `AreaName = '${centerParam}'`;
+                centersLayer.definitionExpression = `CenterName = '${centerParam}'`;
                 centersLayer.visible = true;
             }
 
