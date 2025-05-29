@@ -116,7 +116,7 @@ require([
             // full min max of time slider
             fullTimeExtent: {
                 start: new Date(1850, 0, 1),
-                end: new Date(2025, 0, 1),
+                end: new Date(2026, 0, 1),
             },
             // starting min max of time slider
             timeExtent: {
@@ -593,7 +593,7 @@ require([
             const yeerEnd = yearParam.split('_')[1];
             timeSlider.timeExtent.start = new Date(yeerStart, 0, 1);
             timeSlider.timeExtent.end = new Date(yeerEnd, 0, 1);
-            yearQuery = `(APX_BLT_YR >= ${yeerStart} AND APX_BLT_YR <= ${yeerEnd})`;
+            yearQuery = `(APX_BLT_YR >= ${yeerStart} AND APX_BLT_YR < ${yeerEnd})`;
         }
 
         // routine for timeslider stored in function
@@ -607,7 +607,7 @@ require([
             window.history.replaceState({ additionalInformation: 'Updated the URL with JS' }, '', newURL);
 
             // update active query
-            yearQuery = `(APX_BLT_YR >= ${yStart} AND APX_BLT_YR <= ${yEnd})`;
+            yearQuery = `(APX_BLT_YR >= ${yStart} AND APX_BLT_YR < ${yEnd})`;
             generateFullQuery();
             updateChartsUsingActiveLayerView();
         }
