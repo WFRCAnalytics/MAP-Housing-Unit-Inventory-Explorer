@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+
+    <title>
+      Intro to clustering | Sample | ArcGIS Maps SDK for JavaScript 4.32
+    </title>
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+        background: rgba(50, 50, 50);
+      }
+      #infoDiv {
+        padding: 10px;
+      }
+    </style>
+
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.32/esri/themes/dark/main.css"
+    />
+    <script src="https://js.arcgis.com/4.32/"></script>
+
+    <script>
+      require([
+        'esri/Map',
+        'esri/layers/FeatureLayer',
+        'esri/layers/GeoJSONLayer',
+        'esri/views/MapView',
+        'esri/widgets/Legend',
+        'esri/widgets/Expand',
+        'esri/widgets/Home',
+        'esri/layers/support/AggregateField',
+      ], (
+        Map,
+        FeatureLayer,
+        GeoJSONLayer,
+        MapView,
+        Legend,
+        Expand,
+        Home,
+        AggregateField
+      ) => {
+        // Configures clustering on the layer. A cluster radius
+        // of 100px indicates an area comprising screen space 100px
+        // in length from the center of the cluster
+
+        const clusterConfig = {
+          type: 'cluster',
+          clusterRadius: '100px',
+          fields: [
+            new AggregateField({
+              name: 'UNIT_COUNT_SUM',
+              onStatisticField: 'UNIT_COUNT',
+              statisticType: 'sum',
+            }),
+          ],
+          // {cluster_count} is an aggregate field containing
+          // the number of features comprised by the cluster
+          popupTemplate: {
+            title: 'Cluster summary',
+            content: 'This cluster represents {UNIT_COUNT_SUM} housing units.',
+            fieldInfos: [
+              {
+                fieldName: 'UNIT_COUNT_SUM',
+                format: {
+                  places: 0,
+                  digitSeparator: true,
+                },
+              },
+            ],
+          },
+          clusterMinSize: '24px',
+          clusterMaxSize: '60px',
+          labelingInfo: [
+            {
+              deconflictionStrategy: 'none',
+              labelExpressionInfo: {
+                expression: `
+          var n = $feature.UNIT_COUNT_SUM;
+          var abs = Abs(n);
+          var sign = IIF(n < 0, "-", "");
+          IIF(abs >= 1000000000, sign + Text(Round(abs / 1e9, 1)) + "B",
+          IIF(abs >= 1000000, sign + Text(Round(abs / 1e6, 1)) + "M",
+          IIF(abs >= 1000, sign + Text(Round(abs / 1e3, 1)) + "k",
+          Text(n, "#,###"))))
+        `,
+              },
+              symbol: {
+                type: 'text',
+                color: '#004a5d',
+                font: {
+                  weight: 'bold',
+                  family: 'Noto Sans',
+                  size: '12px',
+                },
+              },
+              labelPlacement: 'center-center',
+            },
+          ],
+        };
+
+        const dPixelSize = '6px';
+        const dOutlineWidth = 1;
+        const transparency = 1;
+        const PtOutlineColor = [40, 40, 40];
+        const ptRendererType = {
+          type: 'unique-value',
+          legendOptions: {
+            title: 'Housing Type',
+          },
+          field: 'SUBTYPE',
+          uniqueValueInfos: [
+            {
+              value: 'single_family',
+              label: 'Single Family',
+              symbol: {
+                type: 'simple-marker',
+                color: [250, 236, 167, transparency], // [R,G,B, Transparency]
+                size: dPixelSize,
+                outline: {
+                  color: PtOutlineColor,
+                  width: dOutlineWidth,
+                },
+              },
+            },
+            {
+              value: 'duplex',
+              label: 'Duplex',
+              symbol: {
+                type: 'simple-marker',
+                color: [252, 146, 31, transparency],
+                size: dPixelSize,
+                outline: {
+                  color: PtOutlineColor,
+                  width: dOutlineWidth,
+                },
+              },
+            },
+            {
+              value: 'single_family_adu',
+              label: 'Single Family ADU',
+              symbol: {
+                type: 'simple-marker',
+                color: [230, 0, 73, transparency],
+                size: dPixelSize,
+                outline: {
+                  color: PtOutlineColor,
+                  width: dOutlineWidth,
+                },
+              },
+            },
+            {
+              value: 'townhome',
+              label: 'Townhome',
+              symbol: {
+                type: 'simple-marker',
+                color: [40, 200, 48, transparency],
+                size: dPixelSize,
+                outline: {
+                  color: PtOutlineColor,
+                  width: dOutlineWidth,
+                },
+              },
+            },
+            {
+              value: 'condo',
+              label: 'Condo',
+              symbol: {
+                type: 'simple-marker',
+                color: [158, 85, 156, transparency],
+                size: dPixelSize,
+                outline: {
+                  color: PtOutlineColor,
+                  width: dOutlineWidth,
+                },
+              },
+            },
+            {
+              value: 'mobile_home_park',
+              label: 'Mobile Home Park',
+              symbol: {
+                type: 'simple-marker',
+                color: [91, 73, 196, transparency],
+                size: dPixelSize,
+                outline: {
+                  color: PtOutlineColor,
+                  width: dOutlineWidth,
+                },
+              },
+            },
+            {
+              value: 'mixed th/single_family',
+              label: 'Townhome/Single Family',
+              symbol: {
+                type: 'simple-marker',
+                color: [30, 133, 83, transparency],
+                size: dPixelSize,
+                outline: {
+                  color: PtOutlineColor,
+                  width: dOutlineWidth,
+                },
+              },
+            },
+            {
+              value: 'apartment',
+              label: 'Apartment',
+              symbol: {
+                type: 'simple-marker',
+                color: [20, 158, 206, transparency],
+                size: dPixelSize,
+                outline: {
+                  color: PtOutlineColor,
+                  width: dOutlineWidth,
+                },
+              },
+            },
+          ],
+        };
+
+        const layer = new FeatureLayer({
+          url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/hui_for_web2_gdb/FeatureServer/1',
+          featureReduction: clusterConfig,
+          renderer: ptRendererType,
+          outFields: ['*'],
+          visible: true,
+        });
+
+        const map = new Map({
+          layers: [layer],
+          basemap: 'hybrid',
+        });
+
+        const view = new MapView({
+          container: 'viewDiv',
+          zoom: 9,
+          center: [-111.91, 40.8],
+          map: map,
+        });
+
+        view.ui.add(
+          new Home({
+            view: view,
+          }),
+          'top-left'
+        );
+
+        const legend = new Legend({
+          view: view,
+          container: 'legendDiv',
+        });
+
+        const infoDiv = document.getElementById('infoDiv');
+        view.ui.add(
+          new Expand({
+            view: view,
+            content: infoDiv,
+            expandIcon: 'list-bullet',
+            expanded: false,
+          }),
+          'top-left'
+        );
+
+        const toggleButton = document.getElementById('cluster');
+
+        // To turn off clustering on a layer, set the
+        // featureReduction property to null
+        toggleButton.addEventListener('click', () => {
+          let fr = layer.featureReduction;
+          layer.featureReduction =
+            fr && fr.type === 'cluster' ? null : clusterConfig;
+          toggleButton.innerText =
+            toggleButton.innerText === 'Enable Clustering'
+              ? 'Disable Clustering'
+              : 'Enable Clustering';
+        });
+      });
+    </script>
+  </head>
+
+  <body>
+    <div id="viewDiv"></div>
+    <div id="infoDiv" class="esri-widget">
+      <button id="cluster" class="esri-button">Disable Clustering</button>
+      <div id="legendDiv"></div>
+    </div>
+  </body>
+</html>

@@ -258,7 +258,7 @@ require([
 
     const subregionsLayer = new FeatureLayer({
         // outFields: ['CO_NAME'],
-        url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/SubCountyArea_2019/FeatureServer',
+        url: 'https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/Boundaries_gdb/FeatureServer/3',
         renderer: subregionRenderer,
         maxScale: 0,
         visible: false,
@@ -991,7 +991,12 @@ require([
                     '',
                     newURL,
                 );
-                subregionQuery = `SUBCOUNTY = '${selectionText}'`;
+
+                if (['WFRC', 'MAG'].includes(selectionText)) {
+                    subregionQuery = `SUBCOUNTY LIKE '%(${selectionText})%'`;
+                } else {
+                    subregionQuery = `SUBCOUNTY = '${selectionText}'`;
+                }
                 subregionActive = true;
             }
 
@@ -3142,7 +3147,12 @@ require([
             }
             if (subregionParam !== 'None' && subregionParam) {
                 subregionSelect.value = subregionParam;
-                subregionQuery = `SUBCOUNTY = '${subregionParam}'`;
+
+                if (['WFRC', 'MAG'].includes(subregionParam)) {
+                    subregionQuery = `SUBCOUNTY LIKE '%(${subregionParam})%'`;
+                } else {
+                    subregionQuery = `SUBCOUNTY = '${subregionParam}'`;
+                }
             }
             if (cityParam !== 'None' && cityParam) {
                 citySelect.value = cityParam;
@@ -3221,7 +3231,7 @@ require([
                 countiesLayer.visible = true;
             }
             if (subregionParam && cityParam == null && centerParam == null) {
-                subregionsLayer.definitionExpression = `SUBCOUNTY = '${subregionParam}'`;
+                subregionsLayer.definitionExpression = `NewSA = '${subregionParam}'`;
                 subregionsLayer.visible = true;
             }
             if (cityParam && centerParam == null) {
